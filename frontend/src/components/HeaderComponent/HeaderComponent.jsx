@@ -13,14 +13,14 @@ const Header = () => {
         <Link to="/">
           <div className="text-3xl font-Dosis font-bold text-orange-500">HocPython</div>
         </Link>
-        <div className="flex items-center px-4 search rounded-full border border-gray-600 w-[420px] ">
+        <div className="flex items-center focus-within:outline focus-within:outline-1 px-4 search rounded-full border border-gray-600 w-[420px] ">
             <FontAwesomeIcon
               icon={faSearch}
               className="text-lg text-gray-500"
             />
             <input
               type="text"
-              className="pl-6 pr-4 py-2 focus:outline-none flex-grow text-sm"
+              className="pl-6 pr-4 py-2 flex-grow text-sm focus:outline-none"
               placeholder="Tìm kiếm khóa học, bài viết, video.... "
             />
            
