@@ -11,7 +11,7 @@ import ProgressCircle from "../ProcessCircle/ProcessCircle";
 const HeaderLearingComponent = () => {
   const [progress, setProgress] = useState(0); // Tiến độ học tập
   return (
-    <header className=" bg-slate-700 w-full">
+    <header className=" bg-slate-700 w-full fixed top-0 z-10">
       <div className="flex items-center justify-between container mx-auto text-white ">
         <div className=" flex items-center gap-4 ">
           <button className="px-5 flex justify-center py-3 w-7 text-white hover:bg-slate-800">
