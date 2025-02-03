@@ -1,15 +1,30 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+
 import HeaderLearingComponent from "../../components/HeaderComponent/HeaderLearingComponent";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import YouTubePlayer from "../../components/YoutubePlayer/YoutubePlayer";
 
 export const LearningPage = () => {
   return (
     <>
       <HeaderLearingComponent />
       <main className="flex h-screen mt-10">
-        <div className="flex basis-9/12 ">hello</div>
+        <div className="flex basis-9/12 flex-col gap-4 ">
+          <YouTubePlayer url="https://youtu.be/x0fSBAgBrOQ?si=urOWi8iOkcqljMMY" />
+          <div className="px-20">
+            <h2 className="text-2xl font-bold mt-4">Bài 1: Giới thiệu về React</h2>
+            <p className="text-gray-700 text-sm">Cập nhật tháng 2 năm 2025</p>
+            <p title="hello" className="text-gray-500 mt-4">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam
+              voluptates, nesciunt, quos doloremque, quas quae quidem
+              exercitationem magni doloribus quia repellendus. Quisquam
+              voluptates, nesciunt, quos doloremque, quas quae quidem
+              exercitationem magni doloribus quia repellendus.
+            </p>
+          </div>
+        </div>
         <div className="flex basis-3/12 ">
-          <div className="w-80 h-full bg-white rounded-lg shadow-md py-4 fixed right-0">
+          <div className="w-80 h-full bg-white shadow-md py-4 fixed right-0">
             <h2 className="text-xl font-bold text-center mb-4">Nội dung khóa học</h2>
             <ul className="list flex flex-col gap-2">
               <li className="flex justify-between flex-col items-start hover:bg-gray-100 p-2 cursor-pointer" >
@@ -38,6 +53,16 @@ export const LearningPage = () => {
           </div>
         </div>
       </main>
+      <div className="flex justify-center py-4 items-center ">
+        <button className="px-4 py-2 text-white ml-2 text-sm font-medium bg-blue-500 uppercase rounded-full "> 
+          <FontAwesomeIcon icon={faChevronLeft} />
+          Bài trước
+        </button>
+        <button title="Phím tắt: Ctrl + Enter" className="px-4 py-2 text-white ml-2 text-sm font-medium bg-blue-500 uppercase rounded-full ">
+          Bài tiếp theo
+          <FontAwesomeIcon icon={faChevronRight} />
+        </button>
+      </div>
     </>
   );
 };
