@@ -1,6 +1,7 @@
 
 
 import HomePage from "../pages/HomePage/HomePage";
+import { LearningPage } from "../pages/LearningPage/LearningPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 
 import SignInPage from "../pages/SignInPage/SignInPage";
@@ -25,8 +26,13 @@ const routes = [
     isShowHeader: false,
   },
   {
-    path: "sign-up",
+    path: "/sign-up",
     page: SignUpPage,
+    isShowHeader: false,
+  },
+  {
+    path: "/learning",
+    page: LearningPage,
     isShowHeader: false,
   }
  

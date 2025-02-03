@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faNewspaper, faRoad } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faHouse, faNewspaper, faRoad } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
  const AsideComponent = () => {
   return (
-    <aside className=" md:block lg:block basis-1/12 bg-white container px-4">
-        <ul className="py-4 grid grid-cols-1 gap-2">
+    <aside className=" md:block lg:block basis-1/12 bg-white min-h-full container px-4 py-4 flex flex-col justify-between">
+        <ul className=" grid grid-cols-1 gap-2">
             <li >
                 <Link className="rounded-2xl border px-1 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
                     <FontAwesomeIcon icon={faHouse} />
@@ -26,6 +26,9 @@ import { Link } from "react-router-dom";
             </li>
             
         </ul>
+        <div className="flex items-center justify-center">
+            <Link><FontAwesomeIcon icon={faBullhorn} /></Link>
+        </div>
     </aside>
   )
 }
