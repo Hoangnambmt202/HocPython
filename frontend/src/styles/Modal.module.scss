@@ -1,0 +1,36 @@
+.modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50;
+  }
+  
+  .modal-container {
+    @apply bg-slate-100 rounded-lg shadow-lg p-6;
+
+    min-width: 500px;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 5s ease-out, opacity 0.3s ease-out;
+  }
+  
+  .modal-open {
+    transform: scale(1);
+    opacity: 1;
+  }
+  
+  .modal-header {
+    @apply flex flex-col max-w-[80%] mx-auto  justify-center items-center;
+  }
+  
+  .modal-title {
+    @apply text-2xl font-bold;
+  }
+  
+  .modal-body {
+    @apply flex flex-col items-center text-center;
+  }
+  
+
+  
+  .close-btn {
+    @apply text-white bg-gray-500 rounded-full p-2 w-10 hover:bg-gray-600;
+  }
+  

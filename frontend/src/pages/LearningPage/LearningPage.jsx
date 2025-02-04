@@ -5,14 +5,16 @@ import HeaderLearingComponent from "../../components/HeaderComponent/HeaderLeari
 import YouTubePlayer from "../../components/YoutubePlayer/YoutubePlayer";
 
 export const LearningPage = () => {
+ 
+
   return (
     <>
       <HeaderLearingComponent />
       <main className="flex h-screen mt-10">
         <div className="flex basis-9/12 flex-col gap-4 ">
-          <YouTubePlayer url="https://youtu.be/x0fSBAgBrOQ?si=urOWi8iOkcqljMMY" />
+          <YouTubePlayer url="https://youtu.be/NZj6LI5a9vc?si=3iO9KnNYfA53crWG" />
           <div className="px-20">
-            <h2 className="text-2xl font-bold mt-4">Bài 1: Giới thiệu về React</h2>
+            <h2 className="text-2xl font-bold mt-4">Bài 1: Giới thiệu về Python</h2>
             <p className="text-gray-700 text-sm">Cập nhật tháng 2 năm 2025</p>
             <p title="hello" className="text-gray-500 mt-4">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam
@@ -30,7 +32,7 @@ export const LearningPage = () => {
               <li className="flex justify-between flex-col items-start hover:bg-gray-100 p-2 cursor-pointer" >
                 <div className="flex justify-between items-center w-full">
                   <a href="#" className="block font-bold">
-                    Bài 1: Giới thiệu về React
+                    Bài 1: Giới thiệu về Python
                   </a>
                   <FontAwesomeIcon icon={faChevronDown} />
                 </div>
@@ -41,7 +43,7 @@ export const LearningPage = () => {
               <li className="flex justify-between flex-col items-start hover:bg-gray-100 p-2 cursor-pointer" >
                 <div className="flex justify-between items-center w-full">
                   <a href="#" className="block font-bold">
-                    Bài 2: Cài đặt môi trường
+                    Bài 2: Cài đặt môi trường Python
                   </a>
                   <FontAwesomeIcon icon={faChevronDown} />
                 </div>
