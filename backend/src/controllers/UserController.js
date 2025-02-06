@@ -55,10 +55,11 @@ const loginUser = async (req, res) => {
     
 
     const response = await UserService.loginUser(req.body);
+        
     const {refresh_token, ...newResponse } = response;
     res.cookie('refresh_token',refresh_token,{
-      HttpOnly:true,
-      Secure:true,
+      httpOnly:true,
+      secure:true,
     });
     return res.status(200).json(response);
 
@@ -141,7 +142,7 @@ const getDetailUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    const token = req.headers["authorization"].split(" ")[1];
+    const token = req.cookies["refresh_token"];
     if (!token) {
       return res.status(200).json({
         status: "err",
@@ -151,6 +152,7 @@ const refreshToken = async (req, res) => {
 
     const response = await JwtService.refreshToken(token);
     return res.status(200).json(response);
+    return
   } catch (e) {
     return res.status(404).json({
       message: e,

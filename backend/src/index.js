@@ -4,7 +4,7 @@ const cors = require("cors");
 const { mongoose } = require("mongoose");
 const routes = require("./routes");
 const bodyParser = require("body-parser");
-
+const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = process.env.PORT;
 
@@ -12,6 +12,7 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cookieParser());
 // Routes
 routes(app);
 

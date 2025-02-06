@@ -10,17 +10,25 @@ import RegisterFormComponent from "../RegisterFormComponent/RegisterFormComponen
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login"); // "login" hoặc "register"
-  
+  const [user, setUser] = useState(null);
   const openModal = (type) => {
     setModalType(type);
     setIsOpen(true);
   };
- 
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);  
+    setIsOpen(false);
+    console.log("User logged in:", userData); // 
+  };
+  
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
       <div className="container flex justify-between px-4 py-4 mx-auto lg:justify-between">
         <Link to="/">
-          <div className="text-3xl font-Dosis font-bold text-orange-500">HocPython</div>
+          <div className="text-3xl font-Dosis font-bold text-orange-500">
+            HocPython
+          </div>
         </Link>
 
         {/* Search Bar */}
@@ -34,30 +42,68 @@ const Header = () => {
         </div>
 
         {/* User Actions */}
-        <ul className="flex items-center">
-          <li>
-          <button 
-              onClick={() => openModal("register")} 
-              className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500">
-              Đăng ký
-            </button>
+        {
+          user ? (
             
-          </li>
-          <li>
-            <button
-              onClick={() => openModal("login")}
-              className="px-4 py-2 text-white ml-2 text-sm font-medium bg-orange-500 rounded-full"
-            >
-              Đăng nhập
-            </button>
-               {/* Modal */}
-          </li>
-        </ul>
-        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={modalType === "login" ? "Đăng nhập vào HocPython" : "Đăng ký tài khoản"}>
-          {modalType === "login" ? <LoginFormComponent switchToRegister={() => setModalType("register")} /> : <RegisterFormComponent switchToLogin={() => setModalType("login")} />}
-        </Modal>
-
-     
+            <div className="flex items-center">
+              <Link to="/profile" className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500">
+                {user.email}
+              </Link>
+              <button
+                onClick={() => setUser(null)}
+                className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
+              >
+                Đăng xuất
+              </button>
+            </div>
+          ) : (
+            <>
+            <ul className="flex items-center">
+              <li>
+                <button
+                  onClick={() => openModal("register")}
+                  className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
+                >
+                  Đăng ký
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => openModal("login")}
+                  className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
+                >
+                  Đăng nhập
+                </button>
+              </li>
+            </ul>
+             <Modal
+             isOpen={isOpen}
+             setIsOpen={setIsOpen}
+             onClose={() => setIsOpen(false)}
+             title={
+               modalType === "login"
+                 ? "Đăng nhập vào HocPython"
+                 : "Đăng ký tài khoản"
+             }
+             
+           >
+             {modalType === "login" ? (
+               <LoginFormComponent
+                 switchToRegister={() => setModalType("register")}
+                 setIsOpen = {setIsOpen}
+                 onLoginSuccess={handleLoginSuccess}
+                 
+               />
+             ) : (
+               <RegisterFormComponent
+                 switchToLogin={() => setModalType("login")}
+               />
+             )}
+           </Modal>
+           </>
+          )
+        }
+      
       </div>
     </header>
   );

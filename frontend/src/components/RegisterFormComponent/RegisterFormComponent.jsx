@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import UserService from "../../services/UserService";
 import { useMutation } from "@tanstack/react-query";
-import LoadingComponent from "../LoadingComponent copy/LoadingComponent";
-import InputFormComponent from "../InputFormComponent copy/InputFormComponent";
+import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import InputFormComponent from "../InputFormComponent/InputFormComponent";
 import { useState } from "react";
 
 // eslint-disable-next-line react/prop-types
@@ -30,11 +30,11 @@ const RegisterFormComponent = ({ switchToLogin }) => {
     mutationFn: UserService.registerUser,
     onSuccess: (data) => {
       setMessage(data.message || "Đăng ký thành công!");
-      setMessageType("success"); // Thông báo thành công
+      setMessageType("success");
     },
     onError: (error) => {
       setMessage(error.response?.data?.message || "Đã xảy ra lỗi!");
-      setMessageType("error"); // Thông báo lỗi
+      setMessageType("error"); 
     },
   });
 
@@ -49,8 +49,6 @@ const RegisterFormComponent = ({ switchToLogin }) => {
       setMessageType("error");
       return;
     }
-    console.log("Calling mutate...");
-    console.log("Mutation object:", mutation);
 
     mutation.mutate(
       { email, phone, password, confirmPassword },
@@ -73,6 +71,7 @@ const RegisterFormComponent = ({ switchToLogin }) => {
   };
   return (
     <div className="flex flex-col w-full max-w-[80%] mx-auto">
+      <h3 className="text-2xl font-bold mb-4">Đăng ký</h3>
       {mutation.isPending && <LoadingComponent />}
       <InputFormComponent
         placeholder="Email đăng ký"
