@@ -1,7 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie"; // Import thư viện Cookies
 
 import Modal from "../ModalComponent/ModalComponent";
 import LoginFormComponent from "../LoginFormComponent/LoginFormComponent";
@@ -11,16 +12,39 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login"); // "login" hoặc "register"
   const [user, setUser] = useState(null);
+
+  
   const openModal = (type) => {
     setModalType(type);
     setIsOpen(true);
   };
+  useEffect(() => {
+    const storedUser = Cookies.get("user"); // Lấy user từ cookies
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Lỗi khi phân tích JSON:", error);
+        Cookies.remove("user"); // Xóa nếu lỗi
+      }
+    }
+  }, []);
   const handleLoginSuccess = (userData) => {
-    setUser(userData);  
+    if (userData) {
+      setUser(userData.data);
+      Cookies.set("user", JSON.stringify(userData.data), { expires: 7 }); 
+    } else {
+      console.error("User data is undefined");
+    }
     setIsOpen(false);
-    console.log("User logged in:", userData); // 
   };
+ 
   
+
+  const handleLogout = () => {
+    Cookies.remove("user");  // Hoặc sessionStorage.removeItem("user");
+    setUser(null);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
@@ -46,15 +70,21 @@ const Header = () => {
           user ? (
             
             <div className="flex items-center">
-              <Link to="/profile" className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500">
-                {user.email}
-              </Link>
               <button
-                onClick={() => setUser(null)}
-                className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
               >
-                Đăng xuất
+                  Khóa học của tôi
               </button>
+              
+              <FontAwesomeIcon icon={faBell}/>
+              <Link to="/profile" className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500">
+                {
+                  user.name
+                  
+                }
+              </Link>
+              
             </div>
           ) : (
             <>

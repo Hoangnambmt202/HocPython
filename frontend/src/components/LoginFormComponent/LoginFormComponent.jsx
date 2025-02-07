@@ -8,7 +8,7 @@ import { faChevronCircleLeft, faUser } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import {  useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 import styles from "../../styles/Modal.module.scss";
 import UserService from "../../services/UserService";
@@ -59,7 +59,7 @@ const LoginFormComponent = ({ switchToRegister ,setIsOpen, onLoginSuccess }) => 
   const [message, setMessage] = useState(""); // Thêm trạng thái lưu thông báo
   const [messageType, setMessageType] = useState(""); // Lưu loại thông báo ('success' hoặc 'error')
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const handleMenuClick = (item) => {
     if (item.children) {
       setHistory([...history, item.children]);
@@ -88,8 +88,8 @@ const LoginFormComponent = ({ switchToRegister ,setIsOpen, onLoginSuccess }) => 
       } else {
         setMessage(data.message || "Đăng nhập thành công!");
         setMessageType("success");
-        localStorage.setItem("user", JSON.stringify(data.user));
-        onLoginSuccess(data.user);
+        onLoginSuccess(data);
+
         setIsOpen(false); // Đóng modal
       
       }
@@ -103,28 +103,8 @@ const LoginFormComponent = ({ switchToRegister ,setIsOpen, onLoginSuccess }) => 
  
   const handleLogin = () => {
     mutation.mutate(
-      { email, password },
-      {
-        onSuccess: (data) => {
-          
-          if (data.status === "err") {
-            setMessage(data.message);
-            setMessageType("error");
-          } else {
-            setMessage(data.message || "Đăng nhập thành công!");
-            setMessageType("success");
-            localStorage.setItem("user", JSON.stringify(data.user)); 
-            onLoginSuccess(data.user);
-            setIsOpen(false) ;
-            navigate("/");
-          }
-        },
-        onError: (error) => {
-
-          setMessage(error.response?.data?.message || "Đã xảy ra lỗi!");
-          setMessageType("error");
-        },
-      }
+      { email, password }
+     
     );
   };
   
