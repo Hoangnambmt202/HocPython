@@ -33,12 +33,12 @@
   }
   
   .modal-body {
-    @apply flex flex-col items-center text-center;
+    @apply flex flex-col items-center text-center mt-4;
   }
   
 
   
   .close-btn {
-    @apply text-white bg-gray-500 rounded-full p-2 w-10 hover:bg-gray-600;
+    @apply text-white bg-gray-500 rounded-full w-[30px] h-[30px]  hover:bg-gray-600;
   }
   

@@ -1,49 +1,52 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSearch,
+
+} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie"; // Import thư viện Cookies
+import Cookies from "js-cookie";
 
 import Modal from "../ModalComponent/ModalComponent";
 import LoginFormComponent from "../LoginFormComponent/LoginFormComponent";
 import RegisterFormComponent from "../RegisterFormComponent/RegisterFormComponent";
 
-const Header = () => {
+import avatar from "../../assets/imgs/pexels-ryan-holloway-71499-242829.jpg";
+
+import CoursesMenu from "../CoursesMenu/CoursesMenu";
+import ProfileMenu from "../ProfileMenu/ProfileMenu"
+import NotificationList from "../NotificationList/NotificationList";
+
+const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [modalType, setModalType] = useState("login"); // "login" hoặc "register"
+  const [modalType, setModalType] = useState("login");
   const [user, setUser] = useState(null);
 
-  
-  const openModal = (type) => {
-    setModalType(type);
-    setIsOpen(true);
-  };
+
   useEffect(() => {
-    const storedUser = Cookies.get("user"); // Lấy user từ cookies
+    const storedUser = Cookies.get("user");
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (error) {
         console.error("Lỗi khi phân tích JSON:", error);
-        Cookies.remove("user"); // Xóa nếu lỗi
+        Cookies.remove("user");
       }
     }
   }, []);
+
   const handleLoginSuccess = (userData) => {
     if (userData) {
       setUser(userData.data);
-      Cookies.set("user", JSON.stringify(userData.data), { expires: 7 }); 
-    } else {
-      console.error("User data is undefined");
+      Cookies.set("user", JSON.stringify(userData.data), { expires: 7 });
+      setIsOpen(false);
     }
-    setIsOpen(false);
   };
- 
-  
 
   const handleLogout = () => {
-    Cookies.remove("user");  // Hoặc sessionStorage.removeItem("user");
+    Cookies.remove("user");
     setUser(null);
+  
   };
 
   return (
@@ -66,32 +69,21 @@ const Header = () => {
         </div>
 
         {/* User Actions */}
-        {
-          user ? (
+        {user ? (
+          <div className="relative flex items-center gap-4">
+           
+            <CoursesMenu/>
+            <NotificationList/>
+            <ProfileMenu avatar={avatar} handleLogout={handleLogout}/>
+
             
-            <div className="flex items-center">
-              <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
-              >
-                  Khóa học của tôi
-              </button>
-              
-              <FontAwesomeIcon icon={faBell}/>
-              <Link to="/profile" className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500">
-                {
-                  user.name
-                  
-                }
-              </Link>
-              
-            </div>
-          ) : (
-            <>
+          </div>
+        ) : (
+          <>
             <ul className="flex items-center">
               <li>
                 <button
-                  onClick={() => openModal("register")}
+                  onClick={() => setModalType("register") || setIsOpen(true)}
                   className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
                 >
                   Đăng ký
@@ -99,44 +91,41 @@ const Header = () => {
               </li>
               <li>
                 <button
-                  onClick={() => openModal("login")}
-                  className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
+                  onClick={() => setModalType("login") || setIsOpen(true)}
+                  className="px-4 py-2 text-sm font-semibold bg-orange-500 text-white rounded-full hover:bg-orange-600"
                 >
                   Đăng nhập
                 </button>
               </li>
             </ul>
-             <Modal
-             isOpen={isOpen}
-             setIsOpen={setIsOpen}
-             onClose={() => setIsOpen(false)}
-             title={
-               modalType === "login"
-                 ? "Đăng nhập vào HocPython"
-                 : "Đăng ký tài khoản"
-             }
-             
-           >
-             {modalType === "login" ? (
-               <LoginFormComponent
-                 switchToRegister={() => setModalType("register")}
-                 setIsOpen = {setIsOpen}
-                 onLoginSuccess={handleLoginSuccess}
-                 
-               />
-             ) : (
-               <RegisterFormComponent
-                 switchToLogin={() => setModalType("login")}
-               />
-             )}
-           </Modal>
-           </>
-          )
-        }
-      
+
+            <Modal
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              onClose={() => setIsOpen(false)}
+              title={
+                modalType === "login"
+                  ? "Đăng nhập vào HocPython"
+                  : "Đăng ký tài khoản"
+              }
+            >
+              {modalType === "login" ? (
+                <LoginFormComponent
+                  switchToRegister={() => setModalType("register")}
+                  setIsOpen={setIsOpen}
+                  onLoginSuccess={handleLoginSuccess}
+                />
+              ) : (
+                <RegisterFormComponent
+                  switchToLogin={() => setModalType("login")}
+                />
+              )}
+            </Modal>
+          </>
+        )}
       </div>
     </header>
   );
 };
 
-export default Header;
+export default HeaderComponent;

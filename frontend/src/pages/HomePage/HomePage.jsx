@@ -44,14 +44,22 @@ const HomePage = () => {
 
   return (
     <div className="flex w-full h-full bg-white" >
+      
       <AsideComponent />
       <div className="container px-4 py-4 mx-auto basis-11/12">
         <CarouselComponent button="Học thử miễn phí" />
         <div className="grid grid-rows-1 gap-4 mb-8" >
+          <div className="flex justify-end">
+            <select className="w-fit border p-2 rounded-md">
+              <option value="latest">Mới nhất</option>
+              <option value="popular">Phổ biến</option>
+              <option value="free">Miễn phí</option>
+            </select>
+          </div>
             <div className="category text-2xl font-bold">Khóa học Miễn phí</div>
             <div className="grid grid-cols-4 gap-4 ">
             {courses.map((course, index) => (
-                <Link to={`/learning/${course.id}`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
+                <Link to={`/course`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
                   <img src={course.image} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
                   <div className="p-2">
                     <h3 className="text-lg font-semibold">{course.title}</h3>
@@ -71,7 +79,7 @@ const HomePage = () => {
             <div className="category text-2xl font-bold">Khóa học Miễn phí</div>
             <div className="grid grid-cols-4 gap-4">
             {courses.map((course, index) => (
-                <Link to={`/learning/${course.id}`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
+                <Link to={`/learning`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
                   <img src={course.image} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
                   <div className="p-2">
                     <h3 className="text-lg font-semibold">{course.title}</h3>

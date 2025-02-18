@@ -1,26 +1,53 @@
 
-
+import CoursesLayout from "../layouts/CoursesLayout";
+import LearningLayout from "../layouts/LearningLayout";
+import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage/HomePage";
 import { LearningPage } from "../pages/LearningPage/LearningPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
+import ProfilePage from "../pages/ProfilePage/ProfilePage";
 
 const routes = [
   {
-    path: "/",
-    page: HomePage,
-    isShowHeader: true,
+   
+    layout: MainLayout,
+    children:[
+      {
+        path: "/",
+        page: HomePage
+      },
+      {
+        path: "/profile",
+        page: ProfilePage,
+      }
+    ]
   },
 
   {
     path: "*",
     page: NotFoundPage,
-    isShowHeader: false,
+    
   },
- 
   {
-    path: "/learning",
-    page: LearningPage,
-    isShowHeader: false,
+  
+    layout: CoursesLayout,
+    children: [
+      {
+        path: "/course",
+        page: CoursesLayout,
+      },
+    ]
+  },
+  {
+  
+    layout: LearningLayout,
+    children:[
+      {
+        path: "/learning",
+        page: LearningPage
+      }
+    ]
+ 
   }
  
 ];

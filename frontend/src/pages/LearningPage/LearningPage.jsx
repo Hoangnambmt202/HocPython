@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, } from "@fortawesome/free-solid-svg-icons";
 
-import HeaderLearingComponent from "../../components/HeaderComponent/HeaderLearingComponent";
 import YouTubePlayer from "../../components/YoutubePlayer/YoutubePlayer";
 
 export const LearningPage = () => {
@@ -9,8 +8,6 @@ export const LearningPage = () => {
 
   return (
     <>
-      <HeaderLearingComponent />
-      <main className="flex h-screen mt-10">
         <div className="flex basis-9/12 flex-col gap-4 ">
           <YouTubePlayer url="https://youtu.be/NZj6LI5a9vc?si=3iO9KnNYfA53crWG" />
           <div className="px-20">
@@ -54,17 +51,8 @@ export const LearningPage = () => {
             </ul>
           </div>
         </div>
-      </main>
-      <div className="flex justify-center py-4 items-center ">
-        <button className="px-4 py-2 text-white ml-2 text-sm font-medium bg-blue-500 uppercase rounded-full "> 
-          <FontAwesomeIcon icon={faChevronLeft} />
-          Bài trước
-        </button>
-        <button title="Phím tắt: Ctrl + Enter" className="px-4 py-2 text-white ml-2 text-sm font-medium bg-blue-500 uppercase rounded-full ">
-          Bài tiếp theo
-          <FontAwesomeIcon icon={faChevronRight} />
-        </button>
-      </div>
+
+     
     </>
   );
 };

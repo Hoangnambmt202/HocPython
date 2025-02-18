@@ -1,99 +1,109 @@
-import { Link } from "react-router-dom";
-import UserService from "../../services/UserService";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import UserService from "../../services/UserService";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import InputFormComponent from "../InputFormComponent/InputFormComponent";
-import { useState } from "react";
 
 // eslint-disable-next-line react/prop-types
 const RegisterFormComponent = ({ switchToLogin }) => {
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState(""); // Thêm trạng thái lưu thông báo
-  const [messageType, setMessageType] = useState(""); // Lưu loại thông báo ('success' hoặc 'error')
+  const [formData, setFormData] = useState({
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
-  const handleOnChangeEmail = (value) => {
-    setEmail(value);
+  const validateField = (name, value) => {
+    let error = "";
+    if (!value.trim()) {
+      error = "Trường này không được để trống";
+    } else if (name === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      error = "Email không hợp lệ";
+    }  else if (
+      name === "password" &&
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(value)
+    ) {
+      error = "Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt";
+    }
+    else if (name === "password" && value.length < 8) {
+      error = "Mật khẩu phải có ít nhất 8 ký tự";
+    } else if (name === "confirmPassword" && value !== formData.password) {
+      error = "Mật khẩu không khớp";
+    } else if (name === "phone" && value.length <10) {
+      error = "Số điện thoại quá ngắn hoặc không đúng"
+    }
+    return error;
   };
-  const handleOnChangePhone = (value) => {
-    setPhone(value);
+
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
-  const handleOnChangePassword = (value) => {
-    setPassword(value);
-  };
-  const handleOnChangeConfirmPassword = (value) => {
-    setConfirmPassword(value);
-  };
+
+
   const mutation = useMutation({
     mutationFn: UserService.registerUser,
     onSuccess: (data) => {
-      setMessage(data.message || "Đăng ký thành công!");
+      setMessage(data.message);
       setMessageType("success");
+      setTimeout(() => {
+        switchToLogin()
+      }, 2000);
     },
     onError: (error) => {
       setMessage(error.response?.data?.message || "Đã xảy ra lỗi!");
-      setMessageType("error"); 
+      setMessageType("error");
     },
   });
 
   const handleSignUp = () => {
-    if (!email || !phone || !password || !confirmPassword) {
-      setMessage("Vui lòng nhập đầy đủ thông tin.");
-      setMessageType("error");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setMessage("Mật khẩu và xác nhận mật khẩu không khớp.");
-      setMessageType("error");
-      return;
-    }
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      newErrors[key] = validateField(key, formData[key]);
+    });
 
-    mutation.mutate(
-      { email, phone, password, confirmPassword },
-      {
-        onSuccess: (data) => {
-          if (data.status === "err") {
-            setMessage(data.message);
-            setMessageType("error");
-          } else {
-            setMessage(data.message || "Đăng ký thành công!");
-            setMessageType("success");
-          }
-        },
-        onError: (error) => {
-          setMessage(error.response?.data?.message || "Đã xảy ra lỗi!");
-          setMessageType("error");
-        },
-      }
-    );
+    setErrors(newErrors);
+    if (Object.values(newErrors).some((error) => error)) return;
+
+    mutation.mutate(formData);
   };
+
   return (
     <div className="flex flex-col w-full max-w-[80%] mx-auto">
       <h3 className="text-2xl font-bold mb-4">Đăng ký</h3>
       {mutation.isPending && <LoadingComponent />}
       <InputFormComponent
         placeholder="Email đăng ký"
-        value={email}
-        onChange={handleOnChangeEmail}
+        value={formData.email}
+        onChange={(value) => handleChange("email", value)}
       />
+      {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+
       <InputFormComponent
         placeholder="Số điện thoại đăng ký"
-        value={phone}
-        onChange={handleOnChangePhone}
+        value={formData.phone}
+        onChange={(value) => handleChange("phone", value)}
       />
+      {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
+
       <InputFormComponent
         placeholder="Mật khẩu"
-        value={password}
-        onChange={handleOnChangePassword}
+        type="password"
+        value={formData.password}
+        onChange={(value) => handleChange("password", value)}
       />
-      <p className="text-xs mt-2 text-left  "> Mật khẩu ít nhất 8 ký tự, phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt  </p>
+      {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
+
       <InputFormComponent
         placeholder="Nhập lại mật khẩu"
-        value={confirmPassword}
-        onChange={handleOnChangeConfirmPassword}
+        type="password"
+        value={formData.confirmPassword}
+        onChange={(value) => handleChange("confirmPassword", value)}
       />
+      {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword}</p>}
 
       <button
         onClick={handleSignUp}
@@ -103,19 +113,12 @@ const RegisterFormComponent = ({ switchToLogin }) => {
         {mutation.isLoading ? "Đang đăng ký..." : "Đăng ký"}
       </button>
       {message && (
-        <span
-          className={`block mb-4 text-sm ${
-            messageType === "success" ? "text-green-500" : "text-red-500"
-          }`}
-        >
+        <span className={`block mb-4 text-sm ${messageType === "success" ? "text-green-500" : "text-red-500"}`}>
           {message}
         </span>
       )}
       <p className="mt-4">
-        Bạn đã có tài khoản?{" "}
-        <Link onClick={switchToLogin} className="underline text-orange-600">
-          Đăng nhập
-        </Link>
+        Bạn đã có tài khoản? <button onClick={switchToLogin} className="underline text-orange-600">Đăng nhập</button>
       </p>
     </div>
   );

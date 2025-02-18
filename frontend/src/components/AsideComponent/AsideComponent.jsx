@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullhorn, faHouse, faNewspaper, faRoad } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { BookOpenText, Swords } from "lucide-react";
 
  const AsideComponent = () => {
   return (
@@ -9,19 +10,31 @@ import { Link } from "react-router-dom";
             <li >
                 <Link className="rounded-2xl border px-1 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
                     <FontAwesomeIcon icon={faHouse} />
-                    <div className="text-xs mt-2" >Trang Chủ</div>
+                    <div className="text-xs mt-2 text-center" >Trang Chủ</div>
                 </Link>
             </li>
             <li >
                 <Link className="rounded-2xl border px-2 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
                     <FontAwesomeIcon icon={faRoad} />
-                    <div className="text-xs mt-2" >Lộ Trình</div>
+                    <div className="text-xs mt-2 text-center" >Lộ Trình</div>
+                </Link>
+            </li>
+            <li >
+                <Link className="rounded-2xl border px-2 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
+                    <BookOpenText />
+                    <div className="text-xs mt-2 text-center" >Luyện Tập</div>
+                </Link>
+            </li>
+            <li >
+                <Link className="rounded-2xl border px-2 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
+                    <Swords />
+                    <div className="text-xs mt-2 text-center" >Thi Đấu</div>
                 </Link>
             </li>
             <li >
                 <Link className="rounded-2xl border px-2 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
                     <FontAwesomeIcon icon={faNewspaper} />
-                    <div className="text-xs mt-2" >Bài Viết</div>
+                    <div className="text-xs mt-2 text-center" >Bài Viết</div>
                 </Link>
             </li>
             

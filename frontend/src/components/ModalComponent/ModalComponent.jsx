@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import styles from "../../styles/Modal.module.scss";
+import styles from "./Modal.module.scss";
 
 // eslint-disable-next-line react/prop-types
 const Modal = ({ isOpen, onClose, children }) => {

@@ -4,20 +4,20 @@ import {
   faGithub,
   faGoogle,
 } from "@fortawesome/free-brands-svg-icons";
-import { faChevronCircleLeft, faUser } from "@fortawesome/free-solid-svg-icons";
+import { ChevronLeft } from "lucide-react";
+import {  faUser } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import {  useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-// import { useNavigate } from "react-router-dom";
 
-import styles from "../../styles/Modal.module.scss";
+import styles from "../ModalComponent/Modal.module.scss";
 import UserService from "../../services/UserService";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import InputFormComponent from "../InputFormComponent/InputFormComponent";
+import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 
 // eslint-disable-next-line react/prop-types
-const LoginFormComponent = ({ switchToRegister ,setIsOpen, onLoginSuccess }) => {
- 
+const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => {
   const MENU_ITEMS = [
     {
       id: 1,
@@ -27,183 +27,158 @@ const LoginFormComponent = ({ switchToRegister ,setIsOpen, onLoginSuccess }) => 
       children: {
         title: "Đăng nhập bằng email hoặc số điện thoại",
         inputs: [
-          { id: 1, type: "text", placeholder: "Email hoặc số điện thoại" },
-          { id: 2, type: "text", placeholder: "Mật khẩu" },
+          { id: 1, type: "text", placeholder: "Email hoặc số điện thoại", field: "email" },
+          { id: 2, type: "password", placeholder: "Mật khẩu", field: "password" },
         ],
       },
     },
-    {
-      id: 2,
-      icon: faGoogle,
-      title: "Đăng nhập với Google",
-      bgColor: "bg-red-500 text-white",
-    },
-    {
-      id: 3,
-      icon: faFacebook,
-      title: "Đăng nhập với Facebook",
-      bgColor: "bg-blue-500 text-white",
-    },
-    {
-      id: 4,
-      icon: faGithub, 
-      title: "Đăng nhập với Github",
-      bgColor: "bg-black text-white",
-    },
+    { id: 2, icon: faGoogle, title: "Đăng nhập với Google", bgColor: "bg-red-500 text-white" },
+    { id: 3, icon: faFacebook, title: "Đăng nhập với Facebook", bgColor: "bg-blue-500 text-white" },
+    { id: 4, icon: faGithub, title: "Đăng nhập với Github", bgColor: "bg-black text-white" },
   ];
 
   const [history, setHistory] = useState([]);
   const curentMenu = history[history.length - 1] || null;
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState(""); // Thêm trạng thái lưu thông báo
-  const [messageType, setMessageType] = useState(""); // Lưu loại thông báo ('success' hoặc 'error')
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState({ show: false, message: "", color: "" });
 
-  // const navigate = useNavigate();
   const handleMenuClick = (item) => {
-    if (item.children) {
-      setHistory([...history, item.children]);
-    }
+    if (item.children) setHistory([...history, item.children]);
   };
-  const handleOnChange = (field, value) => {
-    if (field === "email") {
-      setEmail(value);
-    } else if (field === "password") {
-      setPassword(value);
-    }
-  };
- 
- 
 
   const handleBack = () => {
     setHistory(history.slice(0, history.length - 1));
   };
+
+  // Validate inputs
+  const validateField = (name, value) => {
+    let error = "";
+    if (!value.trim()) {
+      error = `${name === "email" ? "Email hoặc số điện thoại" : "Mật khẩu"} không được để trống`;
+    } else if (name === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      error = "Email không hợp lệ";
+    } else if (name === "password" && value.length < 6) {
+      error = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+    return error;
+  };
+
+  const handleOnChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    setErrors({ ...errors, [field]: validateField(field, value) });
+  };
+
   const mutation = useMutation({
     mutationFn: UserService.loginUser,
-  
     onSuccess: (data) => {
       if (data.status === "err") {
-        setMessage(data.message);
-        setMessageType("error");
+        setToast({ show: true, message: data.message, color: "red" });
+        setTimeout(() => setToast({ show: false, message: "", color: "" }), 3000);
       } else {
-        setMessage(data.message || "Đăng nhập thành công!");
-        setMessageType("success");
         onLoginSuccess(data);
+        
+        setToast({ show: true, message: `Đăng nhập thành công, chào mừng ${data.data.name}`, color: "green" });
 
-        setIsOpen(false); // Đóng modal
-      
+        setTimeout(() => {
+          setIsOpen(false);
+          setTimeout(() => setToast({ show: false, message: "", color: "" }), 1000);
+        }, 2000);
       }
     },
     onError: (error) => {
-      setMessage(error.response?.data?.message || "Đã xảy ra lỗi!");
-      setMessageType("error");
-      console.log(error);
+      setToast({ show: true, message: error.response?.data?.message || "Đã xảy ra lỗi!", color: "red" });
+      setTimeout(() => setToast({ show: false, message: "", color: "" }), 3000);
     },
   });
- 
+
   const handleLogin = () => {
-    mutation.mutate(
-      { email, password }
-     
-    );
+    let newErrors = {};
+    Object.keys(formData).forEach((field) => {
+      const error = validateField(field, formData[field]);
+      if (error) newErrors[field] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+    } else {
+      mutation.mutate(formData);
+    }
   };
-  
 
   return (
     <div className="w-[80%] mx-auto flex flex-col items-center">
+      {toast.show && (
+        <ToastMessageComponent
+          message={toast.message}
+          color={toast.color}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
+      )}
+
       {curentMenu ? (
-        // Hiển thị menu con nếu có
         <div>
           {mutation.isPending && <LoadingComponent />}
-          <button
-            onClick={handleBack}
-            className="text-gray-500 absolute left-14 top-10 text-3xl mb-2"
-          >
-            <FontAwesomeIcon icon={faChevronCircleLeft} />
+          <button onClick={handleBack} className="text-gray-500 flex absolute left-14 top-6 mb-2">
+            {/* <FontAwesomeIcon icon={faChevronCircleLeft} className=" text-xl mr-2"/> */}
+            <ChevronLeft />
+            <span className="text-base">Quay lại</span>
           </button>
 
           <h3 className="text-lg font-semibold mb-4">{curentMenu.title}</h3>
-          {curentMenu.inputs &&
-            curentMenu.inputs.map((input) => (
-             
+          {curentMenu.inputs.map((input) => (
+            <div key={input.id} className="mb-2 w-full">
               <InputFormComponent
-                key={input.id}
                 placeholder={input.placeholder}
-                value={input.id === 1 ? email : password}
-                onChange={(value) => handleOnChange(input.id === 1 ? "email" : "password", value)}
+                value={formData[input.field]}
+                onChange={(value) => handleOnChange(input.field, value)}
+                type={input.type}
               />
-            ))}
-          <div>
-            <button
-              disabled={mutation.isLoading}
-              onClick={handleLogin}
-              className="w-full bg-orange-500 text-white px-4 py-2 mt-4 rounded"
-            >
-              {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
-            </button>
-            {message && (
-              <span
-                className={`block mb-4 text-sm ${
-                  messageType === "success" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {message}
-              </span>
-            )}
-          </div>
+              {errors[input.field] && <p className="text-red-500 text-sm mt-1">{errors[input.field]}</p>}
+            </div>
+          ))}
+
+          <button
+            disabled={mutation.isLoading}
+            onClick={handleLogin}
+            className="w-full bg-orange-500 text-white px-4 py-2 mt-4 rounded"
+          >
+            {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
+          </button>
         </div>
       ) : (
-        // Hiển thị danh sách menu chính
         <>
           <div className={styles["modal-header"]}>
             <h1 className={styles["modal-title"]}>Đăng nhập</h1>
             <p className="text-red-500 text-sm mt-4">
-              Mỗi người nên sử dụng riêng một tài khoản. Tài khoản nhiều người
-              sử dụng sẽ bị khóa{" "}
+              Mỗi người nên sử dụng riêng một tài khoản. Tài khoản nhiều người sử dụng sẽ bị khóa
             </p>
           </div>
+
           {MENU_ITEMS.map((item) => (
             <button
               key={item.id}
               className={`w-full relative px-4 py-2 mt-2 text-sm flex justify-center items-center border rounded-full ${item.bgColor} hover:opacity-80 transition`}
               onClick={() => handleMenuClick(item)}
             >
-              <FontAwesomeIcon
-                icon={item.icon}
-                className="text-sm absolute left-4"
-              />
+              <FontAwesomeIcon icon={item.icon} className="text-sm absolute left-4" />
               <span>{item.title}</span>
             </button>
           ))}
         </>
       )}
 
-      {/* Footer */}
       <div className="mt-4 text-center">
         <p>
           Bạn chưa có tài khoản?{" "}
-          <Link
-            onClick={switchToRegister}
-            className="underline text-orange-600"
-          >
+          <button onClick={switchToRegister} className="underline text-orange-600">
             Đăng ký
-          </Link>
+          </button>
         </p>
         <p className="mt-2">
           <Link to="/" className="underline text-orange-600">
             Quên mật khẩu?
           </Link>
-        </p>
-      </div>
-
-      <div className="mt-4 text-center">
-        <p className="text-sm text-gray-500 max-w-[70%] mx-auto">
-          Việc bạn tiếp tục sử dụng trang web này đồng nghĩa với việc bạn đồng ý
-          với{" "}
-          <Link to="/terms" className="underline">
-            điều khoản sử dụng
-          </Link>{" "}
-          của chúng tôi.
         </p>
       </div>
     </div>

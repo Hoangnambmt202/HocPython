@@ -8,7 +8,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ProgressCircle from "../ProcessCircle/ProcessCircle";
 
-const HeaderLearingComponent = () => {
+const HeaderLearningComponent = () => {
+  // eslint-disable-next-line no-unused-vars
   const [progress, setProgress] = useState(0); // Tiến độ học tập
   const navigate = useNavigate();
   const goBack = () => {
@@ -68,4 +69,4 @@ const HeaderLearingComponent = () => {
     </header>
   );
 };
-export default HeaderLearingComponent;
+export default HeaderLearningComponent;
