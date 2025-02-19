@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import {Link} from "react-router-dom";
 import BaseDropdown from "../BaseDropdown/BaseDropdown";
 import { Book, GraduationCap, School, History } from "lucide-react";
 const MyCoursesMenu = () => {
@@ -102,11 +102,11 @@ const MyCoursesMenu = () => {
         </div>
         
         <div className="p-4 border-t border-gray-100">
-          <button
+          <Link to="/my-courses"
             className="w-full px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
           >
             Xem tất cả khóa học
-          </button>
+          </Link>
         </div>
       </div>
     </div>

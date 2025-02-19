@@ -1,8 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSearch,
-
-} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
@@ -10,12 +5,10 @@ import Cookies from "js-cookie";
 import Modal from "../ModalComponent/ModalComponent";
 import LoginFormComponent from "../LoginFormComponent/LoginFormComponent";
 import RegisterFormComponent from "../RegisterFormComponent/RegisterFormComponent";
-
-import avatar from "../../assets/imgs/pexels-ryan-holloway-71499-242829.jpg";
-
 import CoursesMenu from "../CoursesMenu/CoursesMenu";
 import ProfileMenu from "../ProfileMenu/ProfileMenu"
 import NotificationList from "../NotificationList/NotificationList";
+import { Search } from "lucide-react";
 
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,7 +53,8 @@ const HeaderComponent = () => {
 
         {/* Search Bar */}
         <div className="flex items-center px-4 search rounded-full border border-gray-600 w-[420px]">
-          <FontAwesomeIcon icon={faSearch} className="text-lg text-gray-500" />
+
+          <Search className="text-gray-500" width="1.25rem" height="1.25rem"/> 
           <input
             type="text"
             className="pl-6 pr-4 py-2 flex-grow text-sm focus:outline-none"
@@ -74,7 +68,7 @@ const HeaderComponent = () => {
            
             <CoursesMenu/>
             <NotificationList/>
-            <ProfileMenu avatar={avatar} handleLogout={handleLogout}/>
+            <ProfileMenu avatar={user?.avatar} handleLogout={handleLogout}/>
 
             
           </div>

@@ -4,6 +4,7 @@ import LearningLayout from "../layouts/LearningLayout";
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage/HomePage";
 import { LearningPage } from "../pages/LearningPage/LearningPage";
+import MyCoursesPage from "../pages/MyCoursesPage/MyCoursesPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 
@@ -19,6 +20,10 @@ const routes = [
       {
         path: "/profile",
         page: ProfilePage,
+      },
+      {
+        path: "/my-courses",
+        page: MyCoursesPage,
       }
     ]
   },

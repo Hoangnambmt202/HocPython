@@ -1,10 +1,23 @@
+
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, require: true },
   email: { type: String, require: true, unique: true },
   password: { type: String, require: true },
-  isAdmin: { type: Boolean, default: false, require: true },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  avatar: {
+    type: String,
+    default: '/src/assets/imgs/default-avatar.jpg',
+  },
   phone: { type: String, require: true },
   access_token: { type: String, require: true },
   refresh_token: { type: String, require: true },
