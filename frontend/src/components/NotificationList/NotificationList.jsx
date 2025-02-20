@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell } from "@fortawesome/free-solid-svg-icons";
+
 import BaseDropdown from "../BaseDropdown/BaseDropdown";
+import { Bell } from "lucide-react";
 
 const NotificationMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,9 +24,9 @@ const NotificationMenu = () => {
     }
   ];
   return (
-    <div className="relative">
+    <div className="relative ">
       <button className="relative" onClick={() => setIsOpen(true)}>
-        <FontAwesomeIcon icon={faBell} className="text-xl text-gray-700 hover:text-gray-900" />
+        <Bell width="1.25rem" height="1.25rem" className=" text-gray-700 hover:text-gray-900" />
       </button>
 
       <BaseDropdown isOpen={isOpen} setIsOpen={setIsOpen}>

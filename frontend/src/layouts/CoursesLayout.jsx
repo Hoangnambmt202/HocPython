@@ -1,9 +1,10 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+
 import AsideComponent from "../components/AsideComponent/AsideComponent"
 import FooterComponent from "../components/FooterComponent/FooterComponent"
 import HeaderComponent from "../components/HeaderComponent/HeaderComponent"
-import { faAward, faCheck } from "@fortawesome/free-solid-svg-icons"
+
 import YouTubePlayer from "../components/YoutubePlayer/YoutubePlayer"
+import { Check } from "lucide-react"
 
 const topList = [
     "Biết cách xây dựng giao diện web với HTML, CSS",
@@ -39,7 +40,7 @@ const CoursesLayout = () => {
                         {
                             topList.map((item, index)=>(
                                 <>
-                                <div key={index} ><span className="mr-1" ><FontAwesomeIcon icon={faCheck}/></span> <span className="text-sm" >{item}</span></div>
+                                <div key={index} ><span className="mr-1" ><Check/></span> <span className="text-sm" >{item}</span></div>
                                 </>
                             ))
                         }
@@ -60,19 +61,19 @@ const CoursesLayout = () => {
                 </button>
                 <div>
                     <div>
-                        <span><FontAwesomeIcon icon={faAward} /></span> 
+                        <span><Check /></span> 
                         <span>Trình độ cơ bản</span>
                     </div>
                     <div>
-                        <span><FontAwesomeIcon icon={faAward} /></span> 
+                        <span><Check /></span> 
                         <span>Tổng số 60 bài học</span>
                     </div>
                     <div>
-                        <span><FontAwesomeIcon icon={faAward} /></span> 
+                        <span><Check /></span> 
                         <span>Thời lượng 20h</span>
                     </div>
                     <div>
-                        <span><FontAwesomeIcon icon={faAward} /></span> 
+                        <span><Check /></span> 
                         <span>Học mọi lúc mọi nơi</span>
                     </div>
 

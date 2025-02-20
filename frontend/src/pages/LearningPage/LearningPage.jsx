@@ -1,7 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, } from "@fortawesome/free-solid-svg-icons";
+
 
 import YouTubePlayer from "../../components/YoutubePlayer/YoutubePlayer";
+import { ChevronDown } from "lucide-react";
 
 export const LearningPage = () => {
  
@@ -31,7 +31,7 @@ export const LearningPage = () => {
                   <a href="#" className="block font-bold">
                     Bài 1: Giới thiệu về Python
                   </a>
-                  <FontAwesomeIcon icon={faChevronDown} />
+                  <ChevronDown />
                 </div>
                 <div className="text-sm text-gray-500">
                   0/9 | 01:30:00
@@ -42,7 +42,7 @@ export const LearningPage = () => {
                   <a href="#" className="block font-bold">
                     Bài 2: Cài đặt môi trường Python
                   </a>
-                  <FontAwesomeIcon icon={faChevronDown} />
+                  <ChevronDown />
                 </div>
                 <div className="text-sm text-gray-500">
                   0/9 | 01:30:00

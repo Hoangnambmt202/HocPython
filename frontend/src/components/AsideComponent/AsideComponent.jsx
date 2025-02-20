@@ -1,7 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullhorn, faHouse, faNewspaper, faRoad } from "@fortawesome/free-solid-svg-icons";
+
 import { Link } from "react-router-dom";
-import { BookOpenText, Swords } from "lucide-react";
+import { BookOpenText, Home, MessageSquareDot, Newspaper, Swords } from "lucide-react";
+import { FaRoad } from "react-icons/fa";
 
  const AsideComponent = () => {
   return (
@@ -9,13 +9,13 @@ import { BookOpenText, Swords } from "lucide-react";
         <ul className=" grid grid-cols-1 gap-2">
             <li >
                 <Link className="rounded-2xl border px-1 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
-                    <FontAwesomeIcon icon={faHouse} />
+                    <Home />
                     <div className="text-xs mt-2 text-center" >Trang Chủ</div>
                 </Link>
             </li>
             <li >
                 <Link className="rounded-2xl border px-2 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
-                    <FontAwesomeIcon icon={faRoad} />
+                    <FaRoad />
                     <div className="text-xs mt-2 text-center" >Lộ Trình</div>
                 </Link>
             </li>
@@ -33,14 +33,14 @@ import { BookOpenText, Swords } from "lucide-react";
             </li>
             <li >
                 <Link className="rounded-2xl border px-2 py-4 bg-slate-200 text-black flex items-center justify-center flex-col " to="/">
-                    <FontAwesomeIcon icon={faNewspaper} />
+                    <Newspaper />
                     <div className="text-xs mt-2 text-center" >Bài Viết</div>
                 </Link>
             </li>
             
         </ul>
         <div className="flex items-center justify-center">
-            <Link><FontAwesomeIcon icon={faBullhorn} /></Link>
+            <Link><MessageSquareDot /></Link>
         </div>
     </aside>
   )

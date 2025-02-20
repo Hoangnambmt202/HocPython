@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import AsideComponent from "../../components/AsideComponent/AsideComponent";
 import CarouselComponent from "../../components/CarouselComponent/CarouselComponent";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUsers } from "@fortawesome/free-solid-svg-icons";
+
+import { User } from "lucide-react";
 
 
 const HomePage = () => {
@@ -66,7 +66,7 @@ const HomePage = () => {
                     <p className="text-gray-600">Giá: {course.price}</p>
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
-                    <span className="text-sm text-gray-500"><FontAwesomeIcon icon={faUsers} />: {course.students}</span>
+                    <span className="text-sm text-gray-500"><User />: {course.students}</span>
                     <span className="text-sm text-gray-500">Số giờ học: {course.hours} giờ</span>
                   </div>
                 </Link>
@@ -86,7 +86,7 @@ const HomePage = () => {
                     <p className="text-gray-600">Giá: {course.price}</p>
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
-                    <span className="text-sm text-gray-500"><FontAwesomeIcon icon={faUsers} />: {course.students}</span>
+                    <span className="text-sm text-gray-500"><User />: {course.students}</span>
                     <span className="text-sm text-gray-500">Số giờ học: {course.hours} giờ</span>
                   </div>
                 </Link>

@@ -1,6 +1,6 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+
 import styles from "./Modal.module.scss";
+import { X } from "lucide-react";
 
 // eslint-disable-next-line react/prop-types
 const Modal = ({ isOpen, onClose, children }) => {
@@ -12,7 +12,7 @@ const Modal = ({ isOpen, onClose, children }) => {
         {/* Header */}
         <div className="flex justify-end items-center">
             <button onClick={onClose} className={styles["close-btn"]}>
-              <FontAwesomeIcon icon={faXmark} />
+              <X />
             </button>
           </div>
        

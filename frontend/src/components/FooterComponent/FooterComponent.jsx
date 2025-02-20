@@ -1,6 +1,6 @@
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebookF, faInstagram, faTiktok } from "@fortawesome/free-brands-svg-icons";
+
+import { Facebook, Instagram, Twitter } from "lucide-react";
 const FooterComponent = () => {
   return (
     <footer className="py-12 bg-gray-100 border-t-2 border-gray-500 shadow-xl ">
@@ -37,11 +37,11 @@ const FooterComponent = () => {
       </div>
       <div className="container flex justify-between py-4 px-4 mx-auto">
         <p className=""> &#169; 2018 - 2025 HocPython. Nền tảng học lập trình python hàng đầu Việt Nam </p>
-        <div>
+        <div className="flex items-center gap-2">
 
-          <FontAwesomeIcon icon={faFacebookF} className="text-2xl text-blue-600 mx-2" />
-          <FontAwesomeIcon icon={faInstagram} className="text-2xl text-red-600 mx-2" />
-          <FontAwesomeIcon icon={faTiktok} className="text-2xl text-black mx-2" />
+          <Facebook className="text-2xl text-blue-600 mx-2" />
+          <Instagram className="text-2xl text-red-600 mx-2" />
+          <Twitter className="text-2xl text-black mx-2" />
         </div>
       </div>
     </footer>

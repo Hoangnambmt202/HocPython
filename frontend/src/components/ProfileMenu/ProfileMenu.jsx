@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faBookmark, faCog, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+
 import BaseDropdown from "../BaseDropdown/BaseDropdown";
+import { BookMarked, LogOut, Settings, User } from "lucide-react";
 
 const ProfileMenu = ({ avatar, handleLogout }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -22,25 +22,25 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
         <ul className="py-2">
           <li>
             <Link to="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-              <FontAwesomeIcon icon={faUser} className="mr-2" />
+              <User className="mr-2"/>
               Trang cá nhân
             </Link>
           </li>
           <li>
             <Link to="/saved-posts" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-              <FontAwesomeIcon icon={faBookmark} className="mr-2" />
+              <BookMarked className="mr-2"/>
               Bài viết đã lưu
             </Link>
           </li>
           <li>
             <Link to="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-              <FontAwesomeIcon icon={faCog} className="mr-2" />
+              <Settings className="mr-2"/>
               Cài đặt
             </Link>
           </li>
           <li>
             <button onClick={handleLogout} className="flex w-full text-left items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-              <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+              <LogOut className="mr-2" />
               Đăng xuất
             </button>
           </li>

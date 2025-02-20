@@ -1,12 +1,8 @@
-import {
-  faChevronLeft,
-  faCircleQuestion,
-  faNoteSticky,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ProgressCircle from "../ProcessCircle/ProcessCircle";
+import { ChevronLeft, CircleHelp, NotebookPen } from "lucide-react";
 
 const HeaderLearningComponent = () => {
   // eslint-disable-next-line no-unused-vars
@@ -24,7 +20,7 @@ const HeaderLearningComponent = () => {
       <div className="flex items-center justify-between container mx-auto text-white ">
         <div className=" flex items-center gap-4 ">
           <button onClick={goBack} className="px-5 flex justify-center py-3 w-7 text-white hover:bg-slate-800">
-            <FontAwesomeIcon icon={faChevronLeft} />
+            <ChevronLeft />
           </button>
           <Link to="/">
             <div className="text-3xl font-Dosis font-bold text-orange-500">
@@ -56,11 +52,11 @@ const HeaderLearningComponent = () => {
             </li>
             <li>0/10 bài học</li>
             <li>
-              <FontAwesomeIcon icon={faNoteSticky} className="mr-2" />
+              <NotebookPen className="mr-2" />
               Ghi chú
             </li>
             <li>
-              <FontAwesomeIcon icon={faCircleQuestion} className="mr-2" />
+              <CircleHelp className="mr-2" />
               Hướng dẫn
             </li>
           </ul>

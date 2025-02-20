@@ -1,11 +1,12 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import {
-  faFacebook,
-  faGithub,
-  faGoogle,
-} from "@fortawesome/free-brands-svg-icons";
+  FaFacebook,
+  FaGithub,
+  FaGoogle,
+  FaUser,
+} from "react-icons/fa";
 import { ChevronLeft } from "lucide-react";
-import {  faUser } from "@fortawesome/free-solid-svg-icons";
+
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
   const MENU_ITEMS = [
     {
       id: 1,
-      icon: faUser,
+      icon: FaUser,
       title: "Sử dụng email / số điện thoại",
       bgColor: "bg-gray-200 text-gray-600",
       children: {
@@ -32,9 +33,9 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
         ],
       },
     },
-    { id: 2, icon: faGoogle, title: "Đăng nhập với Google", bgColor: "bg-red-500 text-white" },
-    { id: 3, icon: faFacebook, title: "Đăng nhập với Facebook", bgColor: "bg-blue-500 text-white" },
-    { id: 4, icon: faGithub, title: "Đăng nhập với Github", bgColor: "bg-black text-white" },
+    { id: 2, icon: FaGoogle, title: "Đăng nhập với Google", bgColor: "bg-red-500 text-white" },
+    { id: 3, icon: FaFacebook, title: "Đăng nhập với Facebook", bgColor: "bg-blue-500 text-white" },
+    { id: 4, icon: FaGithub, title: "Đăng nhập với Github", bgColor: "bg-black text-white" },
   ];
 
   const [history, setHistory] = useState([]);
@@ -120,7 +121,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
         <div>
           {mutation.isPending && <LoadingComponent />}
           <button onClick={handleBack} className="text-gray-500 flex absolute left-14 top-6 mb-2">
-            {/* <FontAwesomeIcon icon={faChevronCircleLeft} className=" text-xl mr-2"/> */}
+          
             <ChevronLeft />
             <span className="text-base">Quay lại</span>
           </button>
@@ -161,7 +162,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
               className={`w-full relative px-4 py-2 mt-2 text-sm flex justify-center items-center border rounded-full ${item.bgColor} hover:opacity-80 transition`}
               onClick={() => handleMenuClick(item)}
             >
-              <FontAwesomeIcon icon={item.icon} className="text-sm absolute left-4" />
+              {item.icon && <item.icon className="mr-2" />}
               <span>{item.title}</span>
             </button>
           ))}

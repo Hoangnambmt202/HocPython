@@ -1,7 +1,10 @@
 
+import AdminLayout from "../layouts/AdminLayout";
 import CoursesLayout from "../layouts/CoursesLayout";
 import LearningLayout from "../layouts/LearningLayout";
 import MainLayout from "../layouts/MainLayout";
+import CourseManagement from "../pages/Admin/CoursesManagement";
+import Dashboard from "../pages/Admin/Dashboard";
 import HomePage from "../pages/HomePage/HomePage";
 import { LearningPage } from "../pages/LearningPage/LearningPage";
 import MyCoursesPage from "../pages/MyCoursesPage/MyCoursesPage";
@@ -53,6 +56,21 @@ const routes = [
       }
     ]
  
+  },
+  {
+    path: "/admin",
+    layout: AdminLayout,
+    children:[
+      {
+        path: "",
+        page: Dashboard,
+      },
+      {
+        path: "courses",
+        page: CourseManagement,
+      }
+      
+    ]
   }
  
 ];
