@@ -39,7 +39,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
   ];
 
   const [history, setHistory] = useState([]);
-  const curentMenu = history[history.length - 1] || null;
+  const currentMenu = history[history.length - 1] || null;
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState({ show: false, message: "", color: "" });
@@ -59,8 +59,8 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
       error = `${name === "email" ? "Email hoặc số điện thoại" : "Mật khẩu"} không được để trống`;
     } else if (name === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       error = "Email không hợp lệ";
-    } else if (name === "password" && value.length < 6) {
-      error = "Mật khẩu phải có ít nhất 6 ký tự";
+    } else if (name === "password" && value.length < 5) {
+      error = "Mật khẩu phải có ít nhất 5 ký tự";
     }
     return error;
   };
@@ -91,6 +91,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
       setToast({ show: true, message: error.response?.data?.message || "Đã xảy ra lỗi!", color: "red" });
       setTimeout(() => setToast({ show: false, message: "", color: "" }), 3000);
     },
+    
   });
 
   const handleLogin = () => {
@@ -117,7 +118,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
         />
       )}
 
-      {curentMenu ? (
+      {currentMenu ? (
         <div>
           {mutation.isPending && <LoadingComponent />}
           <button onClick={handleBack} className="text-gray-500 flex absolute left-14 top-6 mb-2">
@@ -126,8 +127,8 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
             <span className="text-base">Quay lại</span>
           </button>
 
-          <h3 className="text-lg font-semibold mb-4">{curentMenu.title}</h3>
-          {curentMenu.inputs.map((input) => (
+          <h3 className="text-lg font-semibold mb-4">{currentMenu.title}</h3>
+          {currentMenu.inputs.map((input) => (
             <div key={input.id} className="mb-2 w-full">
               <InputFormComponent
                 placeholder={input.placeholder}

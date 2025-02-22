@@ -57,22 +57,22 @@ const loginUser = (userLogin) => {
       
       if (!checkPassword) {
         resolve({
-          status: "OK",
+          status: "err",
           message: "Mật khẩu không đúng. Vui lòng thử lại!",
-          data: checkUser,
+     
         });
       }
       
       const access_token = await generalAccessToken(
         {
           _id: checkUser._id,
-         isAdmin : checkUser.isAdmin,
+         role : checkUser.role,
         }
       );
       const refresh_token = await generateRefreshToken(
         {
           _id: checkUser._id,
-          isAdmin : checkUser.isAdmin,
+          role : checkUser.role,
         }
       );
    

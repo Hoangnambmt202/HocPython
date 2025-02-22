@@ -10,35 +10,50 @@ import ProfileMenu from "../ProfileMenu/ProfileMenu"
 import NotificationList from "../NotificationList/NotificationList";
 import { Search } from "lucide-react";
 
+import {useDispatch, useSelector} from 'react-redux';
+
+import { logout,setUser } from "../../redux/slides/userSlides";
+
+
+
+
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.user.user);
 
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const storedUser = Cookies.get("user");
     if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Lỗi khi phân tích JSON:", error);
-        Cookies.remove("user");
-      }
+      dispatch(setUser(JSON.parse(storedUser)));
     }
-  }, []);
+  }, [dispatch]);
 
+  // const handleGetDetailUser = async (id, access_token) => { 
+  //   const res = await UserService.getDetailUser(id, access_token);
+  //   dispatch(updateUser({...res?.data,access_token: access_token}));
+  // };
   const handleLoginSuccess = (userData) => {
     if (userData) {
-      setUser(userData.data);
+      dispatch(setUser(userData.data)); // Cập nhật Redux ngay lập tức
       Cookies.set("user", JSON.stringify(userData.data), { expires: 7 });
-      setIsOpen(false);
+      localStorage.setItem("access_token", userData.access_token);
+      
+      setIsOpen(false); // Đóng modal sau khi login
     }
   };
+  
+    
+    
+  
 
   const handleLogout = () => {
     Cookies.remove("user");
-    setUser(null);
+    localStorage.removeItem("access_token");
+    dispatch(logout());
   
   };
 
@@ -68,7 +83,7 @@ const HeaderComponent = () => {
            
             <CoursesMenu/>
             <NotificationList/>
-            <ProfileMenu avatar={user?.avatar} handleLogout={handleLogout}/>
+            <ProfileMenu avatar={user.avatar} handleLogout={handleLogout}/>
 
             
           </div>

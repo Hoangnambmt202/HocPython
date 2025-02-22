@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+
 import {Link} from 'react-router-dom'
 import { BookCheck, BookMarked, Dot, Mail, Phone, SquarePen, User } from "lucide-react";
+import { useSelector } from "react-redux";
 const ProfilePage = () => {
   const courses = [
     {
@@ -83,69 +84,118 @@ const ProfilePage = () => {
     { id: 2, title: "Article 2", description: "Description of article 2" },
     // Add more articles as needed
   ];
-  const [user, setUser] = useState(null); // 👈 Khởi tạo null
-  const [loading, setLoading] = useState(true); // 👈 Thêm trạng thái loading
+  const user = useSelector((state) => state.user.user); // Lấy user từ Redux
+  const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(true);
 
   useEffect(() => {
-    const loadUser = () => {
-      try {
-        const storedUser = Cookies.get("user");
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error("Lỗi parse user:", error);
-        Cookies.remove("user");
-      } finally {
-        // 👈 Luôn tắt loading
-        setLoading(false);
-      }
-    };
-
-    loadUser();
-  }, []);
+    setLoading(false);
+  }, [user]); // Khi user thay đổi, component sẽ re-render
 
   if (loading) {
     return <div className="text-center py-8">Loading user data...</div>;
   }
 
   if (!user) {
-    return <div className="text-center py-8 text-red-500">User not found</div>;
+    return (
+      <>
+      <div className="container mx-auto p-4 bg-white">
+      <div className="flex flex-col py-10 md:flex-row">
+        <div className="md:w-1/4 container mx-auto px-4 mb-4 md:mb-0">
+       
+        <img
+            src={user?.avatar || "/src/assets/imgs/default-avatar.jpg"}
+            alt={`User Avatar ${ "Guess"}`}
+            className="w-32 h-32 rounded-full object-fill mx-auto"
+          />
+          <div className="flex items-center justify-center">
+            <h3 className="text-xl font-semibold text-center mr-2">{user?.name || "Guest"}</h3>
+            <button><SquarePen width="1rem" height="1rem" /></button>
+          </div>
+          <div className="text-gray-600 flex justify-start items-center mb-2">
+            <span className="mr-2"><Mail/></span>
+            <span>{user?.email || "Chưa cập nhật email"}</span>
+          </div>
+          <div className="text-gray-600 flex justify-start items-center mb-2">
+            <span className="mr-2"><Phone/></span>
+            <span>{user?.phone || "Chưa cập nhật số điện thoại"}</span>
+          </div>
+          <div className="text-gray-600 flex justify-start items-center mb-2">
+            <span className="mr-2"><User/></span>
+            <span>{user?.role || "Chưa cập nhật role"}</span>
+          </div>
+          <div className="text-gray-600 flex justify-start items-center mb-2">
+            <span className="mr-2"><Dot className={active == undefined ? "text-green-500" : "text-red-500" }/></span>
+            <span>{user?.isActive ? "Đang hoạt động" : "Đã Mở"}</span>
+          </div>
+
+        </div>
+        <div className="md:w-3/4 px-4 container mx-auto">
+          <header className="flex justify-between items-center mb-8">
+            <div>
+              <h3 className="text-2xl font-bold mb-2 flex items-center"> <span className="mr-2"><BookCheck/></span> Khóa học của tôi</h3>
+              <p>Bạn chưa đăng nhập để xem khóa học. Vui lòng đăng nhập!</p>
+            </div>
+            <div>
+              <select className="w-fit border p-2 rounded-md">
+                <option value="latest">Mới nhất</option>
+                <option value="popular">Phổ biến</option>
+                <option value="free">Miễn phí</option>
+              </select>
+            </div>
+          </header>
+          <div className="grid  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+            <h2>
+              Bạn chưa đăng nhập. Vui lòng đăng nhập để xem thông tin cá nhân và khóa học.
+            </h2>
+            </div>
+          <h4 className="text-2xl flex font-bold items-center mt-6 mb-3"> <span className="mr-2"><BookMarked/></span>Saved Articles</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {savedArticles.map((article) => (
+              <div
+                key={article.id}
+                className="bg-white p-4 rounded-lg shadow-md"
+              >
+                <h5 className="text-md font-semibold">{article.title}</h5>
+                <p className="text-gray-600">{article.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+      </>
+    );
   }
   return (
     <div className="container mx-auto p-4 bg-white">
       <div className="flex flex-col py-10 md:flex-row">
         <div className="md:w-1/4 container mx-auto px-4 mb-4 md:mb-0">
        
-          <img
+        <img
             src={user.avatar}
             alt={`User Avatar ${user?.name || "Guess"}`}
-            className="w-32 h-32 rounded-full object-fill mx-auto "
+            className="w-32 h-32 rounded-full object-fill mx-auto"
           />
-          <div className="flex items-center justify-center ">
-            <h3 className="text-xl font-semibold text-center mr-2 ">{user?.name || "Guess"}</h3>
-            <button ><SquarePen width="1rem" height="1rem" /></button>
+          <div className="flex items-center justify-center">
+            <h3 className="text-xl font-semibold text-center mr-2">{user?.name || "Guest"}</h3>
+            <button><SquarePen width="1rem" height="1rem" /></button>
           </div>
           <div className="text-gray-600 flex justify-start items-center mb-2">
             <span className="mr-2"><Mail/></span>
-            <span>{user?.email || "Chưa cập nhật email"}</span> 
+            <span>{user?.email || "Chưa cập nhật email"}</span>
           </div>
           <div className="text-gray-600 flex justify-start items-center mb-2">
-            <span className="mr-2">
-              <Phone/>
-            </span>
-            <span className="mr-2">
-              {user?.phone || "Chưa cập nhật số điện thoại"}
-            </span>
+            <span className="mr-2"><Phone/></span>
+            <span>{user?.phone || "Chưa cập nhật số điện thoại"}</span>
           </div>
           <div className="text-gray-600 flex justify-start items-center mb-2">
-            <span className="mr-2"><User/></span><span className="mr-2">{user?.role || "Chưa cập nhật role"}</span>
-            
+            <span className="mr-2"><User/></span>
+            <span>{user?.role || "Chưa cập nhật role"}</span>
           </div>
           <div className="text-gray-600 flex justify-start items-center mb-2">
-            <span className="mr-2"><Dot className={active ? "text-green-500" : "text-red-500" }/></span><span>{user?.isActive ? "Đang hoạt động" : "Đã khóa"}</span>
-            
+            <span className="mr-2"><Dot className={active ? "text-green-500" : "text-red-500" }/></span>
+            <span>{user?.isActive ? "Đang hoạt động" : "Đã khóa"}</span>
           </div>
 
         </div>

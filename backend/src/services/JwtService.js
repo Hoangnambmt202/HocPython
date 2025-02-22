@@ -1,7 +1,10 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
+
+
 const generalAccessToken = async (payload) => {
-  const access_token = jwt.sign({ payload }, "access_token", {
+  const access_token = jwt.sign({ ...payload }, "access_token", {
     expiresIn: process.env.ACCESS_TOKEN_LIFE,
   });
 
@@ -9,7 +12,7 @@ const generalAccessToken = async (payload) => {
 };
 
 const generateRefreshToken = async (payload) => {
-  const refresh_token = jwt.sign({ payload }, "refresh_token", {
+  const refresh_token = jwt.sign({ ...payload }, "refresh_token", {
     expiresIn: process.env.REFRESH_TOKEN_LIFE,
   });
 
@@ -28,8 +31,9 @@ const refreshToken = async (token) => {
           });
         }
         const { payload } = user;
-        const access_token = await generalAccessToken({id: payload?.id, isAdmin: payload?.isAdmin});
-        console.log('access_token:',access_token);
+        
+        const access_token = await generalAccessToken({id: payload?.id, role: payload?.role});
+
         resolve({
           status: "OK",
           message: "success",
