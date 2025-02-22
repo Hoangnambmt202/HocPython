@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 
 import Modal from "../ModalComponent/ModalComponent";
 import LoginFormComponent from "../LoginFormComponent/LoginFormComponent";
@@ -9,10 +8,9 @@ import CoursesMenu from "../CoursesMenu/CoursesMenu";
 import ProfileMenu from "../ProfileMenu/ProfileMenu"
 import NotificationList from "../NotificationList/NotificationList";
 import { Search } from "lucide-react";
-
 import {useDispatch, useSelector} from 'react-redux';
-
 import { logout,setUser } from "../../redux/slides/userSlides";
+import UserService from "../../services/UserService";
 
 
 
@@ -20,28 +18,36 @@ import { logout,setUser } from "../../redux/slides/userSlides";
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
-  // const [user, setUser] = useState(null);
   const user = useSelector((state) => state.user.user);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const storedUser = Cookies.get("user");
-    if (storedUser) {
-      dispatch(setUser(JSON.parse(storedUser)));
-    }
-  }, [dispatch]);
+    const fetchUser = async () => {
+      const access_token = localStorage.getItem("access_token");
+      if (access_token) {
+        try {
+          const res = await UserService.getDetailUser(access_token);
+          if (res?.data) {
+            
+            dispatch(setUser(res.data.data)); // Cập nhật Redux với user mới
+          }
+        } catch (error) {
+          console.error("Lỗi khi lấy thông tin user:", error);
+          localStorage.removeItem("access_token"); // Nếu lỗi, xóa token
+          dispatch(logout()); // Xóa user khỏi Redux
+        }
+      }
+    };
+  
+    fetchUser(); // Gọi hàm fetchUser
+  }, [dispatch]); // Chạy lại khi Redux dispatch thay đổi
 
-  // const handleGetDetailUser = async (id, access_token) => { 
-  //   const res = await UserService.getDetailUser(id, access_token);
-  //   dispatch(updateUser({...res?.data,access_token: access_token}));
-  // };
+
   const handleLoginSuccess = (userData) => {
     if (userData) {
       dispatch(setUser(userData.data)); // Cập nhật Redux ngay lập tức
-      Cookies.set("user", JSON.stringify(userData.data), { expires: 7 });
       localStorage.setItem("access_token", userData.access_token);
-      
       setIsOpen(false); // Đóng modal sau khi login
     }
   };
@@ -51,7 +57,7 @@ const HeaderComponent = () => {
   
 
   const handleLogout = () => {
-    Cookies.remove("user");
+    
     localStorage.removeItem("access_token");
     dispatch(logout());
   

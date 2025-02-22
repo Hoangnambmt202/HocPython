@@ -145,7 +145,7 @@ const ProfilePage = () => {
             </div>
           </header>
           <div className="grid  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-            <h2>
+            <h2 className="text-red-500 font-bold">
               Bạn chưa đăng nhập. Vui lòng đăng nhập để xem thông tin cá nhân và khóa học.
             </h2>
             </div>

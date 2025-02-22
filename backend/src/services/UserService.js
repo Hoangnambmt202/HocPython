@@ -48,8 +48,8 @@ const loginUser = (userLogin) => {
       });
       if (checkUser === null) {
         resolve({
-          status: "ÔK",
-          message: "User not found",
+          status: "err",
+          message: "Email không tồn tại. Vui lòng thử lại!",
         });
       }
       const checkPassword = bcrypt.compareSync(password, checkUser.password);
@@ -158,15 +158,14 @@ const getAllUser = () => {
 const getDetailUser = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const 
-      user = await User.findOne({ _id: id });
+      const user = await User.findById(id).select("-password");
 
       if (
         user === null) {
         resolve({
           status: "OK",
           message: "Không tìm thầy người dùng",
-          data: user,
+
         });
       }
       

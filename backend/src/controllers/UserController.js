@@ -123,14 +123,8 @@ const getAllUser = async (req, res) => {
 };
 const getDetailUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    if (!userId) {
-      return res.status(200).json({
-        status: "err",
-        message: "Không tìm thấy id người dùng",
-      });
-    }
-
+    const userId = req.user._id; // Lấy _id từ token đã giải mã
+  
   const response = await UserService.getDetailUser(userId);
     return res.status(200).json(response);
   } catch (e) {

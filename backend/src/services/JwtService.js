@@ -23,7 +23,7 @@ const generateRefreshToken = async (payload) => {
 const refreshToken = async (token) => {
   return new Promise((resolve, reject) => {
     try {
-      jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
+       jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
         if (err) {
           resolve({
             status: "err",
@@ -51,4 +51,5 @@ module.exports = {
   generalAccessToken,
   generateRefreshToken,
   refreshToken,
+
 };

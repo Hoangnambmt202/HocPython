@@ -12,13 +12,13 @@ const loginUser = async (data) => {
    // Log dữ liệu phản hồi từ server
     return res.data;
 }
-const getDetailUser = async (id, access_token) => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/get/${id}`, {
+const getDetailUser = async (access_token) => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/me`, {
         headers: {
-            Authorization: `Bearer ${access_token}`,
+            authorization: `Bearer ${access_token}`,
         },
     });
-  
+    
     return res;
 }
 
