@@ -74,8 +74,8 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
     mutationFn: UserService.loginUser,
     onSuccess: (data) => {
       if (data.status === "err") {
-        setToast({ show: true, message: data.message, color: "red" });
-        setTimeout(() => setToast({ show: false, message: "", color: "" }), 3000);
+        ;
+        setTimeout(() => setToast({ show: true, message: data.message, color: "red" }), 3000);
       } else {
         onLoginSuccess(data);
         
@@ -141,7 +141,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
           ))}
 
           <button
-            disabled={mutation.isLoading}
+            disabled={mutation.isPending}
             onClick={handleLogin}
             className="w-full bg-orange-500 text-white px-4 py-2 mt-4 rounded"
           >

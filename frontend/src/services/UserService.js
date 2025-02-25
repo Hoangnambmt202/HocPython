@@ -19,11 +19,21 @@ const getDetailUser = async (access_token) => {
         },
     });
     
+    
     return res;
 }
+const updateUser = async ({data, access_token}) => {
+    const res = await axios.put(`${import.meta.env.VITE_API_URL}/user/update`, data, {
+        headers: { authorization: `Bearer ${access_token}` },
+    });
+   
+    return res.data;
+};
+
 
 export default {
     loginUser,
     registerUser,
     getDetailUser,
+    updateUser,
 }

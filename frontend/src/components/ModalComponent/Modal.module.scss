@@ -5,9 +5,11 @@
   .modal-container {
     @apply bg-slate-100 rounded-lg shadow-lg p-6;
     min-width: 500px;
+    max-height: 560px;
     transform: scale(0);
     opacity: 0;
     transition: transform 0.2s ease-out, opacity 0.3s ease-out;
+    overflow: hidden;
   }
   @keyframes ScaleIn {
     0% {
@@ -36,9 +38,7 @@
     @apply flex flex-col items-center text-center mt-4;
   }
   
-
-  
   .close-btn {
-    @apply text-white bg-gray-500 rounded-full w-[30px] h-[30px]  hover:bg-gray-600;
+    @apply text-white bg-gray-500 rounded-full w-[30px] h-[30px] p-[3px]  hover:bg-gray-600;
   }
   

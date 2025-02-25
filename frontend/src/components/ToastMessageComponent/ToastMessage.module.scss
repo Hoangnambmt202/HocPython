@@ -1,0 +1,75 @@
+// ToastMessage.module.scss
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 300px;
+  z-index: 1000;
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  transform: translateX(100%);
+  opacity: 0;
+
+  &.visible {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  &.exiting {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  
+    .close-button {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  
+}
+.toast-content {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+}
+
+// Background colors
+.bg-blue {
+  background-color: #3b82f6;
+}
+
+.bg-red {
+  background-color: #ef4444;
+}
+
+.bg-green {
+  background-color: #22c55e;
+}
+
+.bg-yellow {
+  background-color: #eab308;
+}
+
+.bg-gray {
+  background-color: #6b7280;
+}

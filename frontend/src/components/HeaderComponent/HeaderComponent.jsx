@@ -14,12 +14,12 @@ import UserService from "../../services/UserService";
 
 
 
-
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
   const user = useSelector((state) => state.user.user);
 
+  
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -85,8 +85,8 @@ const HeaderComponent = () => {
 
         {/* User Actions */}
         {user ? (
-          <div className="relative flex items-center gap-4">
-           
+          <div className="relative flex items-center gap-4 hover:cursor-pointer">
+            
             <CoursesMenu/>
             <NotificationList/>
             <ProfileMenu avatar={user.avatar} handleLogout={handleLogout}/>

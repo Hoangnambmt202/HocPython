@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import style from "./ToastMessage.module.scss";
 // eslint-disable-next-line react/prop-types
 const ToastMessageComponent = ({ message, color, onClose, duration = 3000 }) => {
   const [visible, setVisible] = useState(false);
@@ -23,12 +23,12 @@ const ToastMessageComponent = ({ message, color, onClose, duration = 3000 }) => 
 
   return (
     <div
-      className={`fixed top-5 right-5 max-w-xs text-sm text-white rounded-xl shadow-lg transition-transform duration-500 ease-in-out transform ${
+      className={`fixed top-5 right-5 max-w-xs z-50 text-sm text-white rounded-xl shadow-lg transition-transform duration-500 ease-in-out transform ${
         visible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
       } ${bgColor}`}
       role="alert"
     >
-      <div className="flex p-4">
+      <div className={style["toast-content"]}>
         {message}
         <div className="ms-auto">
           <button

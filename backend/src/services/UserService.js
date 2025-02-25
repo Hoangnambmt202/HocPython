@@ -96,7 +96,7 @@ const updateUser = (id,data) => {
    
     try {
       const checkUser = await User.findOne({_id:id});
-      console.log('checkUser:',checkUser);
+      
       if(checkUser === null) {
         resolve({
           status: "OK",
@@ -108,7 +108,7 @@ const updateUser = (id,data) => {
       
       resolve({
         status: "OK",
-        message: `Cập nhật thành công cho user:  ${updatedUser.name} `,
+        message: `Cập nhật thành công ! `,
         data: updatedUser,
       });
     } catch (e) {
@@ -163,8 +163,8 @@ const getDetailUser = (id) => {
       if (
         user === null) {
         resolve({
-          status: "OK",
-          message: "Không tìm thầy người dùng",
+          status: "err",
+          message: "Không tìm thấy người dùng",
 
         });
       }

@@ -19,6 +19,8 @@ import StatisticManagement from "../pages/Admin/StatisticManagement";
 import PaymentMethods from "../pages/Admin/PaymentMethods";
 import AdminProfile from "../pages/Admin/AdminProfile";
 import LecturersManagement from "../pages/Admin/LecturersManagement";
+import CoursePage from "../pages/CoursePage/CoursePage";
+import CheckoutPage from "../pages/CheckoutPage/CheckoutPage";
 const routes = [
   {
    
@@ -35,6 +37,10 @@ const routes = [
       {
         path: "/my-courses",
         page: MyCoursesPage,
+      },
+      {
+        path: "/order/checkout",
+        page: CheckoutPage,
       }
     ]
   },
@@ -45,12 +51,12 @@ const routes = [
     
   },
   {
-  
+    path: "/course",
     layout: CoursesLayout,
     children: [
       {
-        path: "/course",
-        page: CoursesLayout,
+        path: "",
+        page: CoursePage,
       },
     ]
   },
