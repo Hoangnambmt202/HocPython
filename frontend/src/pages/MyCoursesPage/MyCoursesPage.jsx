@@ -85,7 +85,7 @@ const MyCoursesPage = () => {
     <div className="flex w-full h-full bg-white" >
       
       <AsideComponent />
-      <div className="container px-4 py-8 mx-auto basis-11/12">
+      <div className="flex-1 px-4 py-8 mx-auto ">
       
         <div className="grid grid-rows-1 gap-4 mb-8" >
           <header className="flex justify-between items-center mb-8">
@@ -103,7 +103,7 @@ const MyCoursesPage = () => {
             </div>
           </header>
        
-            <div className="grid grid-cols-4 gap-4 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 ">
             {courses.map((course, index) => (
                 <Link to={`/course`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
                   <img src={course.img} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />

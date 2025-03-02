@@ -5,7 +5,7 @@ const reviewSchema = new Schema({
     courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String },
-    createdAt: { type: Date, default: Date.now },
+
 }, { timestamps: true });
 
 const Review = mongoose.model('Review', reviewSchema);

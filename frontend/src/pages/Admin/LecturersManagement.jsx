@@ -1,51 +1,180 @@
-import { useState } from "react";
-import { Edit, Trash, Plus, ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Edit,
+  Trash,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  ChevronDown,
+  Search,
+} from "lucide-react";
 import AddForm from "../../components/AddFormComponent/AddForm";
-
-const studentsData = [
-  { id: 1, name: "Nguyen Van A", email: "a@gmail.com", date: "2024-01-10", status: "Active" },
-  { id: 2, name: "Tran Van B", email: "b@gmail.com", date: "2024-01-12", status: "Inactive" },
-  { id: 3, name: "Le Thi C", email: "c@gmail.com", date: "2024-01-15", status: "Active" },
-  { id: 4, name: "Pham Van D", email: "d@gmail.com", date: "2024-01-18", status: "Inactive" },
-  { id: 5, name: "Bui Thi E", email: "e@gmail.com", date: "2024-01-20", status: "Active" },
-];
+import { useMutation } from "@tanstack/react-query";
+import UserService from "../../services/UserService";
+import InputFormComponent from "../../components/InputFormComponent/InputFormComponent";
+import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent"; // Giả sử bạn đang sử dụng react-toastify
 
 const LecturersManagement = () => {
-  const [students, setStudents] = useState(studentsData);
-  // eslint-disable-next-line no-unused-vars
+  const [lecturers, setLecturers] = useState([]);
   const [search, setSearch] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const studentsPerPage = 3;
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", color: "" });
 
+  // Form data với giá trị mặc định
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    birth: "",
+    password: "",
+    phone: "",
+    address: "",
+    avatar: "",
+    role: "lecturer", // Đảm bảo role được set là lecturer
+  });
+
+  // Xác thực form
+  const [errors, setErrors] = useState({});
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    // Kiểm tra trường trống
+    if (!value.trim() && name !== "avatar") {
+      return "Trường này không được để trống";
+    }
+
+    // Xác thực dựa trên loại trường
+    switch (name) {
+      case "email":
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = "Email không hợp lệ";
+        }
+        break;
+      case "phone":
+        if (!/^\d{10,11}$/.test(value)) {
+          error = "Số điện thoại phải có 10-11 số";
+        }
+        break;
+      case "name":
+        if (value.length < 2) {
+          error = "Tên phải có ít nhất 2 ký tự";
+        }
+        break;
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  // Xử lý thay đổi giá trị trường form
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+  };
+
+  // Mutation để đăng ký người dùng mới
+  const mutation = useMutation({
+    mutationFn: UserService.registerUser,
+    onSuccess: (data) => {
+      if (data.status === "err") {
+        setToast({ show: true, message: data.message, color: "red" });
+      } else {
+        setToast({
+          show: true,
+          message: `Đăng ký thành công`,
+          color: "green",
+        });
+      }
+      setShowAddModal(false);
+      // Reset form data sau khi thêm thành công
+      setFormData({
+        name: "",
+        email: "",
+        birth: "",
+        phone: "",
+        address: "",
+        avatar: "",
+        role: "lecturer",
+      });
+      // Có thể cập nhật lại danh sách giảng viên ở đây
+      setIsSubmitting(false);
+    },
+    onError: (error) => {
+      setToast({
+        show: true,
+        message: error.response?.data?.message || "Đã xảy ra lỗi!",
+        color: "red",
+      });
+      setTimeout(() => setToast({ show: false, message: "", color: "" }), 3000);
+      setIsSubmitting(false);
+    },
+  });
+
+  // Xử lý đăng ký
+  const handleSignUp = () => {
+    const newErrors = {};
+    
+    setErrors(newErrors);
+    setIsSubmitting(true);
+    // Gọi API đăng ký
+    mutation.mutate(formData);
+    console.log(formData)
+
+  };
+
+  // Xử lý tìm kiếm
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
+
+  useEffect(() => {
+    const access_token = localStorage.getItem("access_token");
+    const fetchLecturers = async () => {
+      try {
+        const role = "lecturer";
+        const response = await UserService.getAllUser(access_token,role);
+        if (response?.data) {
+          setLecturers(response.data);
+        }
+      } catch (error) {
+        setToast({
+          show: true,
+          message: error,
+          color: "red"
+        });
+      }
+    };
+
+    fetchLecturers();
+  }, []);
+
+  // Xử lý xóa giảng viên
   const handleDelete = (id) => {
-    setStudents(students.filter(student => student.id !== id));
-  };
-  const handleSubmit = () => {
-    console.log('Thêm học viên:', { name, email, phone });
-    // Gọi API hoặc xử lý dữ liệu ở đây
+    setLecturers(lecturers.filter((lecturer) => lecturer.id !== id));
   };
 
-  // const handleSearch = (e) => {
-  //   setSearch(e.target.value);
-  // };
+  // // Lọc giảng viên theo tìm kiếm
+  // const filteredLecturers = lecturers.filter(
+  //   (lecturer) =>
+  //     lecturer.name.toLowerCase().includes(search.toLowerCase()) ||
+  //     lecturer.email.toLowerCase().includes(search.toLowerCase())
+  // );
 
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(search.toLowerCase()) ||
-    student.email.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
-
-  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+  
 
   return (
     <div className="py-8 space-y-6">
+      {toast.show && (
+        <ToastMessageComponent
+          message={toast.message}
+          color={toast.color}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
+      )}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Danh Sách Giảng Viên</h1>
         <button
@@ -65,6 +194,8 @@ const LecturersManagement = () => {
             type="text"
             placeholder="Tìm kiếm Giảng viên..."
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            value={search}
+            onChange={handleSearch}
           />
         </div>
         <div className="flex space-x-3">
@@ -81,78 +212,168 @@ const LecturersManagement = () => {
           <tr className="bg-gray-100">
             <th className="border border-gray-300 p-2">Tên</th>
             <th className="border border-gray-300 p-2">Email</th>
+            <th className="border border-gray-300 p-2">SĐT</th>
             <th className="border border-gray-300 p-2">Ngày đăng ký</th>
             <th className="border border-gray-300 p-2">Trạng thái</th>
             <th className="border border-gray-300 p-2">Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {currentStudents.map(student => (
-            <tr key={student.id} className="text-center">
-              <td className="border border-gray-300 p-2">{student.name}</td>
-              <td className="border border-gray-300 p-2">{student.email}</td>
-              <td className="border border-gray-300 p-2">{student.date}</td>
-              <td className="border border-gray-300 p-2">{student.status}</td>
+          {lecturers.map((lecturer) => (
+            <tr key={lecturer.id} className="text-center">
+              <td className="border border-gray-300 p-2">{lecturer.name}</td>
+              <td className="border border-gray-300 p-2">{lecturer.email}</td>
+              <td className="border border-gray-300 p-2">{lecturer.phone}</td>
+              <td className="border border-gray-300 p-2">{lecturer.createdAt}</td>
               <td className="border border-gray-300 p-2">
-                <button className="mr-2 p-1 bg-blue-500 text-white rounded"><Edit size={16} /></button>
-                <button className="p-1 bg-red-500 text-white rounded" onClick={() => handleDelete(student.id)}><Trash size={16} /></button>
+                <span
+                  className={`px-2 py-1 rounded text-xs ${
+                    lecturer.isActive === true
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  { lecturer.isActive === true
+                      ? "Đang hoạt động"
+                      : "Đã khóa"}
+                </span>
+              </td>
+              <td className="border border-gray-300 p-2">
+                <button className="mr-2 p-1 bg-blue-500 text-white rounded">
+                  <Edit size={16} />
+                </button>
+                <button
+                  className="p-1 bg-red-500 text-white rounded"
+                  onClick={() => handleDelete(lecturer.id)}
+                >
+                  <Trash size={16} />
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="flex justify-between items-center mt-4">
-        <button 
-          className={`px-4 py-2 border rounded ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`} 
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+
+      {/* <div className="flex justify-between items-center mt-4">
+        <button
+          className={`px-4 py-2 border rounded flex items-center ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
-          <ChevronLeft /> Trước
+          <ChevronLeft className="mr-1" /> Trước
         </button>
-        <span>Trang {currentPage} / {totalPages}</span>
-        <button 
-          className={`px-4 py-2 border rounded ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`} 
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+        <span>
+          Trang {currentPage} / {totalPages || 1}
+        </span>
+        <button
+          className={`px-4 py-2 border rounded flex items-center ${
+            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages || 1))
+          }
           disabled={currentPage === totalPages}
         >
-          Sau <ChevronRight />
+          Sau <ChevronRight className="ml-1" />
         </button>
-      </div>
+      </div> */}
+
       {showAddModal && (
-        <AddForm title="Thêm học viên mới" onClose={()=> {setShowAddModal(false)}} onSubmit={handleSubmit}>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Tên học viên</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
-          <input
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-      </AddForm>
+        <AddForm
+          title="Thêm giảng viên mới"
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleSignUp}
+        >
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Tên giảng viên <span className="text-red-500">*</span>
+            </label>
+            <InputFormComponent
+              type="text"
+              placeholder="Nhập tên giảng viên"
+              value={formData.name}
+              onChange={(value) => handleChange("name", value)}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
+          </div>
+
+          
+            <div className="">
+              <label className="block text-sm font-medium text-gray-700">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <InputFormComponent
+                type="email"
+                placeholder="example@domain.com"
+                value={formData.email}
+                onChange={(value) => handleChange("email", value)}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+            
+        
+
+          <div className="flex gap-4">
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-700">
+                Số điện thoại <span className="text-red-500">*</span>
+              </label>
+              <InputFormComponent
+                type="text"
+                placeholder="Nhập số điện thoại"
+                value={formData.phone}
+                onChange={(value) => handleChange("phone", value)}
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
+            </div>
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-700">
+                Ngày sinh
+              </label>
+              <InputFormComponent
+                type="date"
+                value={formData.birth}
+                onChange={(value) => handleChange("birth", value)}
+              />
+              {errors.birth && (
+                <p className="text-red-500 text-xs mt-1">{errors.birth}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Địa chỉ <span className="text-red-500">*</span>
+            </label>
+            <InputFormComponent
+              type="text"
+              placeholder="Nhập địa chỉ đầy đủ"
+              value={formData.address}
+              onChange={(value) => handleChange("address", value)}
+            />
+            {errors.address && (
+              <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+            )}
+          </div>
+
+          {/* Có thể thêm trường avatar ở đây nếu cần */}
+
+          <p className="text-xs text-gray-500">
+            Các trường đánh dấu <span className="text-red-500">*</span> là bắt
+            buộc
+          </p>
+        </AddForm>
       )}
     </div>
   );
-}
+};
+
 export default LecturersManagement;

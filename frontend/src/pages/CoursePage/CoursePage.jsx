@@ -51,7 +51,7 @@ const CoursePage = () => {
           <p className="text-xl text-red-500 font-bold mt-2">
             Giá: {course.price > 0 ? `${course.price} VNĐ` : "Miễn phí"}
           </p>
-          <button onClick={()=> {navigate("/order/checkout")}} className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400 ">Mua ngay</button>
+          <button onClick={()=> {navigate("/order/payment")}} className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400 ">Mua ngay</button>
         </div>
       </div>
 

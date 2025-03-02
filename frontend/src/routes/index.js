@@ -14,13 +14,17 @@ import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import LessonManagement from "../pages/Admin/LessonManagement";
 import SettingsManagement from "../pages/Admin/SettingsManagement";
 import LoginAdmin from "../pages/Admin/LoginAdmin";
-import PaymentManagement from "../pages/Admin/PaymentManagement";
 import StatisticManagement from "../pages/Admin/StatisticManagement";
 import PaymentMethods from "../pages/Admin/PaymentMethods";
 import AdminProfile from "../pages/Admin/AdminProfile";
 import LecturersManagement from "../pages/Admin/LecturersManagement";
 import CoursePage from "../pages/CoursePage/CoursePage";
+import PaymentPage from "../pages/PaymentPage/PaymentPage";
 import CheckoutPage from "../pages/CheckoutPage/CheckoutPage";
+import PaymentSuccess from "../pages/CheckoutPage/PaymentSuccess";
+import PaymentFailure from "../pages/CheckoutPage/PaymentFailure";
+import PaymentHistory from "../pages/Admin/PaymentHistory";
+import PaymentRefund from "../pages/Admin/PaymentRefund";
 const routes = [
   {
    
@@ -39,12 +43,24 @@ const routes = [
         page: MyCoursesPage,
       },
       {
+        path: "/order/payment",
+        page: PaymentPage,
+      },
+      {
         path: "/order/checkout",
         page: CheckoutPage,
       }
     ]
   },
-
+  {
+    path: "/order/success",
+    page: PaymentSuccess,
+  },
+  {
+    path: "/order/failure",
+    page: PaymentFailure,
+  }
+,
   {
     path: "*",
     page: NotFoundPage,
@@ -104,13 +120,17 @@ const routes = [
         page: LessonManagement,
       },
       {
-        path: "payment",
-        page: PaymentManagement,
+        path: "payment/history",
+        page: PaymentHistory,
       
       },
       {
         path: "payment/methods",
         page: PaymentMethods,
+      },
+      {
+        path: "payment/refunds",
+        page: PaymentRefund,
       },
       {
         path: "statistic",

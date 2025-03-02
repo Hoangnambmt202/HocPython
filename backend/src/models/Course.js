@@ -16,7 +16,7 @@ const courseSchema = new mongoose.Schema({
     
     title: { type: String, required: true },
     description: { type: String, required: true },
-    instructor: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    lecturerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     price: { type: Number, default: 0 },
     thumbnail: { type: String, default: "/src/assets/imgs/default-thumbnail.jpg" },
     category: { type: String, required: true },

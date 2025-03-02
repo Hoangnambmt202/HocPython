@@ -9,6 +9,7 @@ import { useRef } from "react";
       <div
         className="fixed inset-0 flex justify-end"
         onClick={() => setIsOpen(false)}
+        onBlur={()=> setIsOpen(false)}
       >
         <div
           ref={dropdownRef}

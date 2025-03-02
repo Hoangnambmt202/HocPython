@@ -6,7 +6,7 @@ const { generalAccessToken , generateRefreshToken} = require("./JwtService");
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
-      const { name, email, phone, password,confirmPassword } = newUser
+      const { name, email,  birth, phone, address, avatar, role, password , confirmPassword} = newUser
       try {
         const checkUser = await User.findOne({
           email: email
@@ -23,6 +23,10 @@ const createUser = (newUser) => {
           name,
           email, 
           phone,
+          avatar,
+          role,
+          birth,
+          address,
           password: hash,
           confirmPassword: hash, 
         })
@@ -140,11 +144,14 @@ const deleteUser = (id) => {
     }
   });
 };
-const getAllUser = () => {
+const getAllUser = (role) => {
   return new Promise(async (resolve, reject) => {
     try {
-    
-      const user = await User.find();
+      let filter = {};
+      if (role) {
+        filter.role = role; // Lọc theo role nếu được cung cấp
+      }
+      const user = await User.find(filter);
       resolve({
         status: "OK",
         message: "Danh sách người dùng",

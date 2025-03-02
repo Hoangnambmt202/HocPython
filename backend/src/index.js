@@ -15,6 +15,10 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 // Routes
 routes(app);
+const path = require("path");
+
+// Cho phép truy cập ảnh từ folder uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 mongoose
   .connect(process.env.MONGODB_URI)

@@ -12,6 +12,14 @@ const loginUser = async (data) => {
    // Log dữ liệu phản hồi từ server
     return res.data;
 }
+const getAllUser = async (access_token, role) => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getAll?role=${role}`, {
+        headers: {
+            authorization: `Bearer ${access_token}`
+        }
+    })
+    return res.data
+}
 const getDetailUser = async (access_token) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/me`, {
         headers: {
@@ -34,6 +42,7 @@ const updateUser = async ({data, access_token}) => {
 export default {
     loginUser,
     registerUser,
+    getAllUser,
     getDetailUser,
     updateUser,
 }

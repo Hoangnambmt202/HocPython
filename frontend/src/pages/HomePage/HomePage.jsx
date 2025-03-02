@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import AsideComponent from "../../components/AsideComponent/AsideComponent";
 import CarouselComponent from "../../components/CarouselComponent/CarouselComponent";
 
-import { User } from "lucide-react";
+import { Clock, User } from "lucide-react";
 
 
 const HomePage = () => {
@@ -59,15 +59,15 @@ const HomePage = () => {
             <div className="category text-2xl font-bold">Khóa học Miễn phí</div>
             <div className="grid grid-cols-4 gap-4 ">
             {courses.map((course, index) => (
-                <Link to={`/course`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
+                <Link to={`/course`} key={index} className="card bg-gray-100 flex flex-col rounded-lg shadow-md">
                   <img src={course.image} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
-                  <div className="p-2">
-                    <h3 className="text-lg font-semibold">{course.title}</h3>
+                  <div className="p-2 flex-1">
+                    <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">{course.title}</h3>
                     <p className="text-gray-600">Giá: {course.price}</p>
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
-                    <span className="text-sm text-gray-500"><User />: {course.students}</span>
-                    <span className="text-sm text-gray-500">Số giờ học: {course.hours} giờ</span>
+                    <span className="text-sm flex gap-1 items-center text-gray-500"><User />{course.students}</span>
+                    <span className="text-sm flex gap-1 items-center text-gray-500"><Clock/> {course.hours} giờ</span>
                   </div>
                 </Link>
              
@@ -79,15 +79,15 @@ const HomePage = () => {
             <div className="category text-2xl font-bold">Khóa học Miễn phí</div>
             <div className="grid grid-cols-4 gap-4">
             {courses.map((course, index) => (
-                <Link to={`/learning`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
+                <Link to={`/learning`} key={index} className="card bg-gray-100 flex flex-col rounded-lg shadow-md">
                   <img src={course.image} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
-                  <div className="p-2">
-                    <h3 className="text-lg font-semibold">{course.title}</h3>
+                  <div className="p-2 flex-1">
+                    <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">{course.title}</h3>
                     <p className="text-gray-600">Giá: {course.price}</p>
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
-                    <span className="text-sm text-gray-500"><User />: {course.students}</span>
-                    <span className="text-sm text-gray-500">Số giờ học: {course.hours} giờ</span>
+                    <span className="text-sm flex gap-1 items-center  text-gray-500"><User /> {course.students}</span>
+                    <span className="text-sm flex gap-1 items-center text-gray-500"> <Clock/> {course.hours} giờ</span>
                   </div>
                 </Link>
              

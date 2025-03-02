@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaSearch,  FaDownload } from 'react-icons/fa';
 
-const PaymentManagement = () => {
+const PaymentHistory = () => {
     const [payments, setPayments] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
@@ -26,10 +26,10 @@ const PaymentManagement = () => {
     return (
         <div className="min-h-screen bg-white p-6">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl font-bold text-gray-800 mb-8">Quản Lý Thanh Toán</h1>
+                <h1 className="text-3xl font-bold text-gray-800 mb-8">Lịch Sử Thanh Toán</h1>
                 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
                     <div className="bg-gray-100 p-6 rounded-lg shadow-sm">
                         <h3 className="text-gray-500 text-sm">Tổng Thu Nhập</h3>
                         <p className="text-2xl font-bold text-gray-800">45.000.000 ₫</p>
@@ -162,4 +162,4 @@ const PaymentManagement = () => {
     );
 };
 
-export default PaymentManagement;
+export default PaymentHistory;

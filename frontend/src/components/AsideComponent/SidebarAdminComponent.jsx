@@ -30,11 +30,11 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
     {
       icon: WalletMinimal,
       label: "Thanh toán",
-      href: "/admin/payment",
+
       dropdown: [
         { label: "Phương thức thanh toán", href: "/admin/payment/methods" },
         { label: "Lịch sử thanh toán", href: "/admin/payment/history" },
-        { label: "Xử lý hoàn tiền", href: "/admin/payment/refunds" },
+        { label: "Hoàn tiền & Khiếu nại", href: "/admin/payment/refunds" },
       ],
     },
     { icon: TrendingUp, label: "Thống kê", href: "/admin/statistic" },

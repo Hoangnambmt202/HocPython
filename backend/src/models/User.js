@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
   name: { type: String, require: true },
   email: { type: String, require: true, unique: true },
-  password: { type: String, require: true },
+  password: { type: String},
   role: {
     type: String,
-    enum: ["user", "admin"],
+    enum: ["user","lecturer", "admin"],
     default: "user",
   },
   isActive: {
@@ -22,8 +22,8 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, require: true },
   school: {type: String},
   major: {type: String},
-  access_token: { type: String, require: true },
-  refresh_token: { type: String, require: true },
+  address: {type: String},
+  
 },
 {
     timestamps:true

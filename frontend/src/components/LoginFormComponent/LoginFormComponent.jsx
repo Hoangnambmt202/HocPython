@@ -74,17 +74,17 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
     mutationFn: UserService.loginUser,
     onSuccess: (data) => {
       if (data.status === "err") {
-        ;
+        
         setTimeout(() => setToast({ show: true, message: data.message, color: "red" }), 3000);
       } else {
         onLoginSuccess(data);
         
-        setToast({ show: true, message: `Đăng nhập thành công, chào mừng ${data.data.name}`, color: "green" });
-
+        
         setTimeout(() => {
+          setToast({ show: true, message: `Đăng nhập thành công, chào mừng ${data.data.name}`, color: "green" });
           setIsOpen(false);
-          setTimeout(() => setToast({ show: false, message: "", color: "" }), 1000);
-        }, 2000);
+          
+        }, 5000);
       }
     },
     onError: (error) => {
@@ -109,7 +109,8 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
   };
 
   return (
-    <div className="w-[80%] mx-auto flex flex-col items-center">
+    <>
+    
       {toast.show && (
         <ToastMessageComponent
           message={toast.message}
@@ -117,6 +118,8 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
           onClose={() => setToast({ ...toast, show: false })}
         />
       )}
+
+    <div className="w-[80%] mx-auto flex flex-col items-center">
 
       {currentMenu ? (
         <div>
@@ -184,6 +187,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
         </p>
       </div>
     </div>
+    </>
   );
 };
 

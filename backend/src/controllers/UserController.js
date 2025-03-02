@@ -6,10 +6,10 @@ const createUser = async (req, res) => {
   try {
     const reg =
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    const {  email, phone, password, confirmPassword } = req.body;
+    const { name, email, birth, phone, address, avatar, role,password} = req.body;
    
     const isEmail = reg.test(email);
-    if (!email || !phone || !password || !confirmPassword) {
+    if (!email || !phone ) {
       return res.status(200).json({
         status: "err",
         message: "Trường này là bắt buộc",
@@ -19,13 +19,14 @@ const createUser = async (req, res) => {
         status: "err",
         message: "Trường này phải là email",
       });
-    } else if (password != confirmPassword) {
-      return res.status(200).json({
-        status: "err",
-        message: "Mật khẩu và xác nhận mật khẩu không khớp",
-      });
-    }
-
+      }
+    //    else if (password != confirmPassword) {
+    //   return res.status(200).json({
+    //     status: "err",
+    //     message: "Mật khẩu và xác nhận mật khẩu không khớp",
+    //   });
+    // }
+    console.log(req.body)
     const response = await UserService.createUser(req.body);
  
     return res.status(200).json(response);
@@ -116,7 +117,8 @@ const deleteUser = async (req, res) => {
 };
 const getAllUser = async (req, res) => {
   try {
-    const response = await UserService.getAllUser();
+    const {role} = req.query;
+    const response = await UserService.getAllUser(role);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
