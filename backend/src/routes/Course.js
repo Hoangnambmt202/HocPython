@@ -4,5 +4,6 @@ const CourseController = require('../controllers/CourseController');
 
 
 router.post('/create', CourseController.createCourse);
+router.get('/all', CourseController.getAllCourses);
 
 module.exports = router;

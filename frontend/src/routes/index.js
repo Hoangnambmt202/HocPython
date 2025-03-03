@@ -25,6 +25,7 @@ import PaymentSuccess from "../pages/CheckoutPage/PaymentSuccess";
 import PaymentFailure from "../pages/CheckoutPage/PaymentFailure";
 import PaymentHistory from "../pages/Admin/PaymentHistory";
 import PaymentRefund from "../pages/Admin/PaymentRefund";
+import StudentProgressAdmin from "../pages/Admin/StudentProgressManagement";
 const routes = [
   {
    
@@ -90,7 +91,7 @@ const routes = [
   {
     path: "/admin/login",
     page: LoginAdmin,
-  },
+  },  
   {
     path: "/admin",
     layout: AdminLayout,
@@ -110,6 +111,10 @@ const routes = [
       {
         path: "students",
         page: ManageStudents,
+      },
+      {
+        path: "students/progress",
+        page: StudentProgressAdmin
       },
       {
         path: "lecturers",

@@ -73,6 +73,7 @@ const loginUser = (userLogin) => {
          role : checkUser.role,
         }
       );
+     
       const refresh_token = await generateRefreshToken(
         {
           _id: checkUser._id,

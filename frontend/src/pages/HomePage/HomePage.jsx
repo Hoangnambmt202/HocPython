@@ -3,44 +3,30 @@ import AsideComponent from "../../components/AsideComponent/AsideComponent";
 import CarouselComponent from "../../components/CarouselComponent/CarouselComponent";
 
 import { Clock, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import CourseService from "../../services/CourseService";
 
 
 const HomePage = () => {
 
-  const courses = [
-    {
-      id: 1,
-      title: "Học Python cơ bản miễn phí",
-      image: "https://itech.edu.vn/wp-content/uploads/2022/08/pasted-image-0.png",
-      price: 0,
-      students: Math.floor(Math.random() * 1000),
-      hours: Math.floor(Math.random() * 50) + 1
-    },
-    {
-      id: 2,
-      title: "Học Django cơ bản miễn phí",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-      price: 0,
-      students: Math.floor(Math.random() * 1000),
-      hours: Math.floor(Math.random() * 50) + 1
-    },
-    {
-      id: 3,
-      title: "Học giải thuật Python miễn phí",
-      image: "https://s3-sgn09.fptcloud.com/codelearnstorage/files/thumbnails/Python_-_Algorithms_6865856c821b4bbe88a9b9e88dba2208.png",
-      price: 0,
-      students: Math.floor(Math.random() * 1000),
-      hours: Math.floor(Math.random() * 50) + 1
-    },
-    {
-      id:4,
-      title: "Học giải thuật Python miễn phí",
-      image: "https://s3-sgn09.fptcloud.com/codelearnstorage/files/thumbnails/Python_-_Algorithms_6865856c821b4bbe88a9b9e88dba2208.png",
-      price: 0,
-      students: Math.floor(Math.random() * 1000),
-      hours: Math.floor(Math.random() * 50) + 1
-    }
-  ];
+  const [toast, setToast] = useState(""); 
+  const [courses, setCourses] = useState([]); 
+  useEffect(()=>{
+    const fetchCourses = async () => {
+      try {
+        const response = await CourseService.getAllCourses();
+        if (response.data) {
+          setCourses(response.data);
+        }
+
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        setToast("Failed to load courses");
+      }
+    };
+    fetchCourses()
+  },[])
+  
 
   return (
     <div className="flex w-full h-full bg-white" >

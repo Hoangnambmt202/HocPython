@@ -6,7 +6,7 @@ const createCourse = async (courseData) => {
   };
 // Lấy tất cả khóa học
 const getAllCourses = async () => {
-  return await Course.find().populate("lecturerId").populate("reviews").populate("comments");
+  return await Course.find().populate("lecturerId", "name")
 };
 module.exports = {
     createCourse,

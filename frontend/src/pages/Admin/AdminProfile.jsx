@@ -2,26 +2,18 @@ import  { useState } from 'react';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaPen, FaFacebookF } from 'react-icons/fa';
 import { FcGoogle } from "react-icons/fc";
 import { FaInstagram } from "react-icons/fa6";
+import { useSelector } from 'react-redux';
 const AdminProfile = () => {
-    const [adminData] = useState({
-        name: 'John Doe',
-        email: 'admin@pythonlearning.com',
-        phone: '+84 123 456 789',
-        address: 'Ho Chi Minh City, Vietnam',
-        role: 'Senior Administrator',
-        avatar: '/src/assets/imgs/default-avatar.jpg',
-        joinDate: '01/01/2023'
-    });
-
+   
     const [isEditing, setIsEditing] = useState(false);
-    const [editedData, setEditedData] = useState(adminData);
-
+    const user = useSelector((state) => state.user.user);
+    const [editedData, setEditedData] = useState(user);
     const handleEdit = () => {
         setIsEditing(true);
     };
 
     const handleSave = () => {
-        // Here you would typically make an API call to update the data
+      
         setIsEditing(false);
     };
 
@@ -58,10 +50,10 @@ const AdminProfile = () => {
                                     className="text-3xl font-bold text-gray-800 border-b-2 border-blue-500"
                                 />
                             ) : (
-                                <h1 className="text-3xl font-bold text-gray-800">{editedData.name}</h1>
+                                <h1 className="text-3xl font-bold text-gray-800">{user.name || editedData.name}</h1>
                             )}
-                            <p className="text-blue-500 font-semibold mt-1">{editedData.role}</p>
-                            <p className="text-gray-500 mt-1">Member since {editedData.joinDate}</p>
+                            <p className="text-blue-500 font-semibold mt-1">{user.role || editedData.role}</p>
+                            <p className="text-gray-500 mt-1">Member since { user.createdAt }</p>
                         </div>
                         </div>
                         

@@ -1,86 +1,28 @@
 
 import { Link } from "react-router-dom";
 import AsideComponent from "../../components/AsideComponent/AsideComponent";
+import { useEffect, useState } from "react";
+import CourseService from "../../services/CourseService";
 
 const MyCoursesPage = () => {
-    const courses = [
-        {
-          id: 1,
-          title: "Python cơ bản",
-          type: "Đang học",
-          img: "https://itech.edu.vn/wp-content/uploads/2022/08/pasted-image-0.png",
-          progress: 65,
-          totalLessons: 24,
-          completedLessons: 16
-        },
-        {
-          id: 2,
-          title: "Machine Learning",
-          type: "Đang học",
-          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-          progress: 30,
-          totalLessons: 32,
-          completedLessons: 10
-        },
-        {
-          id: 3,
-          title: "Data Science",
-          type: "Hoàn thành",
-          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-          progress: 100,
-          totalLessons: 28,
-          completedLessons: 28
-        },
-        {
-          id: 4,
-          title: "Web Development",
-          type: "Gần đây",
-          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-          progress: 15,
-          totalLessons: 40,
-          completedLessons: 6
-        }
-        ,
-        {
-          id: 4,
-          title: "Web Development",
-          type: "Gần đây",
-          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-          progress: 15,
-          totalLessons: 40,
-          completedLessons: 6
-        }
-        ,
-        {
-          id: 4,
-          title: "Web Development",
-          type: "Gần đây",
-          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-          progress: 15,
-          totalLessons: 40,
-          completedLessons: 6
-        }
-        ,
-        {
-          id: 4,
-          title: "Web Development",
-          type: "Gần đây",
-          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-          progress: 15,
-          totalLessons: 40,
-          completedLessons: 6
-        }
-        ,
-        {
-          id: 4,
-          title: "Web Development",
-          type: "Gần đây",
-          img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaoWKfljgIO4Trlo4Aj36O3kk_-rLAeHQw2w&s",
-          progress: 15,
-          totalLessons: 40,
-          completedLessons: 6
-        }
-      ];
+    const [toast, setToast] = useState(""); 
+      const [courses, setCourses] = useState([]); 
+      useEffect(()=>{
+        const fetchCourses = async () => {
+          try {
+            const response = await CourseService.getAllCourses();
+            if (response.data) {
+              setCourses(response.data);
+            }
+            console.log(response.data)
+          } catch (error) {
+            console.error("Error fetching courses:", error);
+            setToast("Failed to load courses");
+          }
+        };
+        fetchCourses()
+      },[])
+      
   return (
     <div className="flex w-full h-full bg-white" >
       
@@ -106,7 +48,7 @@ const MyCoursesPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 ">
             {courses.map((course, index) => (
                 <Link to={`/course`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
-                  <img src={course.img} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
+                  <img src="" alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
                   <div className="p-2">
                     <h3 className="text-lg font-semibold">{course.title}</h3>
                     

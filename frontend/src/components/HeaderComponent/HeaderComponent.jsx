@@ -57,7 +57,6 @@ const HeaderComponent = () => {
   
 
   const handleLogout = () => {
-    
     localStorage.removeItem("access_token");
     dispatch(logout());
   
