@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import {Link} from "react-router-dom";
 import BaseDropdown from "../BaseDropdown/BaseDropdown";
-import { Book, GraduationCap, School, History } from "lucide-react";
 import CourseService from "../../services/CourseService";
-const MyCoursesMenu = () => {
+const CoursesMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [toast, setToast] = useState(""); 
     const [courses, setCourses] = useState([]); 
@@ -43,7 +42,7 @@ const MyCoursesMenu = () => {
         </header>
         
         <div className="max-h-[400px] overflow-y-auto">
-          {courses.map((course) => {
+          {courses?.map((course) => {
            
             return (
               <div
@@ -52,10 +51,11 @@ const MyCoursesMenu = () => {
               >
                 <div className="flex items-start">
                   <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                    {/* <IconComponent size={20} className="text-orange-500" /> */}
+                    
+                    <img src={course?.thumbnail} />
                   </div>
                   <div className="ml-3 flex-1">
-                    <p className="text-sm font-medium text-gray-900">{course.title}</p>
+                    <p className="text-sm font-medium text-gray-900">{course?.title}</p>
                     <p className="text-xs text-gray-500 mb-2"></p>
                     
                     {/* Progress Bar */}
@@ -95,4 +95,4 @@ const MyCoursesMenu = () => {
     </div>
   );
 }
-export default MyCoursesMenu
+export default CoursesMenu

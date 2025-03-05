@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import Modal from "../ModalComponent/ModalComponent";
@@ -7,10 +7,12 @@ import RegisterFormComponent from "../RegisterFormComponent/RegisterFormComponen
 import CoursesMenu from "../CoursesMenu/CoursesMenu";
 import ProfileMenu from "../ProfileMenu/ProfileMenu"
 import NotificationList from "../NotificationList/NotificationList";
-import { Search } from "lucide-react";
+import { Search, ShoppingBag } from "lucide-react";
 import {useDispatch, useSelector} from 'react-redux';
 import { logout,setUser } from "../../redux/slides/userSlides";
 import UserService from "../../services/UserService";
+import CartPage from "../../pages/CartPage/CartPage";
+import { toggleCart } from "../../redux/slides/cartSlides";
 
 
 
@@ -18,7 +20,9 @@ const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
   const user = useSelector((state) => state.user.user);
+  
 
+  const navigate = useNavigate();
   
   const dispatch = useDispatch();
 
@@ -52,10 +56,6 @@ const HeaderComponent = () => {
     }
   };
   
-    
-    
-  
-
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     dispatch(logout());
@@ -87,6 +87,8 @@ const HeaderComponent = () => {
           <div className="relative flex items-center gap-4 hover:cursor-pointer">
             
             <CoursesMenu/>
+             <button onClick={() => dispatch(toggleCart())}><ShoppingBag width="1.25rem" height="1.25rem"/></button>
+             <CartPage/>
             <NotificationList/>
             <ProfileMenu avatar={user.avatar} handleLogout={handleLogout}/>
 

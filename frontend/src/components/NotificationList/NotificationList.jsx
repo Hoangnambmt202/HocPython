@@ -24,7 +24,7 @@ const NotificationMenu = () => {
     }
   ];
   return (
-    <div className="relative ">
+    <div className="relative w-8 h-8 flex items-center justify-center ">
       <button className="relative" onClick={() => setIsOpen(true)}>
         <Bell width="1.25rem" height="1.25rem" className=" text-gray-700 hover:text-gray-900" />
       </button>

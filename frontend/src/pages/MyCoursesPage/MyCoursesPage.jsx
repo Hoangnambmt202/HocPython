@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import CourseService from "../../services/CourseService";
 
 const MyCoursesPage = () => {
+    // eslint-disable-next-line no-unused-vars
     const [toast, setToast] = useState(""); 
       const [courses, setCourses] = useState([]); 
       useEffect(()=>{
@@ -14,13 +15,14 @@ const MyCoursesPage = () => {
             if (response.data) {
               setCourses(response.data);
             }
-            console.log(response.data)
+       
           } catch (error) {
             console.error("Error fetching courses:", error);
             setToast("Failed to load courses");
           }
         };
         fetchCourses()
+        console.log(courses)
       },[])
       
   return (
@@ -46,11 +48,11 @@ const MyCoursesPage = () => {
           </header>
        
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 ">
-            {courses.map((course, index) => (
-                <Link to={`/course`} key={index} className="card bg-gray-100 rounded-lg shadow-md">
-                  <img src="" alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
+            {
+                <Link to={`/course`} key={courses.slug} className="card bg-gray-100 rounded-lg shadow-md">
+                  <img src="" alt={`Course`} className="w-full h-32 object-cover rounded-t-lg" />
                   <div className="p-2">
-                    <h3 className="text-lg font-semibold">{course.title}</h3>
+                    <h3 className="text-lg font-semibold">{courses.title}</h3>
                     
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
@@ -59,23 +61,23 @@ const MyCoursesPage = () => {
                     {/* Progress bar */}
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-xs text-gray-500">
-                          {course.completedLessons}/{course.totalLessons} bài học
+                          {/* {courses.completedLessons}/{courses.totalLessons} bài học */}
                         </span>
                         <span className="text-xs font-medium text-orange-500">
-                          {course.progress}%
+                          {/* {courses.progress}% */}
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-1.5">
                         <div
                           className="bg-orange-500 h-1.5 rounded-full transition-all duration-300"
-                          style={{ width: `${course.progress}%` }}
+                          // style={{ width: `${course.progress}%` }}
                         />
                       </div>
                     </div>
                   </div>
                 </Link>
              
-            ))}
+            }
             </div>
             
         </div>

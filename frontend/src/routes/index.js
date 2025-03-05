@@ -26,6 +26,7 @@ import PaymentFailure from "../pages/CheckoutPage/PaymentFailure";
 import PaymentHistory from "../pages/Admin/PaymentHistory";
 import PaymentRefund from "../pages/Admin/PaymentRefund";
 import StudentProgressAdmin from "../pages/Admin/StudentProgressManagement";
+import CartPage from "../pages/CartPage/CartPage";
 const routes = [
   {
    
@@ -42,6 +43,10 @@ const routes = [
       {
         path: "/my-courses",
         page: MyCoursesPage,
+      },
+      {
+        path: "/cart",
+        page: CartPage,
       },
       {
         path: "/order/payment",
@@ -72,7 +77,7 @@ const routes = [
     layout: CoursesLayout,
     children: [
       {
-        path: "",
+        path: ":slug",
         page: CoursePage,
       },
     ]

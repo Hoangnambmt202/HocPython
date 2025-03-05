@@ -1,22 +1,24 @@
 import { Link } from "react-router-dom";
-import AsideComponent from "../../components/AsideComponent/AsideComponent";
-import CarouselComponent from "../../components/CarouselComponent/CarouselComponent";
-
 import { Clock, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import CourseService from "../../services/CourseService";
 
+import AsideComponent from "../../components/AsideComponent/AsideComponent";
+import CarouselComponent from "../../components/CarouselComponent/CarouselComponent";
+import CourseService from "../../services/CourseService";
 
 const HomePage = () => {
 
+  // eslint-disable-next-line no-unused-vars
   const [toast, setToast] = useState(""); 
   const [courses, setCourses] = useState([]); 
+
   useEffect(()=>{
     const fetchCourses = async () => {
       try {
         const response = await CourseService.getAllCourses();
         if (response.data) {
           setCourses(response.data);
+          
         }
 
       } catch (error) {
@@ -27,7 +29,6 @@ const HomePage = () => {
     fetchCourses()
   },[])
   
-
   return (
     <div className="flex w-full h-full bg-white" >
       
@@ -44,9 +45,9 @@ const HomePage = () => {
           </div>
             <div className="category text-2xl font-bold">Khóa học Miễn phí</div>
             <div className="grid grid-cols-4 gap-4 ">
-            {courses.map((course, index) => (
-                <Link to={`/course`} key={index} className="card bg-gray-100 flex flex-col rounded-lg shadow-md">
-                  <img src={course.image} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
+            {courses.map((course) => (
+                <Link to={`/course/${course.slug}`} key={course._id} className="card bg-gray-100 flex flex-col rounded-lg shadow-md">
+                  <img src={course.image} alt={`Course ${course.title}`} className="w-full h-32 object-cover rounded-t-lg" />
                   <div className="p-2 flex-1">
                     <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">{course.title}</h3>
                     <p className="text-gray-600">Giá: {course.price}</p>

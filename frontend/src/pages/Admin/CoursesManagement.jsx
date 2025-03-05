@@ -183,7 +183,7 @@ const CourseManagement = () => {
     }, 0);
 
     return (
-      <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ marginTop: 0 }}>
+      <div className="fixed top-0 center-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ marginTop: 0 }}>
         <div className="bg-white rounded-lg w-full max-w-4xl p-6 max-h-screen overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold">
@@ -509,7 +509,7 @@ const CourseManagement = () => {
       {/* Filters and Search */}
       <div className="flex justify-between items-center space-x-4">
         <div className="flex-1 max-w-md relative">
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+          <Search className="absolute center-3 top-2.5 text-gray-400" size={20} />
           <input
             type="text"
             placeholder="Tìm kiếm khóa học..."
@@ -527,32 +527,32 @@ const CourseManagement = () => {
 
       {/* Courses Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <table  className="w-full table-fixed">
+        <table  className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Khóa Học
               </th>
-              <th  className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th  className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Chi tiết khóa học
               </th>
-              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Giảng Viên
               </th>
-              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Danh mục
               </th>
-              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Thời Lượng
               </th>
            
-              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Giá
               </th>
-              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Trạng Thái
               </th>
-              <th className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 Thao Tác
               </th>
             </tr>

@@ -9,7 +9,7 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative w-8 h-8">
       <button className="relative" onClick={() => setIsProfileOpen(true)}>
         <img
           src={avatar}
