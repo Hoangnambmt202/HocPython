@@ -3,13 +3,14 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const access_token = req.cookies.access_token;
+  
+  if (!access_token) {
     return res.status(401).json({ message: "Bạn chưa đăng nhập" });
   }
-  const token = authHeader.split(" ")[1];  
+  
   try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN);
+    const decoded = jwt.verify(access_token, process.env.ACCESS_TOKEN);
     req.user = decoded;
     next();
   } catch (error) {
@@ -18,16 +19,8 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-const authorizeRoles = (...roles) => {
-  return (req, res, next) => {
-      if (!roles.includes(req.user.role)) {
-          return res.status(403).json({ message: 'Bạn không có quyền truy cập!' });
-      }
-      next();
-  };
-};
 
 module.exports = {
     authMiddleware,
-    authorizeRoles
+   
 };

@@ -56,13 +56,20 @@ const loginUser = async (req, res) => {
     
 
     const response = await UserService.loginUser(req.body);
-        
-    const {refresh_token, ...newResponse } = response;
-    res.cookie('refresh_token',refresh_token,{
-      httpOnly:true,
-      secure:true,
+    const { access_token, refresh_token, ...userData } = response;
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true, // Không thể truy cập từ JavaScript
+      secure: false, // Chỉ bật true nếu dùng HTTPS
+      sameSite: 'Strict', // Ngăn cookie gửi từ trang khác
     });
-    return res.status(200).json(response);
+    res.cookie('refresh_token',refresh_token,{
+      httpOnly: true, 
+      secure: false, 
+      sameSite: 'Strict',
+    });
+  
+     return res.status(200).json(response);
 
 
 
@@ -72,6 +79,25 @@ const loginUser = async (req, res) => {
     });
   }
 };
+const logoutUser = (req, res) => {
+  res.clearCookie("access_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+  });
+
+  res.clearCookie("refresh_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+  });
+
+  return res.status(200).json({
+    status: "success",
+    message: "Đăng xuất thành công",
+  });
+};
+
 const updateUser = async (req, res) => {
   try {
   
@@ -161,6 +187,7 @@ const refreshToken = async (req, res) => {
 module.exports = {
   createUser,
   loginUser,
+  logoutUser,
   updateUser,
   deleteUser,
   getAllUser,

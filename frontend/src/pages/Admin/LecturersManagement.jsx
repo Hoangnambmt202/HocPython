@@ -119,9 +119,9 @@ const LecturersManagement = () => {
     
     setErrors(newErrors);
     setIsSubmitting(true);
-    // Gọi API đăng ký
+  
     mutation.mutate(formData);
-    console.log(formData)
+  
 
   };
 
@@ -132,11 +132,11 @@ const LecturersManagement = () => {
 
 
   useEffect(() => {
-    const access_token = localStorage.getItem("access_token");
+   
     const fetchLecturers = async () => {
       try {
         const role = "lecturer";
-        const response = await UserService.getAllUser(access_token,role);
+        const response = await UserService.getAllUser(role);
         if (response?.data) {
           setLecturers(response.data);
         }

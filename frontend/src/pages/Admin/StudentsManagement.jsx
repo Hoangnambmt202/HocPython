@@ -21,11 +21,11 @@ const ManageStudents = () => {
   const [birthday, setBirthday] = useState('');
 
    useEffect(() => {
-      const access_token = localStorage.getItem("access_token");
+ 
       const fetchStudents = async () => {
         try {
           const role = "user";
-          const response = await UserService.getAllUser(access_token,role);
+          const response = await UserService.getAllUser(role);
           if (response?.data) {
             setStudents(response.data);
           }

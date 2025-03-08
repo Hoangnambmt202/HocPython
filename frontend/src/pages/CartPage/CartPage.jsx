@@ -11,17 +11,20 @@ import {
   closeCart,
   removeFromCart,
 
-} from "../../redux/slides/cartSlides"; // Assume you have this action
+} from "../../redux/slides/cartSlides"; 
+import empty_cart from '../../assets/imgs/Empty-Cart.png';
+import { Link, useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const isOpen = useSelector((state) => state.cart.isOpen);
-
-
-
   const totalPrice = cart.reduce((total, course) => total + course.price, 0);
-
+  const navigate = useNavigate() ;
+  const handlePay = () => {
+    navigate("/order/checkout");
+    dispatch(closeCart());
+  }
   return (
     <Dialog
       open={isOpen}
@@ -60,8 +63,8 @@ const CartPage = () => {
                   </div>
 
                   {cart.length === 0 ? (
-                    <div className="mt-8 text-center text-gray-500">
-                      Giỏ hàng của bạn đang trống
+                    <div>
+                      <img src={empty_cart} alt="empty_cart" />
                     </div>
                   ) : (
                     <div className="mt-8">
@@ -83,7 +86,7 @@ const CartPage = () => {
                               <div className="ml-4 flex flex-1 flex-col">
                                 <div>
                                   <div className="flex justify-between text-base font-medium text-gray-900">
-                                    <h3>{course.title}</h3>
+                                    <Link className="hover:underline" to={`/course/${course.slug}`}>{course.title}</Link>
                                     <p className="ml-4">
                                       {course.price.toLocaleString("vi-VN")} đ
                                     </p>
@@ -122,12 +125,12 @@ const CartPage = () => {
                       Phí vận chuyển và thuế sẽ được tính khi thanh toán.
                     </p>
                     <div className="mt-6">
-                      <a
-                        href="#"
-                        className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                      <button
+                        onClick={handlePay}
+                        className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
                       >
                         Thanh toán
-                      </a>
+                      </button>
                     </div>
                     <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                       <p>

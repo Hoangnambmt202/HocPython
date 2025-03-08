@@ -20,7 +20,7 @@ const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
   const user = useSelector((state) => state.user.user);
-  
+
 
   const navigate = useNavigate();
   
@@ -28,38 +28,37 @@ const HeaderComponent = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const access_token = localStorage.getItem("access_token");
-      if (access_token) {
-        try {
-          const res = await UserService.getDetailUser(access_token);
-          if (res?.data) {
-            
-            dispatch(setUser(res.data.data)); // Cập nhật Redux với user mới
-          }
-        } catch (error) {
-          console.error("Lỗi khi lấy thông tin user:", error);
-          localStorage.removeItem("access_token"); // Nếu lỗi, xóa token
-          dispatch(logout()); // Xóa user khỏi Redux
+      try {
+        const res = await UserService.getDetailUser(); // API sẽ tự lấy access_token từ cookie
+        if (res?.data) {
+          dispatch(setUser(res?.data)); 
         }
+      } catch (error) {
+        console.error("Lỗi khi lấy user:", error);
+        dispatch(logout());
       }
     };
   
-    fetchUser(); // Gọi hàm fetchUser
-  }, [dispatch]); // Chạy lại khi Redux dispatch thay đổi
+    fetchUser();
+  }, [dispatch]);
+  // Chạy lại khi Redux dispatch thay đổi
 
 
   const handleLoginSuccess = (userData) => {
-    if (userData) {
-      dispatch(setUser(userData.data)); // Cập nhật Redux ngay lập tức
-      localStorage.setItem("access_token", userData.access_token);
-      setIsOpen(false); // Đóng modal sau khi login
+    if (userData && userData.data) {
+      
+      dispatch(setUser(userData.data)); 
+      setIsOpen(false); // Đóng modal
     }
   };
   
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    dispatch(logout());
-  
+  const handleLogout = async () => {
+    try {
+      await UserService.logoutUser();
+      dispatch(logout());
+    } catch (error) {
+      console.error("Lỗi khi logout:", error);
+    }
   };
 
   return (
@@ -90,7 +89,7 @@ const HeaderComponent = () => {
              <button onClick={() => dispatch(toggleCart())}><ShoppingBag width="1.25rem" height="1.25rem"/></button>
              <CartPage/>
             <NotificationList/>
-            <ProfileMenu avatar={user.avatar} handleLogout={handleLogout}/>
+            <ProfileMenu avatar={user?.avatar} handleLogout={handleLogout}/>
 
             
           </div>

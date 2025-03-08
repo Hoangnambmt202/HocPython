@@ -50,7 +50,7 @@ const HomePage = () => {
                   <img src={course.image} alt={`Course ${course.title}`} className="w-full h-32 object-cover rounded-t-lg" />
                   <div className="p-2 flex-1">
                     <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">{course.title}</h3>
-                    <p className="text-gray-600">Giá: {course.price}</p>
+                   <p> {course?.price > 0 ? `Giá: ${course?.price} VNĐ` : "Miễn phí"}</p> 
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
                     <span className="text-sm flex gap-1 items-center text-gray-500"><User />{course.students}</span>
@@ -70,7 +70,7 @@ const HomePage = () => {
                   <img src={course.image} alt={`Course ${index + 1}`} className="w-full h-32 object-cover rounded-t-lg" />
                   <div className="p-2 flex-1">
                     <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">{course.title}</h3>
-                    <p className="text-gray-600">Giá: {course.price}</p>
+                    <p> {course?.price > 0 ? `Giá: ${course?.price} VNĐ` : "Miễn phí"}</p> 
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
                     <span className="text-sm flex gap-1 items-center  text-gray-500"><User /> {course.students}</span>

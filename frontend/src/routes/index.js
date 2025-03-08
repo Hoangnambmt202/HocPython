@@ -7,7 +7,7 @@ import CourseManagement from "../pages/Admin/CoursesManagement";
 import Dashboard from "../pages/Admin/Dashboard";
 import ManageStudents from "../pages/Admin/StudentsManagement";
 import HomePage from "../pages/HomePage/HomePage";
-import { LearningPage } from "../pages/LearningPage/LearningPage";
+import LearningPage from "../pages/LearningPage/LearningPage";
 import MyCoursesPage from "../pages/MyCoursesPage/MyCoursesPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
@@ -87,7 +87,7 @@ const routes = [
     layout: LearningLayout,
     children:[
       {
-        path: "/learning",
+        path: "course/:slug/learn",
         page: LearningPage
       }
     ]

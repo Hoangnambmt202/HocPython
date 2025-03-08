@@ -22,7 +22,7 @@ const MyCoursesPage = () => {
           }
         };
         fetchCourses()
-        console.log(courses)
+
       },[])
       
   return (

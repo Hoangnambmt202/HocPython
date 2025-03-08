@@ -2,11 +2,12 @@ import { useState } from "react";
 import InputFormComponent from "../../components/InputFormComponent/InputFormComponent";
 import { useMutation } from "@tanstack/react-query";
 import UserService from "../../services/UserService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../redux/slides/userSlides";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import Cookie from "js-cookie";
 
 const LoginAdmin = () => {
   const [formData, setFormData] = useState({
@@ -38,7 +39,7 @@ const LoginAdmin = () => {
     setFormData({ ...formData, [field]: value });
     setErrors({ ...errors, [field]: validateField(field, value) });
   };
-
+ 
   // ✅ Mutation xử lý đăng nhập
   const mutation = useMutation({
     mutationFn: UserService.loginUser,
@@ -46,10 +47,10 @@ const LoginAdmin = () => {
       if (data.status === "err") {
         setToast({ show: true, message: data.message, color: "red" });
       } else {
-        // Lưu token vào localStorage
-        localStorage.setItem("admin_access_token", data.access_token);
+    
+        Cookie.set("access_token", data.access_token);
        dispatch(setUser(data.data))
-
+  
         setToast({
           show: true,
           message: `Đăng nhập thành công, chào mừng ${data.data.name}. \n Vui lòng đợi chút trong khi chung tôi chuyển hướng cho bạn`,

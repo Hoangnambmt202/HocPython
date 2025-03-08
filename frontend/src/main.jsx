@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import {
   QueryClient,
   QueryClientProvider,} from '@tanstack/react-query'
-  import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+  // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import store from "./redux/store";
 import App from "./App";
 import "./index.css";
@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <App />
     </Provider>
-    <ReactQueryDevtools initialIsOpen={false} />
+    {/* <ReactQueryDevtools initialIsOpen={false} /> */}
   </QueryClientProvider>
     
 );

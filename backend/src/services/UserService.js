@@ -80,12 +80,12 @@ const loginUser = (userLogin) => {
           role : checkUser.role,
         }
       );
-   
+      const { password: _, ...userData } = checkUser.toObject();
 
       resolve({
         status: "OK",
         message: "Đăng nhập thành công",
-        data: checkUser,
+        data: userData,
         access_token,
         refresh_token,
 
@@ -178,7 +178,7 @@ const getDetailUser = (id) => {
       }
       
       resolve({
-        status: "OK",
+        status: "success",
         message: "Chi tiết người dùng",
         data: user,
       });

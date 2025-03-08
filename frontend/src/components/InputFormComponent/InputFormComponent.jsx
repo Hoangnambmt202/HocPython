@@ -12,7 +12,7 @@ const InputFormComponent = (props) => {
   return (
 
     // eslint-disable-next-line react/no-unknown-property, react/prop-types
-    <input type={props.type} className= "w-full px-4 py-2 mb-2 border outline-none border-gray-300 rounded-md " placeholder={placeholder} value={props.value} {...rests} onChange={handleOnChangeInput} />
+    <input type={props.type} className= {`w-full px-4 py-2 mb-2 border outline-none border-gray-300 rounded-md ${props.className}`} placeholder={placeholder} value={props.value} {...rests} onChange={handleOnChangeInput} />
   )
 }
 export default InputFormComponent;

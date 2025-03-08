@@ -6,14 +6,14 @@ import { ChevronDown, ChevronUp, Star, MessageSquareText, FileText, Award, Text,
 import { useNavigate , useParams } from "react-router-dom";
 
 import CourseService from "../../services/CourseService";
-import { addToCart } from "../../redux/slides/cartSlides";
+import { addToCart, enrollCourse } from "../../redux/slides/cartSlides";
 const CoursePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [openChapter, setOpenChapter] = useState(null); // State để theo dõi chương nào đang mở
   const [course, setCourse] = useState(null);
   const { slug } = useParams(); // Lấy slug từ URL
   const cart = useSelector((state) => state.cart.cart);
-  
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   
   useEffect(()=>{
@@ -42,6 +42,13 @@ const CoursePage = () => {
   const handleAddToCart = () => {
     dispatch(addToCart(course));  
   }
+
+  const handleStartLearn = () => {
+    dispatch(enrollCourse(course));  
+    localStorage.setItem("enrolledCourses", JSON.stringify(course));
+    navigate(`/course/${course.slug}/learn`);
+
+  }
   const isInCart = cart.some((item) => item._id === course?._id);
   return (
     
@@ -61,18 +68,39 @@ const CoursePage = () => {
             Giảng viên: {course?.lecturerId.name}
           </p>
           <p className="text-xl text-red-500 font-bold mt-2">
-            Giá: {course?.price > 0 ? `${course?.price} VNĐ` : "Miễn phí"}
-          </p>
-          {isInCart ? (
-        <button className="bg-gray-400 px-4 py-2 text-white" disabled>
-          Đã thêm vào giỏ hàng
-        </button>
-      ) : (
-        <>
-        <button onClick={handleBuyNow} className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400 ">Mua ngay</button>
-        <button onClick={handleAddToCart} className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400 ">Thêm vào giỏ hàng</button>
-        </>
-      )}
+  Giá: {course?.price > 0 ? `${course?.price} VNĐ` : "Miễn phí"}
+</p>
+
+{course?.price === 0 ? (
+  <button 
+    onClick={handleStartLearn}
+    className="rounded-3xl bg-green-500 text-white px-3 py-2 mt-2 hover:bg-green-400"
+  >
+    Học ngay
+  </button>
+) : (
+  isInCart ? (
+    <button className="bg-gray-400 px-4 py-2 text-white" disabled>
+      Đã thêm vào giỏ hàng
+    </button>
+  ) : (
+    <div className="flex gap-2">
+      <button 
+        onClick={handleBuyNow} 
+        className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400"
+      >
+        Mua ngay
+      </button>
+      <button 
+        onClick={handleAddToCart} 
+        className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400"
+      >
+        Thêm vào giỏ hàng
+      </button>
+    </div>
+  )
+)}
+
          
         </div>
       </div>

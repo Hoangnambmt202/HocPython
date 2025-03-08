@@ -3,15 +3,17 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const PaymentPage = () => {
+  const user = useSelector((state)=> state.user.user);
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
+    name: user?.name,
+    email: user?.email,
+    phone: user?.phone,
+    address: user?.address,
+    city: user?.city,
     note: "",
   });
   const cart = useSelector((state) => state.cart.cart);
+  
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -42,7 +44,7 @@ const PaymentPage = () => {
                   type="text"
                   name="fullName"
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={formData.fullName}
+                  value={formData.name}
                   onChange={handleInputChange}
                 />
               </div>
@@ -126,7 +128,7 @@ const PaymentPage = () => {
                     >
                       <div>
                         <h3 className="font-medium">{course.title}</h3>
-                        <p className="text-sm text-gray-600">Số lượng: {}</p>
+                        <p className="text-sm text-gray-600">Số lượng: 1</p>
                       </div>
                       <div className="font-medium">
                         {course.price.toLocaleString("vi-VN")}đ

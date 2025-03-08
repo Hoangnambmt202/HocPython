@@ -228,7 +228,7 @@ const ProfilePage = () => {
                 <span className="mr-2">
                   <Dot
                     className={
-                      active == undefined ? "text-green-500" : "text-red-500"
+                      active == undefined ? "text-red-500" : "text-green-500"
                     }
                   />
                 </span>

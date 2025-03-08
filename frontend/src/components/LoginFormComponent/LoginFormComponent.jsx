@@ -77,7 +77,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
         
         setTimeout(() => setToast({ show: true, message: data.message, color: "red" }), 3000);
       } else {
-        onLoginSuccess(data);
+        onLoginSuccess(data.data);
         
         
         setTimeout(() => {

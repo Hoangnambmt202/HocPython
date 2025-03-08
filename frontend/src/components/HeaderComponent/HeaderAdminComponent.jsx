@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, setUser } from "../../redux/slides/userSlides";
 import UserService from "../../services/UserService";
-
+import Cookie from "js-cookie";
 const HeaderAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State để quản lý trạng thái dropdown
 
@@ -23,12 +23,12 @@ const HeaderAdmin = () => {
       setIsDropdownOpen(false);
     }
   };
-  // const handleLoginSuccess = (userData) => {
-  //   if (userData) {
-  //     dispatch(setUser(userData.data)); // Cập nhật Redux ngay lập tức
-  //     localStorage.setItem("access_token", userData.access_token);
-  //   }
-  // };
+  const handleLoginSuccess = (userData) => {
+    if (userData) {
+      dispatch(setUser(userData.data)); // Cập nhật Redux ngay lập tức
+      Cookie.set("access_token", userData.access_token);
+    }
+  };
 
   // Thêm event listener để đóng dropdown khi click ra ngoài
   const handleLogout = () => {
@@ -39,21 +39,20 @@ const HeaderAdmin = () => {
   };
   useEffect(() => {
     const fetchUser = async () => {
-      const admin_access_token = localStorage.getItem("admin_access_token");
-      if (admin_access_token) {
+     
+    
         try {
-          const res = await UserService.getDetailUser(admin_access_token);
+          const res = await UserService.getDetailUser;
           if (res?.data) {
             dispatch(setUser(res.data.data)); // Cập nhật Redux với user mới
+            navigate("/admin/login");
           }
         } catch (error) {
           console.error("Lỗi khi lấy thông tin user:", error);
-          localStorage.removeItem("admin_access_token"); // Nếu lỗi, xóa token
+          Cookie.removeItem("admin_access_token"); // Nếu lỗi, xóa token
           dispatch(logout()); // Xóa user khỏi Redux
         }
-      } else {
-        navigate("/admin/login");
-      }
+      
     };
     fetchUser();
 
