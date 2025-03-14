@@ -2,12 +2,11 @@ import { useState } from "react";
 import InputFormComponent from "../../components/InputFormComponent/InputFormComponent";
 import { useMutation } from "@tanstack/react-query";
 import UserService from "../../services/UserService";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/slides/userSlides";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
-import Cookie from "js-cookie";
 
 const LoginAdmin = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +21,8 @@ const LoginAdmin = () => {
   const [isLoadingRedirect, setIsLoadingRedirect] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
   // ✅ Hàm kiểm tra dữ liệu nhập vào (Validation)
+
+
   const validateField = (name, value) => {
     let error = "";
     if (!value.trim()) {
@@ -47,10 +48,8 @@ const LoginAdmin = () => {
       if (data.status === "err") {
         setToast({ show: true, message: data.message, color: "red" });
       } else {
-    
-        Cookie.set("access_token", data.access_token);
        dispatch(setUser(data.data))
-  
+       
         setToast({
           show: true,
           message: `Đăng nhập thành công, chào mừng ${data.data.name}. \n Vui lòng đợi chút trong khi chung tôi chuyển hướng cho bạn`,
@@ -63,8 +62,9 @@ const LoginAdmin = () => {
             setIsLoadingRedirect(true);
             setTimeout(() => {
                 navigate("/admin");
-              }, 2000);
-          }, 3000);
+              }, 1000);
+          }, 2000);
+       
       }
     },
     onError: (error) => {

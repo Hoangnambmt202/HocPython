@@ -1,17 +1,5 @@
 const mongoose = require('mongoose');
 
-const lessonSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    videoUrl: { type: String, required: true },
-    description: { type: String },
-    duration: { type: Number, required: true } // Đơn vị: phút
-});
-
-const chapterSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    lessons: [lessonSchema]
-});
-
 const courseSchema = new mongoose.Schema({
     title: { type: String, required: true },
     slug: { type: String, unique: true, required: true },
@@ -20,10 +8,10 @@ const courseSchema = new mongoose.Schema({
     price: { type: Number, default: 0 },
     discountPrice: { type: Number, default: 0 }, // Giá khuyến mãi
     thumbnail: { type: String, default: "/src/assets/imgs/default-thumbnail.jpg" },
-    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true }, // Liên kết danh mục
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category" }, // Liên kết danh mục
     tags: [{ type: String }], // Hỗ trợ tìm kiếm từ khóa
     isPublished: { type: Boolean, default: false },
-    content: [chapterSchema],
+    content: [{type: mongoose.Schema.Types.ObjectId, ref: "Chapter"}],
     numberStudent: { type: Number, default: 0 }, // Mặc định 0 nếu chưa có học viên
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Danh sách học viên đăng ký
     rating: { type: Number, default: 0 }, // Điểm đánh giá trung bình

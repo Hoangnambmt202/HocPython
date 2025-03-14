@@ -16,10 +16,19 @@ const getCourses = async (slug) => {
     return res.data
    
 }
-// Lấy tất cả khóa học
+const updateCourse = async (courseId) => {
+    const res = await axios.put(`${import.meta.env.VITE_API_URL}/course/update/${courseId}`)
+    return res.data
+}
+const deleteCourse = async (courseId) => {
+    const res = await axios.delete(`${import.meta.env.VITE_API_URL}/course/delete/${courseId}`, {withCredentials: true})
+    return res.data
+}
 
 export default {
     createCourse,
     getAllCourses,
     getCourses,
+    updateCourse,
+    deleteCourse
 }

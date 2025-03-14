@@ -1,61 +1,115 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { useDispatch, useSelector } from "react-redux";
-import { ChevronDown, ChevronUp, Star, MessageSquareText, FileText, Award, Text, Check } from "lucide-react";
-import { useNavigate , useParams } from "react-router-dom";
+import {
+  ChevronDown,
+  ChevronUp,
+  Star,
+  MessageSquareText,
+  FileText,
+  Award,
+  Text,
+  Check,
+} from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 
 import CourseService from "../../services/CourseService";
-import { addToCart, enrollCourse } from "../../redux/slides/cartSlides";
+import EnrollService from "../../services/EnrollService";
+import { addToCart } from "../../redux/slides/cartSlides";
+import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
+import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import { enrollCourseStart, enrollCourseSuccess, enrollCourseFailure } from "../../redux/slides/enrollSlice";
+
+
 const CoursePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
-  const [openChapter, setOpenChapter] = useState(null); // State để theo dõi chương nào đang mở
+  const [openChapter, setOpenChapter] = useState(null); 
   const [course, setCourse] = useState(null);
-  const { slug } = useParams(); // Lấy slug từ URL
+  const { slug } = useParams();
+  const [toast, setToast] = useState({ show: false, color: "", message: "" });
   const cart = useSelector((state) => state.cart.cart);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  useEffect(()=>{
-      const fetchCourse = async () => {
-        try {
-           
-          const response = await CourseService.getCourses(slug);
-          if (response.data) {
-            setCourse(response.data);
-          }
-        } catch (error) {
-          console.error("Lỗi khi tải khóa học:", error);
+  const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const response = await CourseService.getCourses(slug);
+        if (response.data) {
+          setCourse(response.data);
         }
-      };
-      fetchCourse()
-    },[slug])
+      } catch (error) {
+        console.error("Lỗi khi tải khóa học:", error);
+      }
+    };
+ 
+    fetchCourse();
+  },  [slug, dispatch]);
+
   const toggleChapter = (index) => {
     setOpenChapter(openChapter === index ? null : index);
   };
-  // const navigate = useNavigate();
+
   const handleBuyNow = () => {
-    // dispatch(addToCart(course));
-    // console.log(course)
-    // navigate("/order/payment");
-  }
+    dispatch(addToCart(course));
+    navigate("/order/payment");
+  };
+
   const handleAddToCart = () => {
-    dispatch(addToCart(course));  
-  }
+    dispatch(addToCart(course));
+  };
+
+  // Sử dụng useMutation để đăng ký khóa học
+  const enrollMutation = useMutation({
+    mutationFn: () => EnrollService.enrollCourse(course?._id),
+    onMutate: () => {
+      dispatch(enrollCourseStart());
+    },
+    onSuccess: (response) => {
+      if (response?.status !== "success") {
+        setToast({ show: true, message: response?.message, color: "red" });
+        dispatch(enrollCourseFailure(response?.message));
+      } else {
+        dispatch(enrollCourseSuccess(course)); // Lưu khóa học vào Redux
+        
+        setToast({ show: true, message: response.message, color: "green" });
+
+        // Chờ 2 giây rồi chuyển hướng sang trang học
+        setTimeout(() => {
+          navigate(`/course/${course.slug}/learn`);
+        }, 2000);
+      }
+    },
+    onError: (error) => {
+      console.error("Lỗi khi enroll khóa học:", error);
+      dispatch(enrollCourseFailure("Lỗi khi đăng ký khóa học"));
+    },
+  });
 
   const handleStartLearn = () => {
-    dispatch(enrollCourse(course));  
-    localStorage.setItem("enrolledCourses", JSON.stringify(course));
-    navigate(`/course/${course.slug}/learn`);
+    enrollMutation.mutate();
 
-  }
+  };
+
+  const isEnrolled = enrolledCourses.some((c) => c._id === course?._id);
   const isInCart = cart.some((item) => item._id === course?._id);
+
   return (
-    
-    
     <div className="w-full mx-auto p-4 bg-white">
-      {/* Thông tin khóa học */}
-      {<div className="flex flex-col md:flex-row gap-6 py-6">
+      {toast.show && (
+        <ToastMessageComponent
+          message={toast.message}
+          color={toast.color}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
+      )}
+
+      {/* Hiển thị loading khi đang đăng ký khóa học */}
+      {enrollMutation.isLoading && <LoadingComponent />}
+
+      <div className="flex flex-col md:flex-row gap-6 py-6">
         <img
           src={course?.thumbnail}
           alt={course?.title}
@@ -68,50 +122,54 @@ const CoursePage = () => {
             Giảng viên: {course?.lecturerId.name}
           </p>
           <p className="text-xl text-red-500 font-bold mt-2">
-  Giá: {course?.price > 0 ? `${course?.price} VNĐ` : "Miễn phí"}
-</p>
+            Giá: {course?.price > 0 ? `${course?.price} VNĐ` : "Miễn phí"}
+          </p>
 
-{course?.price === 0 ? (
-  <button 
-    onClick={handleStartLearn}
-    className="rounded-3xl bg-green-500 text-white px-3 py-2 mt-2 hover:bg-green-400"
-  >
-    Học ngay
-  </button>
-) : (
-  isInCart ? (
-    <button className="bg-gray-400 px-4 py-2 text-white" disabled>
-      Đã thêm vào giỏ hàng
-    </button>
-  ) : (
-    <div className="flex gap-2">
-      <button 
-        onClick={handleBuyNow} 
-        className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400"
-      >
-        Mua ngay
-      </button>
-      <button 
-        onClick={handleAddToCart} 
-        className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400"
-      >
-        Thêm vào giỏ hàng
-      </button>
-    </div>
-  )
-)}
-
-         
+           {isEnrolled ? (
+            <button disabled className="bg-gray-400 px-4 py-2 text-white">
+              Đã đăng ký
+            </button>
+          ):course?.price === 0 ? (
+            <button
+              onClick={handleStartLearn}
+              className="rounded-3xl bg-green-500 text-white px-3 py-2 mt-2 hover:bg-green-400"
+              disabled={enrollMutation.isLoading} // Vô hiệu hóa khi đang đăng ký
+            >
+              {enrollMutation.isLoading ? "Đang xử lý..." : "Học ngay"}
+            </button>
+          ) : isInCart ? (
+            <button className="bg-gray-400 px-4 py-2 text-white" disabled>
+              Đã thêm vào giỏ hàng
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={handleBuyNow}
+                className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400"
+              >
+                Mua ngay
+              </button>
+              <button
+                onClick={handleAddToCart}
+                className="rounded-3xl bg-blue-500 text-white px-3 py-2 mt-2 hover:bg-blue-400"
+              >
+                Thêm vào giỏ hàng
+              </button>
+            </div>
+          )}
         </div>
       </div>
-     
-}
+
       {/* Tabs điều hướng */}
-      <Tabs selectedIndex={selectedTab} onSelect={(index) => {setSelectedTab(index);
-      } } className="mt-8">
+      <Tabs
+        selectedIndex={selectedTab}
+        onSelect={(index) => {
+          setSelectedTab(index);
+        }}
+        className="mt-8"
+      >
         <TabList className="flex border-b">
-          {[
-            { icon: <Text size={20} />, label: "Giới thiệu" },
+          {[{ icon: <Text size={20} />, label: "Giới thiệu" },
             { icon: <FileText size={20} />, label: "Nội dung" },
             { icon: <Star size={20} />, label: "Đánh giá" },
             { icon: <MessageSquareText size={20} />, label: "Bình luận" },
@@ -127,38 +185,39 @@ const CoursePage = () => {
             </Tab>
           ))}
         </TabList>
-        <TabPanel>
-            <div className="mt-5 bg-white">
-                <h2 className="text-xl font-semibold">Bạn sẽ học được gì ?</h2>
-                   {
-                    course ? (
-                          <div className="flex items-center">
-                              <Check size={20} fontWeight={300} className="mr-2"/>
-                              <p className="mt-2">
-                                  {course.description}
-                              </p>
-                          </div>
-                  ): (<></>) 
-                   }
 
-                
-            </div>
+        <TabPanel>
+          <div className="mt-5 bg-white">
+            <h2 className="text-xl font-semibold">Bạn sẽ học được gì ?</h2>
+            {course ? (
+              <div className="flex items-center">
+                <Check size={20} fontWeight={300} className="mr-2" />
+                <p className="mt-2">{course.description}</p>
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
         </TabPanel>
 
         {/* Nội dung khóa học */}
         <TabPanel>
           <div className="mt-5 bg-white">
-            {
-              course ? (course.content.map((chapter, index) => (
+            {course ? (
+              course.content.map((chapter, index) => (
                 <div key={index} className="mb-4">
                   <div
                     className="flex justify-between items-center bg-gray-100 p-3 rounded-lg cursor-pointer"
                     onClick={() => toggleChapter(index)}
                   >
                     <h3 className="text-lg font-semibold text-blue-600">
-                       {chapter.title}
+                      {chapter.title}
                     </h3>
-                    {openChapter === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    {openChapter === index ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronDown size={20} />
+                    )}
                   </div>
                   {openChapter === index && (
                     <ul className="ml-4 mt-2 list-disc text-gray-700 bg-white shadow-md rounded-lg p-3">
@@ -170,8 +229,10 @@ const CoursePage = () => {
                     </ul>
                   )}
                 </div>
-              ))) : (<></>)
-            }
+              ))
+            ) : (
+              <></>
+            )}
           </div>
         </TabPanel>
 
@@ -213,9 +274,14 @@ const CoursePage = () => {
           <div className="mt-5">
             {course && course.certificate ? (
               <div>
-                <p className="text-gray-700">Hoàn thành khóa học để nhận chứng chỉ:</p>
+                <p className="text-gray-700">
+                  Hoàn thành khóa học để nhận chứng chỉ:
+                </p>
                 <img
-                  src={course.certificate || "/src/assets/imgs/certificate-default.jpg"}
+                  src={
+                    course.certificate ||
+                    "/src/assets/imgs/certificate-default.jpg"
+                  }
                   alt="Chứng chỉ"
                   className="w-1/2 mt-4 rounded-lg shadow-md"
                 />

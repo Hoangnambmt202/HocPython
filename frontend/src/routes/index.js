@@ -27,6 +27,7 @@ import PaymentHistory from "../pages/Admin/PaymentHistory";
 import PaymentRefund from "../pages/Admin/PaymentRefund";
 import StudentProgressAdmin from "../pages/Admin/StudentProgressManagement";
 import CartPage from "../pages/CartPage/CartPage";
+import CategoriesManagement from "../pages/Admin/CategoriesManagement";
 const routes = [
   {
    
@@ -112,6 +113,10 @@ const routes = [
       {
         path: "courses",
         page: CourseManagement,
+      },
+      {
+        path: "categories",
+        page: CategoriesManagement,
       },
       {
         path: "students",

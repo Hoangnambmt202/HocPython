@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import Modal from "../ModalComponent/ModalComponent";
@@ -16,20 +16,22 @@ import { toggleCart } from "../../redux/slides/cartSlides";
 
 
 
+
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
   const user = useSelector((state) => state.user.user);
 
 
-  const navigate = useNavigate();
-  
+
   const dispatch = useDispatch();
 
+  
+ 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await UserService.getDetailUser(); // API sẽ tự lấy access_token từ cookie
+        const res = await UserService.getDetailUser(); 
         if (res?.data) {
           dispatch(setUser(res?.data)); 
         }
@@ -38,18 +40,15 @@ const HeaderComponent = () => {
         dispatch(logout());
       }
     };
-  
+    
     fetchUser();
+   
   }, [dispatch]);
-  // Chạy lại khi Redux dispatch thay đổi
-
 
   const handleLoginSuccess = (userData) => {
-    if (userData && userData.data) {
-      
-      dispatch(setUser(userData.data)); 
+      dispatch(setUser(userData)); 
       setIsOpen(false); // Đóng modal
-    }
+    
   };
   
   const handleLogout = async () => {

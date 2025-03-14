@@ -8,10 +8,12 @@ const authMiddleware = (req, res, next) => {
   if (!access_token) {
     return res.status(401).json({ message: "Bạn chưa đăng nhập" });
   }
+
   
   try {
     const decoded = jwt.verify(access_token, process.env.ACCESS_TOKEN);
     req.user = decoded;
+   
     next();
   } catch (error) {
     

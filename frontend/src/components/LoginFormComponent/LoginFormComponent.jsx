@@ -78,13 +78,12 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
         setTimeout(() => setToast({ show: true, message: data.message, color: "red" }), 3000);
       } else {
         onLoginSuccess(data.data);
-        
-        
+    
         setTimeout(() => {
           setToast({ show: true, message: `Đăng nhập thành công, chào mừng ${data.data.name}`, color: "green" });
           setIsOpen(false);
           
-        }, 5000);
+        }, 2000);
       }
     },
     onError: (error) => {

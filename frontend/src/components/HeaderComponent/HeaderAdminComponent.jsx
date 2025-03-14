@@ -7,7 +7,7 @@ import UserService from "../../services/UserService";
 import Cookie from "js-cookie";
 const HeaderAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State để quản lý trạng thái dropdown
-
+  
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,44 +23,39 @@ const HeaderAdmin = () => {
       setIsDropdownOpen(false);
     }
   };
-  const handleLoginSuccess = (userData) => {
-    if (userData) {
-      dispatch(setUser(userData.data)); // Cập nhật Redux ngay lập tức
-      Cookie.set("access_token", userData.access_token);
-    }
-  };
 
   // Thêm event listener để đóng dropdown khi click ra ngoài
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
+    Cookie.remove("access_token");
     dispatch(logout());
     navigate("/admin/login");
     setIsDropdownOpen(false);
   };
   useEffect(() => {
-    const fetchUser = async () => {
-     
-    
-        try {
-          const res = await UserService.getDetailUser;
-          if (res?.data) {
-            dispatch(setUser(res.data.data)); // Cập nhật Redux với user mới
-            navigate("/admin/login");
-          }
-        } catch (error) {
-          console.error("Lỗi khi lấy thông tin user:", error);
-          Cookie.removeItem("admin_access_token"); // Nếu lỗi, xóa token
-          dispatch(logout()); // Xóa user khỏi Redux
-        }
-      
-    };
-    fetchUser();
 
+    const fetchUser = async () => {
+      try {
+        const res = await UserService.getDetailUser();
+        if (res?.data) {
+          dispatch(setUser(res.data)); // Cập nhật Redux với user mới
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin user:", error);
+        Cookie.remove("access_token"); // Xóa token nếu lỗi
+        dispatch(logout()); // Xóa user khỏi Redux
+        navigate("/admin/login"); // Điều hướng về trang đăng nhập
+      }
+     
+    };
+  
+    fetchUser();
+  
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [dispatch]);
+  }, [dispatch, navigate]);
+  
 
   return (
     <header className=" bg-white border-b border-gray-200 shadow-lg">
@@ -92,7 +87,7 @@ const HeaderAdmin = () => {
 
           {/* Phần tài khoản với dropdown */}
           <div className="relative dropdown-container">
-            {user && (
+            { user && (
               <>
                 <button
                   onClick={toggleDropdown}
@@ -110,7 +105,8 @@ const HeaderAdmin = () => {
                   <ChevronDown size={16} className="text-gray-400" />
                 </button>
               </>
-            )}
+            )
+          }
 
             {/* Dropdown menu */}
             {isDropdownOpen && (

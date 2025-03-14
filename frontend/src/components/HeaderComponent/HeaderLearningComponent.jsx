@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 const HeaderLearningComponent = () => {
   const { slug } = useParams(); // Lấy slug từ URL
   const navigate = useNavigate();
-  const enrolledCourses = useSelector((state) => state.cart.enrolledCourses || []);
+  const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses || []);
 
   // Tìm khóa học theo slug
   const course = enrolledCourses.find((c) => c.slug === slug) || {};

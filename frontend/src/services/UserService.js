@@ -24,23 +24,16 @@ const logoutUser = async () => {
     const res = await axios.post(`${import.meta.env.VITE_API_URL}/user/sign-up`,data);
     return res.data;
 }
-const getAllUser = async ( role) => {
+const getAllUser = async (role) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getAll?role=${role}`, { withCredentials: true })
     return res.data
 }
 const getDetailUser = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/me`, {
-      
-        withCredentials: true, // Gửi request có cookie
-      });
-    
-    
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/me`, {withCredentials: true});
     return res.data;
 }
-const updateUser = async ({data, access_token}) => {
-    const res = await axios.put(`${import.meta.env.VITE_API_URL}/user/update`, data, {
-        headers: { authorization: `Bearer ${access_token}` },
-    });
+const updateUser = async ({data}) => {
+    const res = await axios.put(`${import.meta.env.VITE_API_URL}/user/update`, data, {withCredentials: true});
    
     return res.data;
 };

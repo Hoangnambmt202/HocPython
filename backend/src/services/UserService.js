@@ -81,9 +81,9 @@ const loginUser = (userLogin) => {
         }
       );
       const { password: _, ...userData } = checkUser.toObject();
-
+      
       resolve({
-        status: "OK",
+        status: "success",
         message: "Đăng nhập thành công",
         data: userData,
         access_token,

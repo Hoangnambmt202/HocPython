@@ -26,7 +26,7 @@ const createUser = async (req, res) => {
     //     message: "Mật khẩu và xác nhận mật khẩu không khớp",
     //   });
     // }
-    console.log(req.body)
+
     const response = await UserService.createUser(req.body);
  
     return res.status(200).json(response);

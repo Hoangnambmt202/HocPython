@@ -5,13 +5,43 @@ import { useEffect, useState } from "react";
 import AsideComponent from "../../components/AsideComponent/AsideComponent";
 import CarouselComponent from "../../components/CarouselComponent/CarouselComponent";
 import CourseService from "../../services/CourseService";
+import { enrollCourseStart, enrollCourseSuccess, enrollCourseFailure } from "../../redux/slides/enrollSlice";
+import { useMutation } from "@tanstack/react-query";
+import EnrollService from "../../services/EnrollService";
+import { useDispatch, useSelector } from "react-redux";
+
+
 
 const HomePage = () => {
 
   // eslint-disable-next-line no-unused-vars
   const [toast, setToast] = useState(""); 
   const [courses, setCourses] = useState([]); 
+  const dispatch  = useDispatch();
+  const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses); 
+ const enrollMutation = useMutation({
+    mutationFn: () => EnrollService.allCourseEnroll(),
+    onMutate: () => {
+      dispatch(enrollCourseStart());
+    },
+    onSuccess: (response) => {
+      if (response?.status === "success" && response.data) {
+        // 🔥 Kiểm tra nếu danh sách khóa học chưa có trong Redux thì mới cập nhật
+        if (enrolledCourses.length === 0) {
+          response.data.map((course)=> {
+            dispatch(enrollCourseSuccess(course));
 
+          })
+        }
+      } else {
+        dispatch(enrollCourseFailure(response?.message || "Không lấy được danh sách khóa học"));
+      }
+    },
+    onError: (error) => {
+      console.error("Lỗi khi enroll khóa học:", error);
+      dispatch(enrollCourseFailure("Lỗi khi đăng ký khóa học"));
+    },
+  });
   useEffect(()=>{
     const fetchCourses = async () => {
       try {
@@ -26,8 +56,19 @@ const HomePage = () => {
         setToast("Failed to load courses");
       }
     };
-    fetchCourses()
-  },[])
+    const fetchEnrolledCourses = async () => {
+          try {
+            if (enrolledCourses.length === 0) {
+              enrollMutation.mutate();
+            }
+          }
+          catch (error){
+            console.log(error)
+          }
+        }
+    fetchCourses();
+    fetchEnrolledCourses();
+  },[dispatch,enrolledCourses.length])
   
   return (
     <div className="flex w-full h-full bg-white" >

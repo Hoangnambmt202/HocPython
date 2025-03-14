@@ -1,38 +1,95 @@
 const Course = require("../models/Course");
+const Chapter = require("../models/Chapter");
+const Lesson = require("../models/Lesson");
 const slugify = require("slugify");
 
 // Tạo khóa học
-const createCourse = async (courseData) => {
+const createCourse = async (data) => {
   try {
-    if (courseData.title) {
-      courseData.slug = slugify(courseData.title, { lower: true, strict: true });
+  
+   
+    if (data.title) {
+      data.slug = slugify(data.title, { lower: true, strict: true });
     }
 
-    const newCourse = new Course(courseData);
-    const savedCourse = await newCourse.save();
+    // Tạo khóa học trước
+    const newCourse = new Course({
+      title: data.title,
+      slug : data.slug,
+      description: data.description,
+      lecturerId: data.lecturerId,
+      categoryId: data.categoryId,
+      price: data.price,
+      discountPrice: data.discountPrice,
+      thumbnail: data.thumbnail,
+      isPublished: data.isPublished
+    });
 
-    return {
-      status: "success",
-      message: "Khóa học đã được tạo thành công",
-      data: savedCourse,
-    };
+    await newCourse.save();
+
+    // Tạo danh sách chương (Chapters)
+    const newChapters = await Promise.all(
+      data.content.map(async (chapter) => {
+        if (!chapter.title) throw new Error("Thiếu tiêu đề chương");
+
+        const newChapter = new Chapter({
+          courseId: newCourse._id,
+          title: chapter.title,
+          lessons: []
+        });
+
+        // Tạo danh sách bài học (Lessons)
+        const newLessons = await Promise.all(
+          chapter.lessons.map(async (lesson) => {
+            if (!lesson.title) throw new Error("Thiếu tiêu đề bài học");
+
+            const newLesson = new Lesson({ 
+              title: lesson.title,
+              videoUrl: lesson.videoUrl,
+              description: lesson.description,
+              duration: lesson.duration,
+              theory: lesson.theory,
+              quiz: lesson.quiz,
+              chapterId: newChapter._id,
+              courseId: newCourse._id
+            });
+
+            return (await newLesson.save())._id;
+          })
+        );
+
+        newChapter.lessons = newLessons;
+        await newChapter.save();
+
+        return newChapter._id;
+      })
+    );
+
+    // Cập nhật danh sách chương vào khóa học
+    newCourse.content = newChapters;
+    await newCourse.save();
+
+    return newCourse;
   } catch (error) {
-    return {
-      status: "error",
-      message: "Lỗi khi tạo khóa học",
-      error: error.message,
-    };
+    console.error("❌ Lỗi trong CourseService:", error);
+    throw error;
   }
-};
+}
 
 // Lấy tất cả khóa học
 const getAllCourses = async () => {
   try {
-    const courses = await Course.find().populate("lecturerId", "name");
+    const courses = await Course.find()
+    .populate("lecturerId", "name")
+    .populate("categoryId", "name")
+  
+
+    const totalCourses = await Course.countDocuments();
     return {
       status: "success",
       message: "Danh sách khóa học",
       data: courses,
+      total: totalCourses,
     };
   } catch (error) {
     return {
@@ -69,9 +126,46 @@ const getCourseBySlug = async (slug) => {
     };
   }
 };
+  // Cập nhật khóa học
+const updateCourse = async (courseId, data) => {
+  
+      try {
+        const updateCourse = await Course.findByIdAndUpdate(courseId, data,{new: true})
+        return  {
+          status: "success",
+          message: "Cập nhật khóa học thành công",
+          data: updateCourse,
+        }
+      }
+      catch (error) {
+        console.log(error)
+        
+      }
+    
+  
+};
+const deleteCourse = async (courseId) => {
+  
+  try {
+    const updateCourse = await Course.findByIdAndDelete(courseId)
+    return  {
+      status: "success",
+      message: "Xóa khóa học thành công",
+    
+    }
+  }
+  catch (error) {
+    console.log(error)
+    
+  }
+
+
+};
 
 module.exports = {
   createCourse,
   getAllCourses,
   getCourseBySlug,
+  updateCourse,
+  deleteCourse,
 };

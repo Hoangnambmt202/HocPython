@@ -14,6 +14,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
   const menuItems = [
     { icon: Home, label: "Trang chủ", href: "/admin" },
     { icon: Book, label: "Khóa học", href: "/admin/courses" },
+    { icon: Book, label: "Danh mục", href: "/admin/categories" },
     {
       icon: Users,
       label: "Users",
