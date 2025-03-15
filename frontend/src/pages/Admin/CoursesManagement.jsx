@@ -18,14 +18,17 @@ import UserService from "../../services/UserService";
 import CategoryService from "../../services/CategoryService";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 import MDEditor from "@uiw/react-md-editor";
-
+import ModalComponent from "../../components/ModalComponent/ModalComponent";
 const CourseManagement = () => {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courses, setCourses] = useState([]);
   const [lecturers, setLecturers] = useState([]);
   const [categories, setCategories] = useState([]);
-
+  const [expandedChapter, setExpandedChapter] = useState(0);
+  const [expandedLesson, setExpandedLesson] = useState(0);
+  const [courseToDelete, setCourseToDelete] = useState(null);
   const [toast, setToast] = useState({ show: false, color: "", message: "" });
 
   useEffect(() => {
@@ -34,7 +37,6 @@ const CourseManagement = () => {
         const response = await CourseService.getAllCourses();
         if (response.data) {
           setCourses(response.data);
-     
         }
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -65,7 +67,6 @@ const CourseManagement = () => {
         console.error("Lỗi khi tải danh mục:", error);
       }
     };
-    
 
     fetchCourses();
     fetchLecturers();
@@ -73,53 +74,9 @@ const CourseManagement = () => {
   }, []);
 
   const CourseForm = ({ isOpen, onClose, course = null }) => {
-    useEffect(() => {
-      if (isOpen) {
-        if (selectedCourse) {
-          setFormData({
-            _id: selectedCourse._id,
-            title: selectedCourse.title || "",
-            description: selectedCourse.description || "",
-            lecturerId: selectedCourse.lecturerId?._id || "",
-            categoryId: selectedCourse.categoryId?._id || "",
-            price: selectedCourse.price || 0,
-            isPublished: selectedCourse.isPublished || false,
-            thumbnail: selectedCourse.thumbnail || "",
-            content: selectedCourse.content?.map((chapter) => ({
-              _id: chapter._id,
-              title: chapter.title,
-              lessons: chapter.lessons?.map((lesson) => ({
-                _id: lesson._id,
-                title: lesson.title,
-                videoUrl: lesson.videoUrl,
-                description: lesson.description,
-                duration: lesson.duration,
-              })) || [],
-            })) || [],
-          });
-        } else {
-          // Reset form khi thêm mới khóa học
-          setFormData({
-            title: "",
-            description: "",
-            lecturerId: lecturers.length > 0 ? lecturers[0]._id : "",
-            categoryId: "",
-            price: 0,
-            isPublished: false,
-            thumbnail: "",
-            content: [],
-          });
-        }
-      }
-    }, [isOpen, selectedCourse]);
-    
-    
-    
-    
-    
-    
-    if (!isOpen) return null;
-
+    const [thumbnailPreview, setThumbnailPreview] = useState(
+      course?.thumbnail || ""
+    );
     const [formData, setFormData] = useState({
       title: course?.title || "",
       description: course?.description || "",
@@ -145,13 +102,37 @@ const CourseManagement = () => {
         },
       ],
     });
-    
-    
-    const [expandedChapter, setExpandedChapter] = useState(0);
-    const [expandedLesson, setExpandedLesson] = useState(0);
-    const [thumbnailPreview, setThumbnailPreview] = useState(
-      course?.thumbnail || ""
-    );
+    useEffect(() => {
+      if (isOpen) {
+        if (selectedCourse) {
+          console.log("📥 Khóa học được chọn:", selectedCourse);
+          setFormData((prev) => ({
+            ...prev,
+            _id: selectedCourse._id,
+            title: selectedCourse.title || "",
+            description: selectedCourse.description || "",
+            lecturerId: selectedCourse.lecturerId?._id || "",
+            categoryId: selectedCourse.categoryId?._id || "",
+            price: selectedCourse.price || 0,
+            isPublished: selectedCourse.isPublished || false,
+            thumbnail: selectedCourse.thumbnail || "",
+            content:
+              selectedCourse.content?.map((chapter) => ({
+                title: chapter.title,
+                lessons:
+                  chapter.lessons?.map((lesson) => ({
+                    title: lesson.title,
+                    videoUrl: lesson.videoUrl,
+                    description: lesson.description,
+                    duration: lesson.duration,
+                  })) || [],
+              })) || [],
+          }));
+        }
+      }
+    }, [isOpen, selectedCourse]);
+
+    if (!isOpen) return null;
 
     const handleInputChange = (e) => {
       const { name, value, type, checked } = e.target;
@@ -247,19 +228,17 @@ const CourseManagement = () => {
       setFormData({ ...formData, content: newContent });
     };
 
-    const updateQuiz = (chapterIndex, lessonIndex, quizIndex, field, value) => {
-      const newContent = [...formData.content];
-      newContent[chapterIndex].lessons[lessonIndex].quiz[quizIndex][field] =
-        value;
-      setFormData({ ...formData, content: newContent });
-    };
+    // const updateQuiz = (chapterIndex, lessonIndex, quizIndex, field, value) => {
+    //   const newContent = [...formData.content];
+    //   newContent[chapterIndex].lessons[lessonIndex].quiz[quizIndex][field] =
+    //     value;
+    //   setFormData({ ...formData, content: newContent });
+    // };
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-    
+
       try {
-        console.log("📤 Gửi dữ liệu lên backend:", formData);
-    
         const formattedData = {
           title: formData.title,
           description: formData.description,
@@ -269,10 +248,8 @@ const CourseManagement = () => {
           isPublished: formData.isPublished,
           thumbnail: formData.thumbnail,
           content: formData.content.map((chapter) => ({
-            _id: chapter._id,
             title: chapter.title,
             lessons: chapter.lessons.map((lesson) => ({
-              _id: lesson._id,
               title: lesson.title,
               videoUrl: lesson.videoUrl,
               description: lesson.description,
@@ -280,7 +257,7 @@ const CourseManagement = () => {
             })),
           })),
         };
-    
+
         if (selectedCourse) {
           await CourseService.updateCourse(selectedCourse._id, formattedData);
           alert("Cập nhật khóa học thành công!");
@@ -289,15 +266,14 @@ const CourseManagement = () => {
           alert("Thêm khóa học thành công!");
         }
         const response = await CourseService.getAllCourses();
-    if (response.data) {
-      setCourses(response.data);
-    }
+        if (response.data) {
+          setCourses(response.data);
+        }
         onClose();
       } catch (error) {
         console.error("Lỗi khi lưu khóa học:", error);
       }
     };
-    
 
     // Tính tổng thời lượng
     const totalDuration = (formData.content || []).reduce((total, chapter) => {
@@ -509,7 +485,6 @@ const CourseManagement = () => {
               </div>
 
               <div className="space-y-4">
-               
                 {formData.content?.map((chapter, chapterIndex) => (
                   <div
                     key={chapterIndex}
@@ -733,7 +708,7 @@ const CourseManagement = () => {
                       </div>
                     )}
                   </div>
-                ))   }
+                ))}
               </div>
             </div>
 
@@ -758,28 +733,36 @@ const CourseManagement = () => {
     );
   };
 
-  // const handleUpdateCourse = async (courseId, updatedData) => {
-  //   try {
-  //     await CourseService.updateCourse(courseId, updatedData);
-  //     setToast({
-  //       show: true,
-  //       message: "Cập nhật khóa học thành công!",
-  //       color: "green",
-  //     });
-  //     // Refresh the courses list
-  //     const response = await CourseService.getAllCourses();
-  //     if (response.data) {
-  //       setCourses(response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error("Lỗi khi cập nhật khóa học:", error);
-  //     setToast({
-  //       show: true,
-  //       message: "Cập nhật khóa học thất bại!",
-  //       color: "red",
-  //     });
-  //   }
-  // };
+  const handleDelete = async () => {
+    if (!courseToDelete) return;
+
+    try {
+      console.log("🗑️ Đang xóa khóa học với _id:", courseToDelete);
+      await CourseService.deleteCourse(courseToDelete);
+
+      setToast({
+        show: true,
+        message: "Xóa khóa học thành công!",
+        color: "green",
+      });
+
+      // Cập nhật lại danh sách khóa học sau khi xóa
+      const response = await CourseService.getAllCourses();
+      if (response.data) {
+        setCourses(response.data);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi khi xóa khóa học:", error);
+      setToast({
+        show: true,
+        message: "Lỗi khi xóa khóa học!",
+        color: "red",
+      });
+    } finally {
+      setIsOpen(false);
+      setCourseToDelete(null);
+    }
+  };
 
   return (
     <div className="space-y-6 py-8">
@@ -897,17 +880,80 @@ const CourseManagement = () => {
 
                 <td className="px-4 py-4 text-right space-x-3">
                   <button
-                    onClick={() => {setSelectedCourse(course); setShowAddModal(true)}}
+                    onClick={() => {
+                      setSelectedCourse(course);
+                      setShowAddModal(true);
+                    }}
                     className="text-gray-600 hover:text-blue-600"
                   >
                     <Edit className="w-5 h-5" />
                   </button>
-                  <button className="text-gray-600 hover:text-red-600">
+                  <button
+                    onClick={() => {
+                      setIsOpen(true);
+                      setCourseToDelete(course._id);
+                    }}
+                    className="text-gray-600 hover:text-red-600"
+                  >
                     <Trash2 className="w-5 h-5" />
                   </button>
                   <button className="text-gray-600">
                     <MoreVertical className="w-5 h-5" />
                   </button>
+                  <ModalComponent
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    onClose={() => setIsOpen(false)}
+                  >
+                    <h3 className="text-2xl font-bold ">Xác Nhận Xóa</h3>
+                    <div className="p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="bg-red-100 p-2 rounded-full mr-4">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 text-red-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">
+                            Bạn có chắc chắn muốn xóa không?
+                          </h4>
+                          <p className="text-gray-500 mt-1">
+                            Hành động này không thể hoàn tác. Dữ liệu sẽ bị xóa
+                            vĩnh viễn.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Modal footer */}
+                    <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                      <button
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                        className="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                      >
+                        Hủy bỏ
+                      </button>
+                      <button
+                        onClick={handleDelete}
+                        className="px-4 py-2 bg-red-500 text-white  rounded-md font-medium hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                      >
+                        Xác nhận xóa
+                      </button>
+                    </div>
+                  </ModalComponent>
                 </td>
               </tr>
             ))}

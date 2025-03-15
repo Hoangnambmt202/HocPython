@@ -26,7 +26,6 @@ const HeaderComponent = () => {
 
   const dispatch = useDispatch();
 
-  
  
   useEffect(() => {
     const fetchUser = async () => {

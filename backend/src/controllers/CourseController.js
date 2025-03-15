@@ -21,25 +21,21 @@ const getAllCourses = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi lấy danh sách khóa học", error });
   }
 };
+
 const getCourse = async (req, res) => {
   try {
     const { slug } = req.params;
-    
     const course = await CourseService.getCourseBySlug(slug);
-
     if (!course) {
       return res.status(404).json({ message: "Khóa học không tồn tại" });
     }
-
     res.status(200).json(course);
- 
   } catch (error) {
     res.status(500).json({ message: "Lỗi khi lấy khóa học", error });
   }
 };
 
 const updateCourse = async (req, res) => {
-
 try {
   const { courseId } = req.params;
   const response = await CourseService.updateCourse(courseId, req.body); 

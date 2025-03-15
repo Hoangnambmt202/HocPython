@@ -1,18 +1,14 @@
 import { Link } from "react-router-dom";
 import AsideComponent from "../../components/AsideComponent/AsideComponent";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Clock, User } from "lucide-react";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const MyCoursesPage = () => {
-  const dispatch = useDispatch();
+
   const [progress, setProgress] = useState(40);
   const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
-
-  useEffect(() => {
-   
-  }, [dispatch]);
 
   return (
     <div className="flex w-full h-full bg-white">

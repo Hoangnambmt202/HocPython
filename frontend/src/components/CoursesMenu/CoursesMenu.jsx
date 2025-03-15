@@ -12,7 +12,7 @@ const CoursesMenu = () => {
         try {
           const response = await CourseService.getAllCourses();
           if (response?.data) {
-            setCourses(response?.data);
+            setEnrollCourses(response?.data);
           }
   
         } catch (error) {
@@ -43,7 +43,7 @@ const CoursesMenu = () => {
         </header>
         
         <div className="max-h-[400px] overflow-y-auto">
-          {courses?.map((course) => {
+          {enrollCourses?.map((course) => {
            
             return (
               <div

@@ -89,9 +89,6 @@ const getAllCourses = async () => {
         select: "title videoUrl description duration" // Chọn các trường bạn muốn lấy từ Lesson
       }
     });
-    
-  
-
     const totalCourses = await Course.countDocuments();
     return {
       status: "success",
@@ -111,7 +108,16 @@ const getAllCourses = async () => {
 // Lấy khóa học theo slug
 const getCourseBySlug = async (slug) => {
   try {
-    const course = await Course.findOne({ slug }).populate("lecturerId", "name");
+    const course = await Course.findOne({ slug })
+    .populate("lecturerId", "name")
+    .populate("categoryId", "name")
+    .populate({
+      path: "content", // Đây là trường chứa các Chapter
+      populate: {
+        path: "lessons", // Đây là trường chứa các Lesson trong Chapter
+        select: "title videoUrl description duration" // Chọn các trường bạn muốn lấy từ Lesson
+      }
+    });
 
     if (!course) {
       return {
@@ -134,24 +140,77 @@ const getCourseBySlug = async (slug) => {
     };
   }
 };
-  // Cập nhật khóa học
-const updateCourse = async (courseId, data) => {
+
+  const updateCourse = async (courseId, data) => {
+    try {
+      console.log("📥 Dữ liệu nhận từ frontend:", data);
   
-      try {
-        const updateCourse = await Course.findByIdAndUpdate(courseId, data,{new: true})
-        return  {
-          status: "success",
-          message: "Cập nhật khóa học thành công",
-          data: updateCourse,
-        }
-      }
-      catch (error) {
-        console.log(error)
-        
-      }
-    
+      // Cập nhật khóa học
+      const updatedCourse = await Course.findByIdAndUpdate(
+        courseId,
+        {
+          title: data.title,
+          description: data.description,
+          lecturerId: data.lecturerId,
+          categoryId: data.categoryId,
+          price: data.price,
+          isPublished: data.isPublished,
+          thumbnail: data.thumbnail,
+        },
+        { new: true, runValidators: true }
+      );
   
-};
+      if (!updatedCourse) {
+        return { status: "error", message: "Không tìm thấy khóa học!" };
+      }
+      console.log(data.content)
+      // 📌 **Cập nhật Chapter**
+      // for (const chapterData of data.content) {
+      //   let updatedChapter;
+  
+      //   if (chapterData._id) {
+      //     // Cập nhật chapter nếu đã có _id
+      //     updatedChapter = await Chapter.findByIdAndUpdate(
+      //       chapterData._id,
+      //       { title: chapterData.title },
+      //       { new: true }
+      //     );
+      //   } 
+      //   // 📌 **Cập nhật Lesson trong từng Chapter**
+      //   for (const lessonData of chapterData.lessons) {
+      //     if (lessonData._id) {
+      //       // Cập nhật lesson nếu đã có _id
+      //       await Lesson.findByIdAndUpdate(
+      //         lessonData._id,
+      //         {
+      //           title: lessonData.title,
+      //           videoUrl: lessonData.videoUrl,
+      //           description: lessonData.description,
+      //           duration: lessonData.duration,
+      //           theory: lessonData.theory,
+      //         },
+      //         { new: true }
+      //       );
+      //     }
+      //   }
+  
+      //   await updatedChapter.save();
+      // }
+  
+      // Lưu lại khóa học sau khi cập nhật danh sách chương
+      await updatedCourse.save();
+  
+      return {
+        status: "success",
+        message: "Cập nhật khóa học thành công!",
+        data: updatedCourse,
+      };
+    } catch (error) {
+      console.error("❌ Lỗi khi cập nhật khóa học:", error);
+      return { status: "error", message: "Lỗi khi cập nhật khóa học" };
+    }
+  };
+  
 const deleteCourse = async (courseId) => {
   
   try {
