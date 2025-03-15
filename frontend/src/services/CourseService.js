@@ -16,8 +16,8 @@ const getCourses = async (slug) => {
     return res.data
    
 }
-const updateCourse = async (courseId) => {
-    const res = await axios.put(`${import.meta.env.VITE_API_URL}/course/update/${courseId}`)
+const updateCourse = async (courseId, data) => {
+    const res = await axios.put(`${import.meta.env.VITE_API_URL}/course/update/${courseId}`,data , {withCredentials: true})
     return res.data
 }
 const deleteCourse = async (courseId) => {

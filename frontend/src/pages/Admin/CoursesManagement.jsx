@@ -34,6 +34,7 @@ const CourseManagement = () => {
         const response = await CourseService.getAllCourses();
         if (response.data) {
           setCourses(response.data);
+     
         }
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -64,6 +65,7 @@ const CourseManagement = () => {
         console.error("Lỗi khi tải danh mục:", error);
       }
     };
+    
 
     fetchCourses();
     fetchLecturers();
@@ -71,6 +73,51 @@ const CourseManagement = () => {
   }, []);
 
   const CourseForm = ({ isOpen, onClose, course = null }) => {
+    useEffect(() => {
+      if (isOpen) {
+        if (selectedCourse) {
+          setFormData({
+            _id: selectedCourse._id,
+            title: selectedCourse.title || "",
+            description: selectedCourse.description || "",
+            lecturerId: selectedCourse.lecturerId?._id || "",
+            categoryId: selectedCourse.categoryId?._id || "",
+            price: selectedCourse.price || 0,
+            isPublished: selectedCourse.isPublished || false,
+            thumbnail: selectedCourse.thumbnail || "",
+            content: selectedCourse.content?.map((chapter) => ({
+              _id: chapter._id,
+              title: chapter.title,
+              lessons: chapter.lessons?.map((lesson) => ({
+                _id: lesson._id,
+                title: lesson.title,
+                videoUrl: lesson.videoUrl,
+                description: lesson.description,
+                duration: lesson.duration,
+              })) || [],
+            })) || [],
+          });
+        } else {
+          // Reset form khi thêm mới khóa học
+          setFormData({
+            title: "",
+            description: "",
+            lecturerId: lecturers.length > 0 ? lecturers[0]._id : "",
+            categoryId: "",
+            price: 0,
+            isPublished: false,
+            thumbnail: "",
+            content: [],
+          });
+        }
+      }
+    }, [isOpen, selectedCourse]);
+    
+    
+    
+    
+    
+    
     if (!isOpen) return null;
 
     const [formData, setFormData] = useState({
@@ -98,8 +145,10 @@ const CourseManagement = () => {
         },
       ],
     });
-
+    
+    
     const [expandedChapter, setExpandedChapter] = useState(0);
+    const [expandedLesson, setExpandedLesson] = useState(0);
     const [thumbnailPreview, setThumbnailPreview] = useState(
       course?.thumbnail || ""
     );
@@ -131,6 +180,7 @@ const CourseManagement = () => {
 
     const addChapter = () => {
       const newContent = [...formData.content];
+
       newContent.push({
         title: `Chương ${newContent.length + 1}: Tiêu đề chương`,
         lessons: [
@@ -139,11 +189,13 @@ const CourseManagement = () => {
             videoUrl: "",
             description: "Mô tả bài học",
             duration: 10,
+            theory: "",
+            quiz: [],
           },
         ],
       });
       setFormData({ ...formData, content: newContent });
-      setExpandedChapter(newContent.length - 1);
+      setExpandedChapter(newContent.length + 1);
     };
 
     const removeChapter = (index) => {
@@ -167,8 +219,11 @@ const CourseManagement = () => {
         videoUrl: "",
         description: "Mô tả bài học",
         duration: 10,
+        theory: "",
+        quiz: [],
       });
       setFormData({ ...formData, content: newContent });
+      setExpandedLesson(newContent.length + 1);
     };
 
     const removeLesson = (chapterIndex, lessonIndex) => {
@@ -184,58 +239,71 @@ const CourseManagement = () => {
     };
     const addQuiz = (chapterIndex, lessonIndex) => {
       const newContent = [...formData.content];
-      newContent[chapterIndex].lessons[lessonIndex].quiz.push({ 
-        question: "", 
-        options: ["", "", "", ""], 
-        correctAnswer: 0 
+      newContent[chapterIndex].lessons[lessonIndex].quiz.push({
+        question: "",
+        options: ["", "", "", ""],
+        correctAnswer: 0,
       });
       setFormData({ ...formData, content: newContent });
     };
-    
+
     const updateQuiz = (chapterIndex, lessonIndex, quizIndex, field, value) => {
       const newContent = [...formData.content];
-      newContent[chapterIndex].lessons[lessonIndex].quiz[quizIndex][field] = value;
+      newContent[chapterIndex].lessons[lessonIndex].quiz[quizIndex][field] =
+        value;
       setFormData({ ...formData, content: newContent });
     };
-    
+
     const handleSubmit = async (e) => {
       e.preventDefault();
-
+    
       try {
         console.log("📤 Gửi dữ liệu lên backend:", formData);
-        // Chuẩn hóa dữ liệu chương, bài học và bài tập trước khi gửi
-        const formattedContent = formData.content.map((chapter) => ({
-          title: chapter.title,
-          lessons: chapter.lessons.map((lesson) => ({
-            title: lesson.title,
-            videoUrl: lesson.videoUrl,
-            description: lesson.description,
-            duration: lesson.duration,
-            theory: lesson.theory,
-            quiz: lesson.quiz.map((q) => ({
-              question: q.question,
-              options: q.options,
-              correctAnswer: q.correctAnswer,
+    
+        const formattedData = {
+          title: formData.title,
+          description: formData.description,
+          lecturerId: formData.lecturerId,
+          categoryId: formData.categoryId,
+          price: formData.price,
+          isPublished: formData.isPublished,
+          thumbnail: formData.thumbnail,
+          content: formData.content.map((chapter) => ({
+            _id: chapter._id,
+            title: chapter.title,
+            lessons: chapter.lessons.map((lesson) => ({
+              _id: lesson._id,
+              title: lesson.title,
+              videoUrl: lesson.videoUrl,
+              description: lesson.description,
+              duration: lesson.duration,
             })),
           })),
-        }));
-
-        // Tạo object mới để gửi lên API
-        const formattedData = { ...formData, content: formattedContent };
-
-        await CourseService.createCourse(formattedData);
-        alert("Thêm khóa học thành công!");
+        };
+    
+        if (selectedCourse) {
+          await CourseService.updateCourse(selectedCourse._id, formattedData);
+          alert("Cập nhật khóa học thành công!");
+        } else {
+          await CourseService.createCourse(formattedData);
+          alert("Thêm khóa học thành công!");
+        }
+        const response = await CourseService.getAllCourses();
+    if (response.data) {
+      setCourses(response.data);
+    }
         onClose();
       } catch (error) {
-        console.error("Lỗi khi tạo khóa học:", error);
+        console.error("Lỗi khi lưu khóa học:", error);
       }
     };
+    
 
     // Tính tổng thời lượng
-    const totalDuration = formData.content.reduce((total, chapter) => {
+    const totalDuration = (formData.content || []).reduce((total, chapter) => {
       return (
         total +
-        chapter.lessons.reduce(
+        (chapter.lessons || []).reduce(
           (sum, lesson) => sum + parseInt(lesson.duration || 0),
           0
         )
@@ -243,8 +311,8 @@ const CourseManagement = () => {
     }, 0);
 
     // Tính tổng số bài học
-    const totalLessons = formData.content.reduce((total, chapter) => {
-      return total + chapter.lessons.length;
+    const totalLessons = (formData.content || []).reduce((total, chapter) => {
+      return total + (chapter.lessons ? chapter.lessons.length : 0);
     }, 0);
 
     return (
@@ -278,6 +346,7 @@ const CourseManagement = () => {
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
+                    placeholder="Nhập tên khóa học"
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -291,6 +360,7 @@ const CourseManagement = () => {
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
+                    placeholder="Nhập chi tiết khóa học"
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     rows="3"
                     required
@@ -328,7 +398,7 @@ const CourseManagement = () => {
                       className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                       required
                     >
-                      <option value=""></option>
+                      <option value="">Chọn Danh Mục</option>
                       {categories.map((category) => (
                         <option key={category._id} value={category._id}>
                           {category.name}
@@ -439,7 +509,8 @@ const CourseManagement = () => {
               </div>
 
               <div className="space-y-4">
-                {formData.content.map((chapter, chapterIndex) => (
+               
+                {formData.content?.map((chapter, chapterIndex) => (
                   <div
                     key={chapterIndex}
                     className="border rounded-lg overflow-hidden"
@@ -485,7 +556,7 @@ const CourseManagement = () => {
 
                     {expandedChapter === chapterIndex && (
                       <div className="p-4 space-y-4">
-                        {chapter.lessons.map((lesson, lessonIndex) => (
+                        {(chapter.lessons || []).map((lesson, lessonIndex) => (
                           <div
                             key={lessonIndex}
                             className="p-3 border rounded-lg bg-gray-50"
@@ -576,45 +647,78 @@ const CourseManagement = () => {
                               />
                             </div>
                             {/* Hiển thị danh sách câu hỏi quiz */}
-{lesson.quiz.map((quiz, quizIndex) => (
-  <div key={quizIndex} className="border p-2 rounded-lg mt-2">
-    <input
-      type="text"
-      value={quiz.question}
-      onChange={(e) => updateQuiz(chapterIndex, lessonIndex, quizIndex, "question", e.target.value)}
-      className="w-full border rounded-lg p-2"
-      placeholder="Nhập câu hỏi"
-    />
+                            {/* {lesson.quiz.map((quiz, quizIndex) => (
+                              <div
+                                key={quizIndex}
+                                className="border p-2 rounded-lg mt-2"
+                              >
+                                <input
+                                  type="text"
+                                  value={quiz.question}
+                                  onChange={(e) =>
+                                    updateQuiz(
+                                      chapterIndex,
+                                      lessonIndex,
+                                      quizIndex,
+                                      "question",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full border rounded-lg p-2"
+                                  placeholder="Nhập câu hỏi"
+                                />
 
-    {quiz.options.map((option, optionIndex) => (
-      <div key={optionIndex} className="flex items-center space-x-2 mt-1">
-        <input
-          type="radio"
-          name={`quiz-${chapterIndex}-${lessonIndex}-${quizIndex}`}
-          checked={quiz.correctAnswer === optionIndex}
-          onChange={() => updateQuiz(chapterIndex, lessonIndex, quizIndex, "correctAnswer", optionIndex)}
-        />
-        <input
-          type="text"
-          value={option}
-          onChange={(e) => {
-            const newOptions = [...quiz.options];
-            newOptions[optionIndex] = e.target.value;
-            updateQuiz(chapterIndex, lessonIndex, quizIndex, "options", newOptions);
-          }}
-          className="w-full border rounded-lg p-2"
-          placeholder={`Đáp án ${optionIndex + 1}`}
-        />
-      </div>
-    ))}
-  </div>
-))}
+                                {quiz.options.map((option, optionIndex) => (
+                                  <div
+                                    key={optionIndex}
+                                    className="flex items-center space-x-2 mt-1"
+                                  >
+                                    <input
+                                      type="radio"
+                                      name={`quiz-${chapterIndex}-${lessonIndex}-${quizIndex}`}
+                                      checked={
+                                        quiz.correctAnswer === optionIndex
+                                      }
+                                      onChange={() =>
+                                        updateQuiz(
+                                          chapterIndex,
+                                          lessonIndex,
+                                          quizIndex,
+                                          "correctAnswer",
+                                          optionIndex
+                                        )
+                                      }
+                                    />
+                                    <input
+                                      type="text"
+                                      value={option}
+                                      onChange={(e) => {
+                                        const newOptions = [...quiz.options];
+                                        newOptions[optionIndex] =
+                                          e.target.value;
+                                        updateQuiz(
+                                          chapterIndex,
+                                          lessonIndex,
+                                          quizIndex,
+                                          "options",
+                                          newOptions
+                                        );
+                                      }}
+                                      className="w-full border rounded-lg p-2"
+                                      placeholder={`Đáp án ${optionIndex + 1}`}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            ))} */}
 
-{/* Nút thêm câu hỏi */}
-<button onClick={() => addQuiz(chapterIndex, lessonIndex)} className="mt-2 bg-green-500 text-white px-3 py-1.5 rounded">
-  + Thêm bài tập quiz
-</button>
-
+                            {/* Nút thêm câu hỏi */}
+                            <button
+                              onClick={() => addQuiz(chapterIndex, lessonIndex)}
+                              className="mt-2 bg-green-500 text-white px-3 py-1.5 rounded"
+                            >
+                              + Thêm bài tập quiz
+                            </button>
                           </div>
                         ))}
 
@@ -629,7 +733,7 @@ const CourseManagement = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                ))   }
               </div>
             </div>
 
@@ -653,6 +757,29 @@ const CourseManagement = () => {
       </div>
     );
   };
+
+  // const handleUpdateCourse = async (courseId, updatedData) => {
+  //   try {
+  //     await CourseService.updateCourse(courseId, updatedData);
+  //     setToast({
+  //       show: true,
+  //       message: "Cập nhật khóa học thành công!",
+  //       color: "green",
+  //     });
+  //     // Refresh the courses list
+  //     const response = await CourseService.getAllCourses();
+  //     if (response.data) {
+  //       setCourses(response.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Lỗi khi cập nhật khóa học:", error);
+  //     setToast({
+  //       show: true,
+  //       message: "Cập nhật khóa học thất bại!",
+  //       color: "red",
+  //     });
+  //   }
+  // };
 
   return (
     <div className="space-y-6 py-8">
@@ -770,7 +897,7 @@ const CourseManagement = () => {
 
                 <td className="px-4 py-4 text-right space-x-3">
                   <button
-                    onClick={() => setSelectedCourse(course)}
+                    onClick={() => {setSelectedCourse(course); setShowAddModal(true)}}
                     className="text-gray-600 hover:text-blue-600"
                   >
                     <Edit className="w-5 h-5" />

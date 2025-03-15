@@ -5,7 +5,8 @@ import CourseService from "../../services/CourseService";
 const CoursesMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [toast, setToast] = useState(""); 
-    const [courses, setCourses] = useState([]); 
+  const [enrollCourses, setEnrollCourses] = useState([]);
+ 
     useEffect(()=>{
       const fetchCourses = async () => {
         try {

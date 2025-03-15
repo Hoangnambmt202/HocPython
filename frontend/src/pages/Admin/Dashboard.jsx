@@ -163,7 +163,7 @@ const Dashboard = () => {
                     </div>
                     <span className="text-sm text-gray-500 mt-1">{course.completion}%</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                     {course.revenue}
                   </td>
                 </tr>
