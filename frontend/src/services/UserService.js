@@ -37,6 +37,10 @@ const updateUser = async ({data}) => {
    
     return res.data;
 };
+const deleteUser = async (userId) => {
+    const res = await axios.delete(`${import.meta.env.VITE_API_URL}/user/delete/${userId}`, {withCredentials: true});
+    return res.data;
+};
 
 
 export default {
@@ -46,4 +50,5 @@ export default {
     getAllUser,
     getDetailUser,
     updateUser,
+    deleteUser
 }

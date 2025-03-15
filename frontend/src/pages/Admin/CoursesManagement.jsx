@@ -102,35 +102,35 @@ const CourseManagement = () => {
         },
       ],
     });
-    useEffect(() => {
-      if (isOpen) {
-        if (selectedCourse) {
-          console.log("📥 Khóa học được chọn:", selectedCourse);
-          setFormData((prev) => ({
-            ...prev,
-            _id: selectedCourse._id,
-            title: selectedCourse.title || "",
-            description: selectedCourse.description || "",
-            lecturerId: selectedCourse.lecturerId?._id || "",
-            categoryId: selectedCourse.categoryId?._id || "",
-            price: selectedCourse.price || 0,
-            isPublished: selectedCourse.isPublished || false,
-            thumbnail: selectedCourse.thumbnail || "",
-            content:
-              selectedCourse.content?.map((chapter) => ({
-                title: chapter.title,
-                lessons:
-                  chapter.lessons?.map((lesson) => ({
-                    title: lesson.title,
-                    videoUrl: lesson.videoUrl,
-                    description: lesson.description,
-                    duration: lesson.duration,
-                  })) || [],
-              })) || [],
-          }));
-        }
-      }
-    }, [isOpen, selectedCourse]);
+    // useEffect(() => {
+    //   if (isOpen) {
+    //     if (selectedCourse) {
+    //       setFormData((prev) => ({
+    //         ...prev,
+    //         _id: selectedCourse._id,
+    //         title: selectedCourse.title || "",
+    //         description: selectedCourse.description || "",
+    //         lecturerId: selectedCourse.lecturerId?._id || "",
+    //         categoryId: selectedCourse.categoryId?._id || "",
+    //         price: selectedCourse.price || 0,
+    //         isPublished: selectedCourse.isPublished || false,
+    //         thumbnail: selectedCourse.thumbnail || "",
+    //         content:
+    //           selectedCourse.content?.map((chapter) => ({
+    //             title: chapter.title,
+    //             lessons:
+    //               chapter.lessons?.map((lesson) => ({
+    //                 title: lesson.title,
+    //                 videoUrl: lesson.videoUrl,
+    //                 description: lesson.description,
+    //                 theory: lesson.theory,
+    //                 duration: lesson.duration,
+    //               })) || [],
+    //           })) || [],
+    //       }));
+    //     }
+    //   }
+    // }, [isOpen, selectedCourse]);
 
     if (!isOpen) return null;
 
@@ -253,6 +253,7 @@ const CourseManagement = () => {
               title: lesson.title,
               videoUrl: lesson.videoUrl,
               description: lesson.description,
+              theory: lesson.theory,
               duration: lesson.duration,
             })),
           })),
@@ -745,7 +746,7 @@ const CourseManagement = () => {
         message: "Xóa khóa học thành công!",
         color: "green",
       });
-
+      setIsOpen(false)
       // Cập nhật lại danh sách khóa học sau khi xóa
       const response = await CourseService.getAllCourses();
       if (response.data) {

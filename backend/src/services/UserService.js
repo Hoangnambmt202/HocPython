@@ -104,7 +104,7 @@ const updateUser = (id,data) => {
       
       if(checkUser === null) {
         resolve({
-          status: "OK",
+          status: "error",
           message: "Không tìm thấy người dùng"
         })
       };
@@ -112,7 +112,7 @@ const updateUser = (id,data) => {
 
       
       resolve({
-        status: "OK",
+        status: "success",
         message: `Cập nhật thành công ! `,
         data: updatedUser,
       });
@@ -128,7 +128,7 @@ const deleteUser = (id) => {
 
       if (checkUser === null) {
         resolve({
-          status: "OK",
+          status: "error",
           message: "Không tìm thầy người dùng",
         });
       }
@@ -136,8 +136,8 @@ const deleteUser = (id) => {
       await User.findByIdAndDelete(id);
 
       resolve({
-        status: "OK",
-        message: `Xoá thành công user: ${checkUser.name} với email :${checkUser.email}`,
+        status: "success",
+        message: `Xoá thành công user`,
   
       });
     } catch (e) {

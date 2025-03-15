@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Edit, Trash, Plus, ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from "lucide-react";
+import { Edit, Trash, Plus, Filter, ChevronDown, Search } from "lucide-react";
 import AddForm from "../../components/AddFormComponent/AddForm";
 import UserService from "../../services/UserService";
+import Modal from "../../components/ModalComponent/ModalComponent";
+import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 
 
 
@@ -12,8 +14,8 @@ const ManageStudents = () => {
   // eslint-disable-next-line no-unused-vars
   const [search, setSearch] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const studentsPerPage = 3;
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -27,7 +29,10 @@ const ManageStudents = () => {
           const role = "user";
           const response = await UserService.getAllUser(role);
           if (response?.data) {
-            setStudents(response.data);
+            setStudents(response?.data);
+          }
+          else {
+            setStudents([]); // Đảm bảo students luôn là mảng
           }
         } catch (error) {
           setToast({
@@ -42,10 +47,34 @@ const ManageStudents = () => {
     }, []);
 
   const handleSubmit = () => {
-    console.log('Thêm học viên:', { name, email, phone });
+    
     // Gọi API hoặc xử lý dữ liệu ở đây
   };
-
+  const handleDelete = async () => {
+    try {
+      const response = await UserService.deleteUser(userToDelete);
+      setIsOpen(false);
+      setToast({show: true, message: response.message, color: "green"});
+      const role = "user";
+      const getStudents = await UserService.getAllUser(role);
+      if(getStudents.data) {
+        setStudents(getStudents.data);
+      }
+      
+    }
+    catch(error) {
+      console.error(error);
+      setToast({
+        show: true,
+        message: "Lỗi",
+        color: "red",
+      })
+    }
+    finally {
+      setIsOpen(false);
+      setUserToDelete(null);
+    }
+  };
   // const handleSearch = (e) => {
   //   setSearch(e.target.value);
   // };
@@ -59,6 +88,13 @@ const ManageStudents = () => {
 
   return (
     <div className="py-8 space-y-6">
+      {toast.show && (
+        <ToastMessageComponent
+          message={toast.message}
+          color={toast.color}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
+      )}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Danh Sách Học Viên</h1>
         <button
@@ -103,8 +139,8 @@ const ManageStudents = () => {
           </tr>
         </thead>
         <tbody>
-          {students.map(student => (
-            <tr key={student.id} className="text-center">
+          { students && students.map(student => (
+            <tr key={student._id} className="text-center">
               <td className="border border-gray-300 p-2">{student.name}</td>
               <td className="border border-gray-300 p-2">{student.birth}</td>
               <td className="border border-gray-300 p-2">{student.email}</td>
@@ -126,29 +162,69 @@ const ManageStudents = () => {
               </td>
               <td className="border border-gray-300 p-2">
                 <button className="mr-2 p-1 bg-blue-500 text-white rounded"><Edit size={16} /></button>
-                <button className="p-1 bg-red-500 text-white rounded" onClick={() => handleDelete(student.id)}><Trash size={16} /></button>
+                <button className="p-1 bg-red-500 text-white rounded"  onClick={() => {
+                      setIsOpen(true);
+                      setUserToDelete(student._id);
+                    }}><Trash size={16} /></button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {/* <div className="flex justify-between items-center mt-4">
-        <button 
-          className={`px-4 py-2 border rounded ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`} 
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft /> Trước
-        </button>
-        <span>Trang {currentPage} / {totalPages}</span>
-        <button 
-          className={`px-4 py-2 border rounded ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`} 
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          Sau <ChevronRight />
-        </button>
-      </div> */}
+      <Modal
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    onClose={() => setIsOpen(false)}
+                  >
+                    <h3 className="text-2xl font-bold ">Xác Nhận Xóa</h3>
+                    <div className="p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="bg-red-100 p-2 rounded-full mr-4">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 text-red-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">
+                            Bạn có chắc chắn muốn xóa không?
+                          </h4>
+                          <p className="text-gray-500 mt-1">
+                            Hành động này không thể hoàn tác. Dữ liệu sẽ bị xóa
+                            vĩnh viễn.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Modal footer */}
+                    <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                      <button
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                        className="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                      >
+                        Hủy bỏ
+                      </button>
+                      <button
+                        onClick={handleDelete}
+                        className="px-4 py-2 bg-red-500 text-white  rounded-md font-medium hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                      >
+                        Xác nhận xóa
+                      </button>
+                    </div>
+                  </Modal>
       {showAddModal && (
         <AddForm title="Thêm học viên mới" onClose={()=> {setShowAddModal(false)}} onSubmit={handleSubmit}>
         <div>

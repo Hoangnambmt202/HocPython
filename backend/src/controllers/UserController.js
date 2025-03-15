@@ -123,17 +123,10 @@ const updateUser = async (req, res) => {
 };
 const deleteUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const token = req.headers.token;
+    const {id} = req.params;
 
-    if (!userId) {
-      return res.status(200).json({
-        status: "err",
-        message: "Không tìm thấy id người dùng",
-      });
-    }
-
-    const response = await UserService.deleteUser(userId);
+    
+    const response = await UserService.deleteUser(id);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
