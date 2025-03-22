@@ -60,12 +60,12 @@ const loginUser = async (req, res) => {
 
     res.cookie('access_token', access_token, {
       httpOnly: true, // Không thể truy cập từ JavaScript
-      secure: false, // Chỉ bật true nếu dùng HTTPS
+      secure:  req.secure || process.env.NODE_ENV === "production", // Chỉ bật true nếu dùng HTTPS
       sameSite: 'Strict', // Ngăn cookie gửi từ trang khác
     });
     res.cookie('refresh_token',refresh_token,{
       httpOnly: true, 
-      secure: false, 
+      secure:  req.secure || process.env.NODE_ENV === "production", 
       sameSite: 'Strict',
     });
   

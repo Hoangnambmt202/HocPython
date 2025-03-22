@@ -16,13 +16,13 @@ const LoginAdmin = () => {
 
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState({ show: false, message: "", color: "" });
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [isLoadingRedirect, setIsLoadingRedirect] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  
   // ✅ Hàm kiểm tra dữ liệu nhập vào (Validation)
-
-
   const validateField = (name, value) => {
     let error = "";
     if (!value.trim()) {
@@ -52,7 +52,7 @@ const LoginAdmin = () => {
        
         setToast({
           show: true,
-          message: `Đăng nhập thành công, chào mừng ${data.data.name}. \n Vui lòng đợi chút trong khi chung tôi chuyển hướng cho bạn`,
+          message: `Đăng nhập thành công, chào mừng ${data.data?.name || data.data?.email}. \n Đang trở về màn hình chính`,
           color: "green",
         });
         setIsToastVisible(true);
@@ -117,7 +117,7 @@ const LoginAdmin = () => {
 
         
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <div className="mt-8 space-y-6">
           <div className="rounded-md shadow-sm space-y-4">
             {/* 🛑 Input Email */}
             <div>
@@ -170,12 +170,13 @@ const LoginAdmin = () => {
 
           {/* 🛑 Nút Đăng nhập */}
           <button
-            type="submit"
+            disabled={mutation.isPending}
+            onClick={handleLogin}
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
           >
-            Đăng nhập
+           {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

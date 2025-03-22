@@ -1,15 +1,27 @@
 import { Link } from "react-router-dom";
 import AsideComponent from "../../components/AsideComponent/AsideComponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Clock, User } from "lucide-react";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import EnrollService from "../../services/EnrollService";
+import { setEnroll } from "../../redux/slides/enrollSlice";
 
 const MyCoursesPage = () => {
-
+  const dispatch = useDispatch();
   const [progress, setProgress] = useState(40);
   const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
-
+  useEffect (()=>{
+    const fetchEnrolledCourses = async () => {
+      const res = await EnrollService.allCourseEnroll();
+      dispatch(setEnroll(res.data));
+    }
+    fetchEnrolledCourses()
+  },[dispatch])
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("vi-VN", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
   return (
     <div className="flex w-full h-full bg-white">
       <AsideComponent />
@@ -55,7 +67,7 @@ const MyCoursesPage = () => {
                     <User /> {course.numberStudent}
                   </span>
                   <span className="text-sm flex gap-1 items-center text-gray-500">
-                    <Clock /> {course.hours} giờ
+                    <Clock />{formatDate(course.enrolledAt)}
                   </span>
                 </div>
               </Link>

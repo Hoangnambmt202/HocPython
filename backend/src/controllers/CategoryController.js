@@ -16,7 +16,7 @@ class CategoryController {
   static async getCategories(req, res) {
     try {
       const categories = await CategoryService.getCategories();
-      res.status(200).json(categories);
+      res.status(200).json({status: "success", message: "Lấy tất cả danh mục thành công" , data: categories});
     } catch (error) {
       res.status(500).json({ message: "Lỗi server", error });
     }

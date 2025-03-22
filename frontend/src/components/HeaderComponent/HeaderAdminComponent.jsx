@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
-import { Search, Bell, ChevronDown, MessageSquare } from "lucide-react";
+import { Search, Bell, ChevronDown, MessageSquare, ChevronUp } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, setUser } from "../../redux/slides/userSlides";
 import UserService from "../../services/UserService";
-import Cookie from "js-cookie";
+import ToastMessageComponent from '../ToastMessageComponent/ToastMessageComponent'
+
+
 const HeaderAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State để quản lý trạng thái dropdown
   
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [toast, setToast] = useState({show: false, message: "", color: ""});
 
   // Hàm đóng/mở dropdown
   const toggleDropdown = () => {
@@ -24,12 +27,17 @@ const HeaderAdmin = () => {
     }
   };
 
-  // Thêm event listener để đóng dropdown khi click ra ngoài
-  const handleLogout = () => {
-    Cookie.remove("access_token");
-    dispatch(logout());
-    navigate("/admin/login");
-    setIsDropdownOpen(false);
+  const handleLogout = async () => {
+    try {
+      const res = await UserService.logoutUser();
+      setToast({show: true, message: res.message, color : "green"})
+      dispatch(logout());
+      navigate("/admin/login");
+      setIsDropdownOpen(false);
+    }
+    catch (err) {
+      console.log(err)
+    }
   };
   useEffect(() => {
 
@@ -40,8 +48,7 @@ const HeaderAdmin = () => {
           dispatch(setUser(res.data)); // Cập nhật Redux với user mới
         }
       } catch (error) {
-        console.error("Lỗi khi lấy thông tin user:", error);
-        Cookie.remove("access_token"); // Xóa token nếu lỗi
+        console.log(error);
         dispatch(logout()); // Xóa user khỏi Redux
         navigate("/admin/login"); // Điều hướng về trang đăng nhập
       }
@@ -59,6 +66,15 @@ const HeaderAdmin = () => {
 
   return (
     <header className=" bg-white border-b border-gray-200 shadow-lg">
+      {
+        toast.show && (
+          <ToastMessageComponent
+          message={toast.message}
+          color={toast.color}
+          onClose={() => setToast({ ...toast, show: false })}
+          />
+        )
+      }
       <div className="flex items-center justify-between px-6 py-4">
         {/* Ô tìm kiếm */}
         <div className="flex items-center flex-1">
@@ -102,7 +118,10 @@ const HeaderAdmin = () => {
                     <p className="text-sm font-medium">{user.name}</p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                   </div>
-                  <ChevronDown size={16} className="text-gray-400" />
+                  {
+                    isDropdownOpen ? (<ChevronUp size={16} className="text-gray-400" />) : ( <ChevronDown size={16} className="text-gray-400" />)
+                  }
+                 
                 </button>
               </>
             )

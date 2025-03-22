@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const LearningPage = () => {
   const { slug } = useParams(); // Lấy slug từ URL
-  const enrolledCourses = useSelector((state) => state.cart.enrolledCourses || []);
+    const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses || []);
 
   // Tìm khóa học có slug khớp với URL
   const course = enrolledCourses.find((c) => c.slug === slug) || {};
@@ -24,7 +24,17 @@ const LearningPage = () => {
   return (
     <>
       <div className={`flex ${isSidebarOpen ? "w-9/12" : "w-full"} bg-white flex-col`}>
-        <YouTubePlayer url="https://youtu.be/NZj6LI5a9vc?si=3iO9KnNYfA53crWG" />
+      {
+        course.content.map((chapter)=> {
+
+          chapter.lessons.map((lesson)=> {
+            return (<>
+            <YouTubePlayer url={lesson.videoUrl} />
+            </>)
+
+          })
+        })
+      }
         
         {course.content ? (
           course.content.map((chapter) => (

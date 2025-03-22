@@ -3,11 +3,11 @@ const CourseService = require( "../services/CourseService");
 
 const createCourse = async (req, res) => {
   try {
-   
+  
     const course = await CourseService.createCourse(req.body);
-    res.status(200).json({ success: true, message: "Tạo khóa học thành công!",data: course });
+
+    res.status(200).json({ status: "success", message: "Tạo khóa học thành công!",data: course });
   } catch (error) {
-    console.error("Lỗi khi tạo khóa học:", error);
     res.status(500).json({ status: "error", message: "Lỗi khi tạo khóa học", error });
   }
   };
@@ -16,7 +16,7 @@ const createCourse = async (req, res) => {
 const getAllCourses = async (req, res) => {
   try {
     const response = await CourseService.getAllCourses();
-    res.status(200).json(response);
+    res.status(200).json({status: "success", message: "Lấy DS khóa học thành công" , data: response.data, total: response.total});
   } catch (error) {
     res.status(500).json({ message: "Lỗi khi lấy danh sách khóa học", error });
   }

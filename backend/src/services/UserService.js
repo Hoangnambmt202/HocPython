@@ -188,6 +188,7 @@ const getDetailUser = (id) => {
   });
 };
 
+
 module.exports = {
   createUser,
   loginUser,
@@ -195,5 +196,5 @@ module.exports = {
   deleteUser,
   getAllUser,
   getDetailUser,
- 
+
 };

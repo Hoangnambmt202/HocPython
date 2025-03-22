@@ -27,12 +27,14 @@ const CoursePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [openChapter, setOpenChapter] = useState(null); 
   const [course, setCourse] = useState(null);
+  const [enrolledCourse, setEnrolledCourse] = useState(null);
   const { slug } = useParams();
   const [toast, setToast] = useState({ show: false, color: "", message: "" });
   const cart = useSelector((state) => state.cart.cart);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
+
   useEffect(() => {
     const fetchCourse = async () => {
       try {
@@ -44,8 +46,25 @@ const CoursePage = () => {
         console.error("Lỗi khi tải khóa học:", error);
       }
     };
+    const fetchEnrolledCourses = async () => {
+      try {
+        const response = await EnrollService.allCourseEnroll();
+        const enrolledCourseIds = response.data.map((data) => data.courseId._id);
+
+        // Kiểm tra nếu Redux đã có dữ liệu thì không cần cập nhật lại
+        if (JSON.stringify(enrolledCourses) !== JSON.stringify(enrolledCourseIds)) {
+          setEnrolledCourse(enrolledCourseIds);
+          dispatch(enrollCourseSuccess(enrolledCourseIds));
+        }
+        
+
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách khóa học đã đăng ký:", error);
+      }
+    };
  
     fetchCourse();
+    fetchEnrolledCourses();
   },  [slug, dispatch]);
 
   const toggleChapter = (index) => {
@@ -93,9 +112,12 @@ const CoursePage = () => {
 
   };
 
-  const isEnrolled = enrolledCourses.some((c) => c._id === course?._id);
+  const flattenedCourses = enrolledCourses.flat(Infinity);
+  const isEnrolled = course?._id && flattenedCourses.includes(course._id);
+  
   const isInCart = cart.some((item) => item._id === course?._id);
 
+  
   return (
     <div className="w-full mx-auto p-4 bg-white">
       {toast.show && (
@@ -126,7 +148,7 @@ const CoursePage = () => {
           </p>
 
            {isEnrolled ? (
-            <button disabled className="bg-gray-400 px-4 py-2 text-white">
+            <button disabled className="bg-gray-400 px-4 py-2 hover:cursor-not-allowed text-white">
               Đã đăng ký
             </button>
           ):course?.price === 0 ? (

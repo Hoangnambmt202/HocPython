@@ -28,13 +28,14 @@ const enrollmentSlice = createSlice({
    
 
     },
-    setEnrolledCourses: (state, action) => {
-      state.enrolledCourses = action.payload;
-    },
+   setEnroll : (state, action) => {
+    state.loading = true;
+    state.enrolledCourses = action.payload
+   }
   },
 });
 
-export const { enrollCourseStart, enrollCourseSuccess, enrollCourseFailure, resetEnrollmentState, setEnrolledCourses } =
+export const { enrollCourseStart, enrollCourseSuccess, enrollCourseFailure, resetEnrollmentState, setEnroll } =
   enrollmentSlice.actions;
 
 export default enrollmentSlice.reducer;

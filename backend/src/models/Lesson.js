@@ -4,7 +4,7 @@ const lessonSchema = new mongoose.Schema({
   courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
   chapterId: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: true },
   title: { type: String, required: true },
-  videoUrl: { type: String, required: true },
+  videoUrl: { type: String },
   description: { type: String },
   duration: { type: Number, required: true }, 
   theory: { type: String }, // Nội dung giáo trình Markdown

@@ -5,6 +5,7 @@ const enrollCourse = async (req, res) => {
         const { courseId } = req.body;
      
         const userId = req.user._id;
+    
         const response = await EnrollService.enrollCourse(userId, courseId);
         res.status(200).json(response);
     } catch (error) {

@@ -8,6 +8,7 @@ const AdminProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const user = useSelector((state) => state.user.user);
     const [editedData, setEditedData] = useState(user);
+    console.log(user)
     const handleEdit = () => {
         setIsEditing(true);
     };
@@ -33,7 +34,7 @@ const AdminProfile = () => {
                     <div className="flex md:flex-row items-center justify-between gap-8">
                         <div className="relative flex items-center md:items-start gap-4">
                             <img
-                                src={editedData.avatar}
+                                src={user?.avatar || editedData.avatar}
                                 alt="Admin Avatar"
                                 className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
                             />
@@ -50,7 +51,7 @@ const AdminProfile = () => {
                                     className="text-3xl font-bold text-gray-800 border-b-2 border-blue-500"
                                 />
                             ) : (
-                                <h1 className="text-3xl font-bold text-gray-800">{user.name || editedData.name}</h1>
+                                <h1 className="text-3xl font-bold text-gray-800">{user?.name || editedData.name || "chưa cập nhật tên"}</h1>
                             )}
                             <p className="text-blue-500 font-semibold mt-1">{user.role || editedData.role}</p>
                             <p className="text-gray-500 mt-1">Member since { user.createdAt }</p>
@@ -136,7 +137,7 @@ const AdminProfile = () => {
                                                 className="w-full text-gray-800 font-medium border-b border-blue-500"
                                             />
                                         ) : (
-                                            <p className="text-gray-800 font-medium">{editedData.address}</p>
+                                            <p className="text-gray-800 font-medium">{user?.address || editedData?.address || "Chưa cập nhật địa chỉ"}</p>
                                         )}
                                     </div>
                                 </div>

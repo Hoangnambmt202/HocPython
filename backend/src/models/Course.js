@@ -12,11 +12,16 @@ const courseSchema = new mongoose.Schema({
     tags: [{ type: String }], // Hỗ trợ tìm kiếm từ khóa
     isPublished: { type: Boolean, default: false },
     content: [{type: mongoose.Schema.Types.ObjectId, ref: "Chapter"}],
+    duration: { type: Number, default: 0 },  // Tổng thời lượng khóa học (tính từ các Lesson)
     numberStudent: { type: Number, default: 0 }, // Mặc định 0 nếu chưa có học viên
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Danh sách học viên đăng ký
     rating: { type: Number, default: 0 }, // Điểm đánh giá trung bình
+    ratingCount: { type: Number, default: 0 },  // Tổng số lượt đánh giá
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }]
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    level: { type: String, enum: [ "Beginner", "Advanced"], default: "Beginner" },
+    requirements: [{ type: String }], // Danh sách yêu cầu đầu vào
+    objectives: [{ type: String }],  // Học viên đạt được gì sau khóa học
 }, { timestamps: true });
 
 const Course = mongoose.model('Course', courseSchema);
