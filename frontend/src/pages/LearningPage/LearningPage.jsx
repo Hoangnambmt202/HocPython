@@ -25,14 +25,14 @@ const LearningPage = () => {
     <>
       <div className={`flex ${isSidebarOpen ? "w-9/12" : "w-full"} bg-white flex-col`}>
       {
-        course.content.map((chapter)=> {
-
-          chapter.lessons.map((lesson)=> {
-            return (<>
-            <YouTubePlayer url={lesson.videoUrl} />
-            </>)
-
-          })
+        course?.content?.map((chapter)=> {
+            // <YouTubePlayer url={} />
+          return(
+            <>
+            <p>{chapter}</p>
+            </>
+          )
+          
         })
       }
         

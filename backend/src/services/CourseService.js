@@ -10,7 +10,7 @@ const createCourse = async (data) => {
     const slug = slugify(data.title, { lower: true, strict: true });
     const newCourse = new Course({
       title: data.title,
-      slug,
+      slug: slug,
       description: data.description,
       lecturerId: data.lecturerId,
       price: data.price,
@@ -109,41 +109,7 @@ const getCourseBySlug = async (slug) => {
       if (!updatedCourse) {
         return { status: "error", message: "Không tìm thấy khóa học!" };
       }
-      console.log(data.content)
-      // 📌 **Cập nhật Chapter**
-      // for (const chapterData of data.content) {
-      //   let updatedChapter;
-  
-      //   if (chapterData._id) {
-      //     // Cập nhật chapter nếu đã có _id
-      //     updatedChapter = await Chapter.findByIdAndUpdate(
-      //       chapterData._id,
-      //       { title: chapterData.title },
-      //       { new: true }
-      //     );
-      //   } 
-      //   // 📌 **Cập nhật Lesson trong từng Chapter**
-      //   for (const lessonData of chapterData.lessons) {
-      //     if (lessonData._id) {
-      //       // Cập nhật lesson nếu đã có _id
-      //       await Lesson.findByIdAndUpdate(
-      //         lessonData._id,
-      //         {
-      //           title: lessonData.title,
-      //           videoUrl: lessonData.videoUrl,
-      //           description: lessonData.description,
-      //           duration: lessonData.duration,
-      //           theory: lessonData.theory,
-      //         },
-      //         { new: true }
-      //       );
-      //     }
-      //   }
-  
-      //   await updatedChapter.save();
-      // }
-  
-      // Lưu lại khóa học sau khi cập nhật danh sách chương
+      
       await updatedCourse.save();
   
       return {

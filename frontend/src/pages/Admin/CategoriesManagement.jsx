@@ -17,7 +17,7 @@ const CategoriesManagement = () => {
   const fetchCategories = async () => {
     try {
       const data = await CategoryService.getCategories();
-      setCategories(data);
+      setCategories(data.data);
     } catch (error) {
       console.error("Lỗi khi tải danh mục:", error);
     }

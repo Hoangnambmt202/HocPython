@@ -28,6 +28,7 @@ import PaymentRefund from "../pages/Admin/PaymentRefund";
 import StudentProgressAdmin from "../pages/Admin/StudentProgressManagement";
 import CartPage from "../pages/CartPage/CartPage";
 import CategoriesManagement from "../pages/Admin/CategoriesManagement";
+import ChaptersManagement from "../pages/Admin/ChaptersManagement";
 const routes = [
   {
    
@@ -113,6 +114,10 @@ const routes = [
       {
         path: "courses",
         page: CourseManagement,
+      },
+      {
+        path: "chapters",
+        page: ChaptersManagement,
       },
       {
         path: "categories",

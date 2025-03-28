@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { useState } from "react";
-import { Menu, Home, Book, Users, Layout, Settings, WalletMinimal, TrendingUp, ChevronDown } from "lucide-react";
+import { Menu, Home, Book, Users, Layout, Settings, WalletMinimal, TrendingUp, ChevronDown, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
@@ -14,6 +14,8 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
   const menuItems = [
     { icon: Home, label: "Trang chủ", href: "/admin" },
     { icon: Book, label: "Khóa học", href: "/admin/courses" },
+    { icon: BookOpen, label: "Chương học", href: "/admin/chapters" },
+    { icon: Layout, label: "Bài giảng", href: "/admin/lessons" },
     { icon: Book, label: "Danh mục", href: "/admin/categories" },
     {
       icon: Users,
@@ -27,7 +29,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
         { label: "Gửi thông báo", href: "/admin/students/notifications" },
       ],
     },
-    { icon: Layout, label: "Bài giảng", href: "/admin/lessons" },
+    
     {
       icon: WalletMinimal,
       label: "Thanh toán",
