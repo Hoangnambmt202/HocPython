@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       boxShadow: {
-        xl: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
+        xl: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
       },
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
 };

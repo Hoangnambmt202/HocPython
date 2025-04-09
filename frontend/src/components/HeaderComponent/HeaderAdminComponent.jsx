@@ -65,7 +65,7 @@ const HeaderAdmin = () => {
   
 
   return (
-    <header className=" bg-white border-b border-gray-200 shadow-lg">
+    <header className=" bg-white border-b sticky z-50 top-0 border-gray-200 shadow-lg">
       {
         toast.show && (
           <ToastMessageComponent

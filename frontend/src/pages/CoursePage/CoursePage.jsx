@@ -12,7 +12,7 @@ import {
   Text,
   Check,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
 import CourseService from "../../services/CourseService";
@@ -20,13 +20,13 @@ import EnrollService from "../../services/EnrollService";
 import { addToCart } from "../../redux/slides/cartSlides";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
-import { enrollCourseStart, enrollCourseSuccess, enrollCourseFailure } from "../../redux/slides/enrollSlice";
-
+import { enrollCourseStart, setEnrolledCourses } from "../../redux/slides/enrollSlice";
+import {setCourseDetail} from "../../redux/slides/coursesSlices";
 
 const CoursePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [openChapter, setOpenChapter] = useState(null); 
-  const [course, setCourse] = useState(null);
+
   const [enrolledCourse, setEnrolledCourse] = useState(null);
   const { slug } = useParams();
   const [toast, setToast] = useState({ show: false, color: "", message: "" });
@@ -34,13 +34,13 @@ const CoursePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
-
+  const { courseDetail } = useSelector((state) => state.course);
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         const response = await CourseService.getCourses(slug);
         if (response.data) {
-          setCourse(response.data);
+          dispatch(setCourseDetail(response.data));
         }
       } catch (error) {
         console.error("Lỗi khi tải khóa học:", error);
@@ -54,7 +54,7 @@ const CoursePage = () => {
         // Kiểm tra nếu Redux đã có dữ liệu thì không cần cập nhật lại
         if (JSON.stringify(enrolledCourses) !== JSON.stringify(enrolledCourseIds)) {
           setEnrolledCourse(enrolledCourseIds);
-          dispatch(enrollCourseSuccess(enrolledCourseIds));
+          dispatch(setEnrolledCourses(enrolledCourseIds));
         }
         
 
@@ -72,38 +72,38 @@ const CoursePage = () => {
   };
 
   const handleBuyNow = () => {
-    dispatch(addToCart(course));
+    dispatch(addToCart(courseDetail));
     navigate("/order/payment");
   };
 
   const handleAddToCart = () => {
-    dispatch(addToCart(course));
+    dispatch(addToCart(courseDetail));
   };
 
   // Sử dụng useMutation để đăng ký khóa học
   const enrollMutation = useMutation({
-    mutationFn: () => EnrollService.enrollCourse(course?._id),
+    mutationFn: () => EnrollService.enrollCourse(courseDetail?._id),
     onMutate: () => {
       dispatch(enrollCourseStart());
     },
     onSuccess: (response) => {
       if (response?.status !== "success") {
         setToast({ show: true, message: response?.message, color: "red" });
-        dispatch(enrollCourseFailure(response?.message));
+        console.log(response.message)
       } else {
-        dispatch(enrollCourseSuccess(course)); // Lưu khóa học vào Redux
+        dispatch(setEnrolledCourses(courseDetail)); // Lưu khóa học vào Redux
         
         setToast({ show: true, message: response.message, color: "green" });
 
         // Chờ 2 giây rồi chuyển hướng sang trang học
         setTimeout(() => {
-          navigate(`/course/${course.slug}/learn`);
+          navigate(`/course/${courseDetail.slug}/learn`);
         }, 2000);
       }
     },
     onError: (error) => {
       console.error("Lỗi khi enroll khóa học:", error);
-      dispatch(enrollCourseFailure("Lỗi khi đăng ký khóa học"));
+     console.log("Lỗi khi đăng ký khóa học");
     },
   });
 
@@ -113,9 +113,9 @@ const CoursePage = () => {
   };
 
   const flattenedCourses = enrolledCourses.flat(Infinity);
-  const isEnrolled = course?._id && flattenedCourses.includes(course._id);
+  const isEnrolled = courseDetail?._id && flattenedCourses.includes(courseDetail._id);
   
-  const isInCart = cart.some((item) => item._id === course?._id);
+  const isInCart = cart.some((item) => item._id === courseDetail?._id);
 
   
   return (
@@ -133,25 +133,25 @@ const CoursePage = () => {
 
       <div className="flex flex-col md:flex-row gap-6 py-6">
         <img
-          src={course?.thumbnail}
-          alt={course?.title}
+          src={courseDetail?.thumbnail}
+          alt={courseDetail?.title}
           className="w-full md:w-1/3 rounded-xl shadow-lg"
         />
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-gray-900">{course?.title}</h1>
-          <p className="text-gray-600 mt-2">{course?.description}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{courseDetail?.title}</h1>
+          <p className="text-gray-600 mt-2">{courseDetail?.description}</p>
           <p className="text-gray-800 font-semibold mt-3">
-            Giảng viên: {course?.lecturerId.name}
+            Giảng viên: {courseDetail?.lecturerId.name}
           </p>
           <p className="text-xl text-red-500 font-bold mt-2">
-            Giá: {course?.price > 0 ? `${course?.price} VNĐ` : "Miễn phí"}
+            Giá: {courseDetail?.price > 0 ? `${courseDetail?.price} VNĐ` : "Miễn phí"}
           </p>
 
            {isEnrolled ? (
-            <button disabled className="bg-gray-400 px-4 py-2 hover:cursor-not-allowed text-white">
-              Đã đăng ký
-            </button>
-          ):course?.price === 0 ? (
+            <Link to={`/course/${courseDetail.slug}/learn`} className="bg-green-500 px-4 py-2 mt-2 max-w-fit block rounded-lg text-white">
+              Tiếp tục học
+            </Link>
+          ):courseDetail?.price === 0 ? (
             <button
               onClick={handleStartLearn}
               className="rounded-3xl bg-green-500 text-white px-3 py-2 mt-2 hover:bg-green-400"
@@ -211,10 +211,10 @@ const CoursePage = () => {
         <TabPanel>
           <div className="mt-5 bg-white">
             <h2 className="text-xl font-semibold">Bạn sẽ học được gì ?</h2>
-            {course ? (
+            {courseDetail ? (
               <div className="flex items-center">
                 <Check size={20} fontWeight={300} className="mr-2" />
-                <p className="mt-2">{course.description}</p>
+                <p className="mt-2">{courseDetail?.objectives  }</p>
               </div>
             ) : (
               <></>
@@ -225,8 +225,8 @@ const CoursePage = () => {
         {/* Nội dung khóa học */}
         <TabPanel>
           <div className="mt-5 bg-white">
-            {course ? (
-              course.content.map((chapter, index) => (
+            {courseDetail ? (
+              courseDetail.content.map((chapter, index) => (
                 <div key={index} className="mb-4">
                   <div
                     className="flex justify-between items-center bg-gray-100 p-3 rounded-lg cursor-pointer"
@@ -261,8 +261,8 @@ const CoursePage = () => {
         {/* Đánh giá */}
         <TabPanel>
           <div className="mt-5">
-            {course && course.reviews.length > 0 ? (
-              course.reviews.map((review, index) => (
+            {courseDetail && courseDetail.reviews.length > 0 ? (
+              courseDetail.reviews.map((review, index) => (
                 <div key={index} className="border-b py-3">
                   <p className="font-semibold">{review.user.name}</p>
                   <p className="text-yellow-500">⭐ {review.rating}/5</p>
@@ -278,8 +278,8 @@ const CoursePage = () => {
         {/* Bình luận */}
         <TabPanel>
           <div className="mt-5">
-            {course && course.comments.length > 0 ? (
-              course.comments.map((comment, index) => (
+            {courseDetail && courseDetail.comments.length > 0 ? (
+              courseDetail.comments.map((comment, index) => (
                 <div key={index} className="border-b py-3">
                   <p className="font-semibold">{comment.user.name}</p>
                   <p className="text-gray-700">{comment.content}</p>
@@ -294,14 +294,14 @@ const CoursePage = () => {
         {/* Chứng chỉ */}
         <TabPanel>
           <div className="mt-5">
-            {course && course.certificate ? (
+            {courseDetail && courseDetail.certificate ? (
               <div>
                 <p className="text-gray-700">
                   Hoàn thành khóa học để nhận chứng chỉ:
                 </p>
                 <img
                   src={
-                    course.certificate ||
+                    courseDetail.certificate ||
                     "/src/assets/imgs/certificate-default.jpg"
                   }
                   alt="Chứng chỉ"

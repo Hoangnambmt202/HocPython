@@ -5,7 +5,7 @@ const LearningLayout = () => {
   return (
     <>
     <HeaderLearningComponent />
-    <main className="flex h-[1000px] w-full mt-11">
+    <main className="flex min-h-screen w-full mt-11">
         <Outlet/>
     </main>
     

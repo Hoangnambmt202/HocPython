@@ -3,12 +3,13 @@ import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaPen, FaFacebookF } from 
 import { FcGoogle } from "react-icons/fc";
 import { FaInstagram } from "react-icons/fa6";
 import { useSelector } from 'react-redux';
+import { Helmet } from 'react-helmet-async';
 const AdminProfile = () => {
    
     const [isEditing, setIsEditing] = useState(false);
     const user = useSelector((state) => state.user.user);
     const [editedData, setEditedData] = useState(user);
-    console.log(user)
+ 
     const handleEdit = () => {
         setIsEditing(true);
     };
@@ -27,6 +28,10 @@ const AdminProfile = () => {
     };
 
     return (
+        <>
+        <Helmet>
+  <title>Admin | Profile</title>
+</Helmet>
         <div className="min-h-screen bg-white  py-8">
             <div className="w-full mx-auto">
                 <div className="bg-white rounded-lg shadow-xl p-8">
@@ -191,6 +196,7 @@ const AdminProfile = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

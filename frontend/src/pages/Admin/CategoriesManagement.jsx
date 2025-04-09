@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
 import CategoryService from "../../services/CategoryService";
+import { Helmet } from "react-helmet-async";
 
 const CategoriesManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -36,6 +37,10 @@ const CategoriesManagement = () => {
   };
 
   return (
+    <>
+    <Helmet>
+  <title>Admin | Quản lý danh mục</title>
+</Helmet>
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
@@ -169,6 +174,7 @@ const CategoriesManagement = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaSearch,  FaDownload } from 'react-icons/fa';
 
 const PaymentHistory = () => {
@@ -24,6 +25,10 @@ const PaymentHistory = () => {
     }, []);
 
     return (
+        <>
+        <Helmet>
+  <title>Admin | Lịch sử thanh toán</title>
+</Helmet>
         <div className="min-h-screen bg-white p-6">
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-3xl font-bold text-gray-800 mb-8">Lịch Sử Thanh Toán</h1>
@@ -159,6 +164,7 @@ const PaymentHistory = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

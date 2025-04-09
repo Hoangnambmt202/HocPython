@@ -46,12 +46,12 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-full transition-all duration-300 ${
+      className={`fixed overflow-y-auto scrollbar-hide top-0 left-0 h-full transition-all duration-300 ${
         isMenuOpen ? "w-64" : "w-20"
       } bg-white border-r border-gray-200 shadow-xl`}
     >
       {/* Sidebar Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex sticky top-0 z-1000 bg-white items-center justify-between p-4 border-b">
         <h1 className={`font-bold text-xl text-blue-600 ${!isMenuOpen && "hidden"}`}>
           Python Admin
         </h1>

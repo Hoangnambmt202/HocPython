@@ -6,6 +6,7 @@ import ProgressBar from "../../components/ProgressBar/ProgressBar";
 import { useDispatch, useSelector } from "react-redux";
 import EnrollService from "../../services/EnrollService";
 import { setEnroll } from "../../redux/slides/enrollSlice";
+import { Helmet } from "react-helmet-async";
 
 const MyCoursesPage = () => {
   const dispatch = useDispatch();
@@ -23,6 +24,10 @@ const MyCoursesPage = () => {
     return date.toLocaleDateString("vi-VN", { year: "numeric", month: "2-digit", day: "2-digit" });
 };
   return (
+    <>
+      <Helmet>
+  <title>HocPython | Khóa học của tôi</title>
+</Helmet>
     <div className="flex w-full h-full bg-white">
       <AsideComponent />
       <div className="flex-1 px-4 py-8 mx-auto">
@@ -76,6 +81,7 @@ const MyCoursesPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import BaseDropdown from "../BaseDropdown/BaseDropdown";
-import { BookMarked, LogOut, Settings, User } from "lucide-react";
+import { BookMarked, LogOut, MessageCircleQuestion, Settings, User } from "lucide-react";
 
 const ProfileMenu = ({ avatar, handleLogout }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -36,6 +36,12 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
             <Link to="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
               <Settings className="mr-2"/>
               Cài đặt
+            </Link>
+          </li>
+          <li>
+            <Link to="/support" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <MessageCircleQuestion className="mr-2"/>
+              Hỗ trợ
             </Link>
           </li>
           <li>

@@ -1,6 +1,8 @@
 
 import { LineChart, XAxis, YAxis, CartesianGrid, Line, Tooltip, BarChart, Bar, ResponsiveContainer } from 'recharts';
 import { Users, BookOpen, Trophy, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Helmet } from "react-helmet-async";
+
 
 const Dashboard = () => {
   // Mock data
@@ -63,8 +65,12 @@ const Dashboard = () => {
     { name: 'Machine Learning Cơ Bản', students: 124, completion: 68, revenue: '15,000,000đ' },
     { name: 'Data Science với Python', students: 145, completion: 71, revenue: '13,200,000đ' },
   ];
-
+  
   return (
+    <>
+    <Helmet>
+  <title>Admin Dashboard</title>
+</Helmet>
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -173,6 +179,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

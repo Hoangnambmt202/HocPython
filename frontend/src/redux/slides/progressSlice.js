@@ -1,32 +1,57 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+  lessonProgress: {},  // Lưu tiến độ từng bài học
+  lastLesson: null,    // Lưu bài học cuối cùng
+  loading: false,
+  error: null
+};
+
 const progressSlice = createSlice({
   name: "progress",
-  initialState: {
-    progressData: JSON.parse(localStorage.getItem("progress")) || {}, // Lưu tiến độ mỗi khóa học
-  },
+  initialState,
   reducers: {
-    updateProgress: (state, action) => {
-      const { courseId, progress } = action.payload;
-
-      // Cập nhật tiến độ khóa học
-      state.progressData[courseId] = progress;
-
-      // Lưu vào localStorage để duy trì trạng thái sau khi reload
-      localStorage.setItem("progress", JSON.stringify(state.progressData));
+    setLoading: (state, action) => {
+      state.loading = action.payload;
     },
-
-    resetProgress: (state, action) => {
-      const { courseId } = action.payload;
-
-      // Xóa tiến độ của khóa học cụ thể
-      delete state.progressData[courseId];
-
-      // Lưu lại trạng thái vào localStorage
-      localStorage.setItem("progress", JSON.stringify(state.progressData));
+    setError: (state, action) => {
+      state.error = action.payload;
     },
+    // Cập nhật tiến độ cho một bài học
+    updateLessonProgress: (state, action) => {
+      const { lessonId, completed, courseId } = action.payload;
+      if (!state.lessonProgress[courseId]) {
+        state.lessonProgress[courseId] = {};
+      }
+      state.lessonProgress[courseId][lessonId] = {
+        completed,
+        timestamp: new Date().toISOString()
+      };
+    },
+    // Lưu bài học cuối cùng
+    setLastLesson: (state, action) => {
+      const { courseId, lessonId, chapterId } = action.payload;
+      state.lastLesson = {
+        courseId,
+        lessonId,
+        chapterId,
+        timestamp: new Date().toISOString()
+      };
+    },
+    // Reset tiến độ
+    resetProgress: (state) => {
+      state.lessonProgress = {};
+      state.lastLesson = null;
+    }
   },
 });
 
-export const { updateProgress, resetProgress } = progressSlice.actions;
+export const {
+  setLoading,
+  setError,
+  updateLessonProgress,
+  setLastLesson,
+  resetProgress
+} = progressSlice.actions;
+
 export default progressSlice.reducer;

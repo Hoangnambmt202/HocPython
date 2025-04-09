@@ -1,19 +1,39 @@
-import { Link, useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {  useEffect, useState } from "react";
 import ProgressCircle from "../ProcessCircle/ProcessCircle";
-import { ChevronLeft, CircleHelp, NotebookPen } from "lucide-react";
-import { useSelector } from "react-redux";
+import { ChevronLeft, CircleHelp,  NotebookPen } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchContentStart, setContent } from "../../redux/slides/courseContentSlices";
+import CourseService from "../../services/CourseService";
+import { setCourseDetail } from "../../redux/slides/coursesSlices";
 
 const HeaderLearningComponent = () => {
-  const { slug } = useParams(); // Lấy slug từ URL
+
   const navigate = useNavigate();
-  const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses || []);
-
-  // Tìm khóa học theo slug
-  const course = enrolledCourses.find((c) => c.slug === slug) || {};
-
+  const dispatch = useDispatch();
   const [progress, setProgress] = useState(0); // Tiến độ học tập
-
+  const { slug } = useParams();
+  useEffect(() => {
+    const fetchCourse = async () => {
+      if (!slug) return; // Chờ slug có giá trị
+  
+      dispatch(fetchContentStart());
+      try {
+        const res = await CourseService.getCourses(slug);
+        console.log(res);
+  
+        dispatch(setContent(res.data.content));
+        dispatch(setCourseDetail(res.data));
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu khóa học:", error);
+      }
+    };
+  
+    fetchCourse();
+  }, [dispatch, slug]);
+  
+  const { courseDetail } = useSelector((state) => state.course);
+  console.log(courseDetail)
   const goBack = () => {
     if (window.history.length > 2) {
       navigate(-1);
@@ -35,7 +55,7 @@ const HeaderLearningComponent = () => {
             </div>
           </Link>
           {/* Hiển thị tiêu đề khóa học */}
-          <h2 className="text-lg font-bold">{course.title || "Đang tải..."}</h2>
+          <h2 className="text-lg font-bold">{courseDetail?.title || "Đang tải..."}</h2>
         </div>
         <div className="flex items-center">
           <ul className="flex items-center px-4 text-white gap-4 text-sm">

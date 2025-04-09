@@ -21,7 +21,7 @@ import UserService from "../../services/UserService";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { setUser } from "../../redux/slides/userSlides";
-
+import {Helmet} from "react-helmet-async";
 const ProfilePage = () => {
   
 
@@ -54,7 +54,7 @@ const ProfilePage = () => {
     },
     onError: (error) => {
       setToast(error.response?.data?.message || "Đã xảy ra lỗi!");
-      console.log(error.response?.data);
+
     },
   });
   const handleModalEdit = () => {
@@ -213,6 +213,10 @@ const ProfilePage = () => {
     );
   }
   return (
+    <>
+      <Helmet>
+  <title>HocPython | Profile</title>
+</Helmet>
     <div className="container mx-auto p-4 bg-white">
       {toast.show && (
         <ToastMessageComponent
@@ -542,6 +546,7 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,0 +1,200 @@
+const Lesson = require("../models/Lesson");
+const Chapter = require("../models/Chapter");
+const { Queue } = require('bullmq');
+const fs = require('fs').promises;
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+const config = require('../config/config');
+const { exec } = require('child_process');
+const { promisify } = require('util');
+const execAsync = promisify(exec);
+
+// Tạo queue để xử lý việc chạy code
+const codeExecutionQueue = new Queue('code-execution', {
+  connection: {
+    host: config.redis.host,
+    port: config.redis.port
+  }
+});
+
+// Sandbox directory for code execution
+const SANDBOX_DIR = path.join(process.cwd(), 'temp');
+
+// Ensure sandbox directory exists
+const ensureSandboxDir = async () => {
+  try {
+    await fs.access(SANDBOX_DIR);
+  } catch {
+    await fs.mkdir(SANDBOX_DIR, { recursive: true });
+  }
+};
+
+// Clean up sandbox files
+const cleanupSandbox = async (filePath) => {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    console.error('Error cleaning up sandbox:', error);
+  }
+};
+
+// Execute Python code
+const executePythonCode = async (code, input = '') => {
+  // Create unique file name
+  const fileName = `code_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.py`;
+  const filePath = path.join(SANDBOX_DIR, fileName);
+
+  try {
+    // Ensure sandbox directory exists
+    await ensureSandboxDir();
+
+    // Write code to file
+    await fs.writeFile(filePath, code);
+
+    // Execute code with input
+    const { stdout, stderr } = await execAsync(`python ${filePath}`, {
+      timeout: 5000,
+      input: input
+    });
+
+    return {
+      output: stdout.trim(),
+      error: stderr || null
+    };
+  } catch (error) {
+    return {
+      output: null,
+      error: error.stderr || error.message
+    };
+  } finally {
+    // Clean up
+    await cleanupSandbox(filePath);
+  }
+};
+
+// Phương thức để xử lý yêu cầu chạy code
+const runCode = async (codeData) => {
+  const { code, testCases } = codeData;
+  
+  // Validate code
+  if (!code) {
+    throw new Error('Code is required');
+  }
+
+  // Validate test cases
+  if (!Array.isArray(testCases)) {
+    throw new Error('Test cases must be an array');
+  }
+
+  // Run test cases
+  const results = [];
+  for (const testCase of testCases) {
+    const result = await executePythonCode(code, testCase.input);
+    
+    results.push({
+      input: testCase.input,
+      expectedOutput: testCase.expectedOutput,
+      actualOutput: result.output,
+      passed: result.output === testCase.expectedOutput,
+      error: result.error
+    });
+  }
+
+  return {
+    success: true,
+    results,
+    allPassed: results.every(r => r.passed)
+  };
+};
+
+// Tạo bài học
+const createLesson = async (chapterId, data) => {
+  const chapter = await Chapter.findById(chapterId);
+  if (!chapter) throw new Error("Chapter không tồn tại");
+
+  const newLesson = new Lesson({
+    ...data,
+    chapterId
+  });
+
+  await newLesson.save();
+  chapter.lessons.push(newLesson._id);
+  await chapter.save();
+  return newLesson;
+};
+
+// Lấy bài học theo chapter
+const getLessonsByChapter = async (chapterId) => {
+  return await Lesson.find({ chapterId }).sort("order");
+};
+// Lấy tất cả bài học
+const getAllLessons = async () => {
+  return await Lesson.find().populate("chapterId", "title")
+  
+};
+
+// Cập nhật bài học
+const updateLesson = async (lessonId, data) => {
+  console.log(lessonId);
+  console.log(data);
+  return await Lesson.findByIdAndUpdate(lessonId, data, { new: true });
+};
+
+// Xóa bài học
+const deleteLesson = async (lessonId) => {
+  const lesson = await Lesson.findById(lessonId);
+  const chapter = await Chapter.findById(lesson.chapterId);
+  
+  chapter.lessons.pull(lessonId);
+  await chapter.save();
+  await Lesson.deleteOne({ _id: lessonId });
+};
+
+// Phương thức để kiểm tra kết quả của một job
+const getCodeExecutionResult = async (jobId) => {
+  const job = await codeExecutionQueue.getJob(jobId);
+  
+  if (!job) {
+    throw new Error("Không tìm thấy công việc");
+  }
+  
+  // Lấy trạng thái hiện tại
+  const state = await job.getState();
+  const result = job.returnvalue;
+  
+  return {
+    jobId,
+    status: state,
+    completed: state === 'completed',
+    result: state === 'completed' ? result : null,
+    failReason: job.failedReason || null
+  };
+};
+
+// Lưu kết quả bài làm của sinh viên
+const saveStudentSubmission = async (userId, lessonId, code, results) => {
+  // Tính điểm dựa trên số test case pass
+  const passedTests = results.filter(r => r.passed).length;
+  const totalTests = results.length;
+  const score = totalTests > 0 ? (passedTests / totalTests) * 100 : 0;
+  
+  // Tạo bản ghi submission mới
+  const submission = new StudentSubmission({
+    userId,
+    lessonId,
+    code,
+    results,
+    score,
+    submittedAt: new Date()
+  });
+  
+  await submission.save();
+  
+  // Cập nhật tiến độ học tập của sinh viên nếu cần
+  // ...
+  
+  return submission;
+};
+
+module.exports = { createLesson, getAllLessons, getLessonsByChapter, updateLesson, deleteLesson, runCode , getCodeExecutionResult,
+  saveStudentSubmission};

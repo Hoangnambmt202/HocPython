@@ -7,6 +7,7 @@ import { setUser } from "../../redux/slides/userSlides";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import { Helmet } from "react-helmet-async";
 
 const LoginAdmin = () => {
   const [formData, setFormData] = useState({
@@ -95,6 +96,10 @@ const LoginAdmin = () => {
   };
 
   return (
+    <>
+    <Helmet>
+  <title>Admin | Đăng nhập</title>
+</Helmet>
     <div className="min-h-screen relative bg-gradient-to-br from-blue-100 to-white flex items-center justify-center p-4">
         {/* 🛑 Hiển thị thông báo lỗi */}
         {isToastVisible && toast.show && (
@@ -179,6 +184,7 @@ const LoginAdmin = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

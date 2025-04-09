@@ -1,6 +1,5 @@
 import  { useState, useEffect } from 'react';
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
-import { toast } from 'react-hot-toast';
 import { SlPaypal } from "react-icons/sl";
 const PaymentMethods = () => {
     const [paymentMethods, setPaymentMethods] = useState([]);
@@ -30,14 +29,14 @@ const PaymentMethods = () => {
                     method.id === editingId ? { ...formData, id: editingId } : method
                 )
             );
-            toast.success('Payment method updated successfully');
+           
         } else {
             // Add new payment method
             setPaymentMethods(methods => [
                 ...methods,
                 { ...formData, id: Date.now() }
             ]);
-            toast.success('Payment method added successfully');
+           
         }
         resetForm();
     };
@@ -45,7 +44,7 @@ const PaymentMethods = () => {
     const handleDelete = (id) => {
         if (window.confirm('Are you sure you want to delete this payment method?')) {
             setPaymentMethods(methods => methods.filter(method => method.id !== id));
-            toast.success('Payment method deleted successfully');
+           
         }
     };
 

@@ -61,7 +61,7 @@ const getCourseBySlug = async (slug) => {
       path: "content", // Đây là trường chứa các Chapter
       populate: {
         path: "lessons", // Đây là trường chứa các Lesson trong Chapter
-        select: "title videoUrl description duration" // Chọn các trường bạn muốn lấy từ Lesson
+        select: "title videoUrl type content practice order" // Chọn các trường bạn muốn lấy từ Lesson
       }
     });
 

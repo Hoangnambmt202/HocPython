@@ -17,3 +17,12 @@ body {
 .font-Dosis {
   font-family: "Dosis", sans-serif;
 }
+/* Ẩn thanh cuộn trên tất cả trình duyệt */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE và Edge */
+  scrollbar-width: none;  /* Firefox */
+}

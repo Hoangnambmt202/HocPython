@@ -1,28 +1,29 @@
-import { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import {Link} from "react-router-dom";
 import BaseDropdown from "../BaseDropdown/BaseDropdown";
-import CourseService from "../../services/CourseService";
+import { useDispatch, useSelector } from "react-redux";
+import EnrollService from "../../services/EnrollService";
+import {  setEnrolledCourses } from "../../redux/slides/enrollSlice";
+
 const CoursesMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [toast, setToast] = useState(""); 
-  const [enrollCourses, setEnrollCourses] = useState([]);
- 
-    useEffect(()=>{
-      const fetchCourses = async () => {
-        try {
-          const response = await CourseService.getAllCourses();
-          if (response?.data) {
-            setEnrollCourses(response?.data);
-          }
+  const dispatch = useDispatch();
   
-        } catch (error) {
-          console.error("Error fetching courses:", error);
-          setToast("Failed to load courses");
-        }
-      };
-      fetchCourses()
-    },[])
-    
+  useEffect(() => {
+    const fetchEnrolledCourses = async () => {
+      try {
+        const res = await EnrollService.allCourseEnroll();
+   
+        dispatch(setEnrolledCourses(res.data));
+      } catch (error) {
+        console.error("Failed to fetch enrolled courses:", error);
+      }
+    };
+    fetchEnrolledCourses();
+  }, [dispatch]);
+  const { enrolledCourses } = useSelector((state) => state.enrollment);
+  
   return (
     <div className="relative">
       <button className="relative px-4 py-2 text-sm font-semibold text-black hover:text-blue-500" onClick={() => setIsOpen(true)}>
@@ -41,14 +42,15 @@ const CoursesMenu = () => {
         <header className="px-5 py-4">
           <h3 className="font-semibold text-gray-900">Khóa học của tôi</h3>
         </header>
-        
+      
         <div className="max-h-[400px] overflow-y-auto">
-          {enrollCourses?.map((course) => {
-           
+          {enrolledCourses?.map((course, index) => {
+
             return (
-              <div
-                key={course._id}
-                className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-t border-gray-100 first:border-t-0"
+              <Link
+              to={`/course/${course.courseId?.slug}`}
+                key={index}
+                className="px-4 py-3 block hover:bg-gray-50 cursor-pointer border-t border-gray-100 first:border-t-0"
               >
                 <div className="flex items-start">
                   <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
@@ -56,7 +58,7 @@ const CoursesMenu = () => {
                     <img src={course?.thumbnail} />
                   </div>
                   <div className="ml-3 flex-1">
-                    <p className="text-sm font-medium text-gray-900">{course?.title}</p>
+                    <p className="text-sm font-medium text-gray-900">{course.courseId?.title}</p>
                     <p className="text-xs text-gray-500 mb-2"></p>
                     
                     {/* Progress Bar */}
@@ -78,7 +80,7 @@ const CoursesMenu = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

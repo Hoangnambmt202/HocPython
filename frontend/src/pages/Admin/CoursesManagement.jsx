@@ -18,6 +18,7 @@ import ToastMessageComponent from "../../components/ToastMessageComponent/ToastM
 
 import Modal from "../../components/ModalComponent/ModalComponent";
 import CourseForm from "./CourseForm";
+import { Helmet } from "react-helmet-async";
 const CourseManagement = () => {
   const [isAddCourseModalOpen, setIsAddCourseModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -109,6 +110,10 @@ const CourseManagement = () => {
     setIsAddCourseModalOpen(false);
   };
   return (
+    <>
+    <Helmet>
+  <title>Admin | Quản lý khóa học</title>
+</Helmet>
     <div className="space-y-6 py-8">
       {toast.show && (
         <ToastMessageComponent
@@ -305,6 +310,7 @@ const CourseManagement = () => {
       </div>
 
     </div>
+    </>
   );
 };
 

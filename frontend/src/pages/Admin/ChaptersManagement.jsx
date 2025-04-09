@@ -3,6 +3,8 @@ import ChapterService from "../../services/ChapterService";
 import CourseService from "../../services/CourseService";
 import Modal from "../../components/ModalComponent/ModalComponent";
 import { Edit, Trash2 } from "lucide-react";
+import {Helmet} from "react-helmet-async"
+
 const ChaptersManagement = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [courses, setCourses] = useState([]);
@@ -96,6 +98,10 @@ const ChaptersManagement = () => {
   };
 
   return (
+    <>
+    <Helmet>
+  <title>Admin | Quản lý Chương</title>
+</Helmet>
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Quản lý Chương</h2>
 
@@ -138,7 +144,7 @@ const ChaptersManagement = () => {
           <tr className="bg-gray-200">
             <th className="border p-2">STT</th>
             <th className="border p-2">Tiêu đề</th>
-            <th className="border p-2">Khóa học</th>
+            <th className="border p-2">Thuộc khóa học</th>
             <th className="border p-2">Hành động</th>
           </tr>
         </thead>
@@ -250,6 +256,7 @@ const ChaptersManagement = () => {
         </div>
       </Modal>
     </div>
+    </>
   );
 };
 

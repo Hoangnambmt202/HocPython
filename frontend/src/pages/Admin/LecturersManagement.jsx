@@ -14,6 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import UserService from "../../services/UserService";
 import InputFormComponent from "../../components/InputFormComponent/InputFormComponent";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent"; // Giả sử bạn đang sử dụng react-toastify
+import { Helmet } from "react-helmet-async";
 
 const LecturersManagement = () => {
   const [lecturers, setLecturers] = useState([]);
@@ -167,6 +168,10 @@ const LecturersManagement = () => {
   
 
   return (
+    <>
+    <Helmet>
+  <title>Admin | Quản lý giảng viên</title>
+</Helmet>
     <div className="py-8 space-y-6">
       {toast.show && (
         <ToastMessageComponent
@@ -373,6 +378,7 @@ const LecturersManagement = () => {
         </AddForm>
       )}
     </div>
+    </>
   );
 };
 

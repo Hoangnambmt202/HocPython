@@ -1,18 +1,74 @@
-const progressService = require("../services/progressService");
+const ProgressService = require('../services/ProgressService');
 
-const saveProgress = async (req, res) => {
-    const { userId, courseId, lessonId } = req.body;
-    if (!userId || !courseId || !lessonId) {
-        return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    const result = await progressService.updateProgress(userId, courseId, lessonId);
-
-    if (result.success) {
-        return res.json({ message: "Progress updated", progress: result.progress });
-    } else {
-        return res.status(500).json({ message: result.message });
-    }
+const saveProgress = async (req, res, next) => {
+  try {
+    const { courseId, lessonId, completed } = req.body;
+    const userId = req.user._id;
+  
+    const progress = await ProgressService.saveProgress(userId, courseId, lessonId, completed);
+    
+    res.json({
+      success: true,
+      message: 'Đã cập nhật tiến độ',
+      data: progress
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-module.exports = { saveProgress };
+const getProgress = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const userId = req.user._id;
+
+    const progress = await ProgressService.getProgress(userId, slug);
+    
+    res.json({
+      success: true,
+      data: progress
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getLastLesson = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const userId = req.user._id;
+
+    const lastLesson = await ProgressService.getLastLesson(userId, slug);
+    
+    res.json({
+      success: true,
+      data: lastLesson
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateLastLesson = async (req, res, next) => {
+  try {
+    const { courseId, lessonId, chapterId } = req.body;
+    const userId = req.user._id;
+
+    const lastLesson = await ProgressService.updateLastLesson(userId, courseId, lessonId, chapterId);
+
+    res.json({
+      success: true,
+      message: 'Đã cập nhật bài học cuối cùng',
+      data: lastLesson
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  saveProgress,
+  getProgress,
+  getLastLesson,
+  updateLastLesson
+};

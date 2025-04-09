@@ -4,7 +4,7 @@ import AddForm from "../../components/AddFormComponent/AddForm";
 import UserService from "../../services/UserService";
 import Modal from "../../components/ModalComponent/ModalComponent";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
-
+import {Helmet} from "react-helmet-async";
 
 
 const ManageStudents = () => {
@@ -87,6 +87,10 @@ const ManageStudents = () => {
   // const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
   return (
+    <>
+    <Helmet>
+  <title>Admin | Quản lý học viên</title>
+</Helmet>
     <div className="py-8 space-y-6">
       {toast.show && (
         <ToastMessageComponent
@@ -284,6 +288,7 @@ const ManageStudents = () => {
       </AddForm>
       )}
     </div>
+    </>
   );
 }
 export default ManageStudents;
