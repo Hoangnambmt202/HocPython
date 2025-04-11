@@ -13,7 +13,8 @@ import { logout,setUser } from "../../redux/slides/userSlides";
 import UserService from "../../services/UserService";
 import CartPage from "../../pages/CartPage/CartPage";
 import { toggleCart } from "../../redux/slides/cartSlides";
-
+import EnrollService from "../../services/EnrollService";
+import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
 
 
 
@@ -21,7 +22,6 @@ const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
   const user = useSelector((state) => state.user.user);
-
 
 
   const dispatch = useDispatch();
@@ -39,10 +39,21 @@ const HeaderComponent = () => {
         dispatch(logout());
       }
     };
+    const fetchEnrolled = async () => {
+      if (!user) return;
+
+      try {
+        const response = await EnrollService.allCourseEnroll();
+        const enrolledCourseIds = response.data.map(c => c.courseId._id);
+        dispatch(setEnrolledCourses(enrolledCourseIds));
+      } catch (err) {
+        console.error("Lỗi tải danh sách đã đăng ký:", err);
+      }
+    };
     
     fetchUser();
-   
-  }, [dispatch]);
+    fetchEnrolled();
+  }, [user, dispatch]);
 
   const handleLoginSuccess = (userData) => {
       dispatch(setUser(userData)); 

@@ -6,7 +6,7 @@ import AsideComponent from "../../components/AsideComponent/AsideComponent";
 import { useDispatch } from "react-redux";
 import CarouselComponent from "../../components/CarouselComponent/CarouselComponent";
 import CourseService from "../../services/CourseService";
-
+import { Helmet } from "react-helmet-async";
 const HomePage = () => {
   // eslint-disable-next-line no-unused-vars
   const [toast, setToast] = useState("");
@@ -31,6 +31,10 @@ const HomePage = () => {
 
   return (
     <>
+    <Helmet>
+      <title>HocPython - Trang chủ</title>
+      <meta name="description" content="HocPython là trang web học tập online cho phép bạn học tập và thực hành lập trình miễn phí." />
+    </Helmet>
       <div className="flex w-full h-full bg-white">
         <AsideComponent />
         <div className="container px-4 py-4 mx-auto basis-11/12">

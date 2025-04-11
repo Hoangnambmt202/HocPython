@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, MoveRight } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Menu, MoveRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import YouTubePlayer from "../../components/YoutubePlayer/YoutubePlayer";
@@ -13,6 +13,7 @@ import CourseService from "../../services/CourseService";
 import { setContent, fetchContentStart } from "../../redux/slides/courseContentSlices";
 import ProgressService from "../../services/ProgressService";
 import { updateLessonProgress, setLastLesson } from "../../redux/slides/progressSlice";
+import { setCourseDetail } from "../../redux/slides/coursesSlices";
 
 const LearningPage = () => {
   const { slug } = useParams();
@@ -21,98 +22,146 @@ const LearningPage = () => {
   const [currentLesson, setCurrentLesson] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openChapters, setOpenChapters] = useState({});
-  const { setCourseDetail, courseDetail } = useSelector((state) => state.course);
+ 
+  const courseDetail = useSelector((state) => state.course.courseDetail);
+
   const [userCode, setUserCode] = useState("");
   const [testResults, setTestResults] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [jobStatus, setJobStatus] = useState(null);
   const { lessonProgress } = useSelector(state => state.progress);
   const [videoProgress, setVideoProgress] = useState(0);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      dispatch(fetchContentStart());
-      const res = await CourseService.getCourses(slug);
-      dispatch(setContent(res.data.content));
-      dispatch(setCourseDetail(res.data))
+  // Tách riêng hàm loadProgress để có thể gọi lại khi cần
+  const loadProgress = async () => {
+    try {
+      setIsLoadingProgress(true);
+      const progress = await ProgressService.getProgress(slug);
       
-     
-      // Find the first lesson with order = 0
-      if (res.data.content && res.data.content.length > 0) {
-        // Find the chapter with the first lesson (order = 0)
-        const firstChapter = res.data.content.find(chapter => 
-          chapter.lessons && chapter.lessons.length > 0
-        );
-        
-        if (firstChapter) {
-          // Sort lessons by order and find the one with order = 0
-          const sortedLessons = [...firstChapter.lessons].sort((a, b) => a.order - b.order);
-          const firstLesson = sortedLessons.find(lesson => lesson.order === 0) || sortedLessons[0];
-          
-          if (firstLesson) {
-            setCurrentLesson({
-              lesson: firstLesson,
-              chapterId: firstChapter._id
-            });
-            
-            // Auto open the chapter containing the first lesson
-            setOpenChapters(prev => ({
-              ...prev,
-              [firstChapter._id]: true
+      // Reset progress state trước khi cập nhật mới
+      dispatch({ type: 'progress/resetProgress' });
+      
+      // Cập nhật tiến độ vào Redux ngay lập tức
+      if (progress.data && progress.data.lessonProgress) {
+        Object.entries(progress.data.lessonProgress).forEach(([lessonId, data]) => {
+          if (data && data.completed) {
+            dispatch(updateLessonProgress({
+              courseId: slug,
+              lessonId,
+              completed: true
             }));
           }
-        }
+        });
       }
-    };
-    
-     
-    
-    fetchCourse();
-  }, [dispatch,slug]);
-
+      return progress;
+    } catch (error) {
+      console.error("Error loading progress:", error);
+    } finally {
+      setIsLoadingProgress(false);
+    }
+  };
+  
+  // Load course content và progress ban đầu
   useEffect(() => {
-    const loadProgress = async () => {
+    const fetchCourseAndProgress = async () => {
       try {
-        if (slug) {
-          const progress = await ProgressService.getProgress(slug);
-          const lastLesson = await ProgressService.getLastLesson(slug);
-          
-          // Cập nhật tiến độ vào Redux
-          if (progress.lessonProgress) {
-            Object.entries(progress.lessonProgress).forEach(([lessonId, data]) => {
-              dispatch(updateLessonProgress({
-                courseId: slug,
-                lessonId,
-                completed: data.completed
+        dispatch(fetchContentStart());
+        const res = await CourseService.getCourses(slug);
+        dispatch(setContent(res.data.content));
+        dispatch(setCourseDetail(res.data));
+
+        // Load progress và last lesson
+        await loadProgress();
+      
+        const lastLesson = await ProgressService.getLastLesson(slug);
+      
+        // Xử lý việc chọn bài học để hiển thị
+        if (lastLesson && lastLesson.data && lastLesson.data.lessonId) {
+          const chapter = res.data.content?.find(c => c._id === lastLesson.data.chapterId);
+          if (chapter) {
+            const lesson = chapter.lessons.find(l => l._id === lastLesson.data.lessonId);
+            if (lesson) {
+              setCurrentLesson({
+                lesson,
+                chapterId: lastLesson.data.chapterId
+              });
+              setOpenChapters(prev => ({
+                ...prev,
+                [lastLesson.data.chapterId]: true
               }));
-            });
+              return;
+            }
           }
+        }
+
+        // Nếu không có last lesson, hiển thị bài đầu tiên
+        if (res.data.content && res.data.content.length > 0) {
+          const firstChapter = res.data.content.find(chapter => 
+            chapter.lessons && chapter.lessons.length > 0
+          );
           
-          // Nếu có bài học cuối cùng, chuyển đến bài đó
-          if (lastLesson && lastLesson.lessonId) {
-            const chapter = content?.find(c => c._id === lastLesson.chapterId);
-            if (chapter) {
-              const lesson = chapter.lessons.find(l => l._id === lastLesson.lessonId);
-              if (lesson) {
-                setCurrentLesson({
-                  lesson,
-                  chapterId: lastLesson.chapterId
-                });
-                setOpenChapters(prev => ({
-                  ...prev,
-                  [lastLesson.chapterId]: true
-                }));
-              }
+          if (firstChapter) {
+            const sortedLessons = [...firstChapter.lessons].sort((a, b) => a.order - b.order);
+            const firstLesson = sortedLessons.find(lesson => lesson.order === 0) || sortedLessons[0];
+            
+            if (firstLesson) {
+              setCurrentLesson({
+                lesson: firstLesson,
+                chapterId: firstChapter._id
+              });
+              setOpenChapters(prev => ({
+                ...prev,
+                [firstChapter._id]: true
+              }));
             }
           }
         }
       } catch (error) {
-        console.error("Error loading progress:", error);
+        console.error("Error loading course and progress:", error);
       }
     };
+
+    fetchCourseAndProgress();
+  }, [dispatch, slug]);
+
+  // Thêm useEffect để reload progress mỗi khi component mount
+  useEffect(() => {
+    const reloadProgress = async () => {
+      await loadProgress();
+    };
     
-    loadProgress();
-  }, [slug, dispatch, content]);
+    window.addEventListener('focus', reloadProgress);
+    
+    return () => {
+      window.removeEventListener('focus', reloadProgress);
+    };
+  }, [slug]);
+
+  useEffect(() => {
+    const updateLastLesson = async () => {
+      if (currentLesson) {
+        try {
+          
+          await ProgressService.updateLastLesson(
+            slug,
+            currentLesson.lesson._id,
+            currentLesson.chapterId
+          );
+          
+          dispatch(setLastLesson({
+            slug,
+            lessonId: currentLesson.lesson._id,
+            chapterId: currentLesson.chapterId
+          }));
+        } catch (error) {
+          console.error("Error updating last lesson:", error);
+        }
+      }
+    };
+
+    updateLastLesson();
+  }, [currentLesson, courseDetail, dispatch, slug]);
 
   const toggleChapter = (chapterId) => {
     setOpenChapters((prev) => ({
@@ -563,21 +612,28 @@ const LearningPage = () => {
       console.error("Error updating progress:", error);
     }
   };
-
-  // Cập nhật UI để hiển thị tiến độ
+  // animate-pulse animation nhấp nháy chấm xanh
+  
+  // Render lesson status với loading state
   const renderLessonStatus = (lesson) => {
+    if (isLoadingProgress) {
+      return <div className="w-4 h-4 rounded-full bg-gray-300 animate-pulse" />;
+    }
+    
     const isCompleted = lessonProgress[slug]?.[lesson._id]?.completed;
     return (
-      <div className={`w-2 h-2 rounded-full ${
+      <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
         isCompleted ? "bg-green-500" : "bg-gray-300"
-      }`} />
+      }`}>
+        {isCompleted && <Check size={12} className="text-white" />}
+      </div>
     );
   };
 
   return (
     <>
       <Helmet>
-  <title>HocPython | </title>
+  <title>HocPython | {courseDetail?.title} </title>
 </Helmet>
       <div className={`flex ${isSidebarOpen ? "w-9/12" : "w-full"} bg-white flex-col`}>
         <div className="bg-white p-4">

@@ -30,9 +30,9 @@ const progressSlice = createSlice({
     },
     // Lưu bài học cuối cùng
     setLastLesson: (state, action) => {
-      const { courseId, lessonId, chapterId } = action.payload;
+      const { slug, lessonId, chapterId } = action.payload;
       state.lastLesson = {
-        courseId,
+        slug,
         lessonId,
         chapterId,
         timestamp: new Date().toISOString()

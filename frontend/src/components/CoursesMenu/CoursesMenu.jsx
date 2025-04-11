@@ -1,20 +1,21 @@
 import {  useEffect, useState } from "react";
 import {Link} from "react-router-dom";
 import BaseDropdown from "../BaseDropdown/BaseDropdown";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import EnrollService from "../../services/EnrollService";
 import {  setEnrolledCourses } from "../../redux/slides/enrollSlice";
 
 const CoursesMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [toast, setToast] = useState(""); 
+ 
   const dispatch = useDispatch();
-  
+  const [courseEnrolled, setCourseEnrolled] = useState([]);
+
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
         const res = await EnrollService.allCourseEnroll();
-   
+        setCourseEnrolled(res.data) ;
         dispatch(setEnrolledCourses(res.data));
       } catch (error) {
         console.error("Failed to fetch enrolled courses:", error);
@@ -22,8 +23,7 @@ const CoursesMenu = () => {
     };
     fetchEnrolledCourses();
   }, [dispatch]);
-  const { enrolledCourses } = useSelector((state) => state.enrollment);
-  
+
   return (
     <div className="relative">
       <button className="relative px-4 py-2 text-sm font-semibold text-black hover:text-blue-500" onClick={() => setIsOpen(true)}>
@@ -44,7 +44,7 @@ const CoursesMenu = () => {
         </header>
       
         <div className="max-h-[400px] overflow-y-auto">
-          {enrolledCourses?.map((course, index) => {
+          {courseEnrolled?.map((course, index) => {
 
             return (
               <Link

@@ -22,12 +22,16 @@ import ToastMessageComponent from "../../components/ToastMessageComponent/ToastM
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { enrollCourseStart, setEnrolledCourses } from "../../redux/slides/enrollSlice";
 import {setCourseDetail} from "../../redux/slides/coursesSlices";
-
+import RegisterFormComponent from "../../components/RegisterFormComponent/RegisterFormComponent";
+import LoginFormComponent from "../../components/LoginFormComponent/LoginFormComponent";
+import Modal from "../../components/ModalComponent/ModalComponent";
+import { setUser } from "../../redux/slides/userSlides";
 const CoursePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [openChapter, setOpenChapter] = useState(null); 
-
-  const [enrolledCourse, setEnrolledCourse] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [modalType, setModalType] = useState("login");
+  
   const { slug } = useParams();
   const [toast, setToast] = useState({ show: false, color: "", message: "" });
   const cart = useSelector((state) => state.cart.cart);
@@ -35,6 +39,9 @@ const CoursePage = () => {
   const dispatch = useDispatch();
   const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
   const { courseDetail } = useSelector((state) => state.course);
+  const user = useSelector((state) => state.user.user);
+ 
+
   useEffect(() => {
     const fetchCourse = async () => {
       try {
@@ -46,25 +53,10 @@ const CoursePage = () => {
         console.error("Lỗi khi tải khóa học:", error);
       }
     };
-    const fetchEnrolledCourses = async () => {
-      try {
-        const response = await EnrollService.allCourseEnroll();
-        const enrolledCourseIds = response.data.map((data) => data.courseId._id);
-
-        // Kiểm tra nếu Redux đã có dữ liệu thì không cần cập nhật lại
-        if (JSON.stringify(enrolledCourses) !== JSON.stringify(enrolledCourseIds)) {
-          setEnrolledCourse(enrolledCourseIds);
-          dispatch(setEnrolledCourses(enrolledCourseIds));
-        }
-        
-
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách khóa học đã đăng ký:", error);
-      }
-    };
+    
  
     fetchCourse();
-    fetchEnrolledCourses();
+    
   },  [slug, dispatch]);
 
   const toggleChapter = (index) => {
@@ -106,14 +98,22 @@ const CoursePage = () => {
      console.log("Lỗi khi đăng ký khóa học");
     },
   });
-
+  const handleLoginSuccess = (userData) => {
+    dispatch(setUser(userData)); 
+    setIsOpen(false); // Đóng modal
+  
+};
   const handleStartLearn = () => {
     enrollMutation.mutate();
-
+    if(!user){
+      alert("Vui lòng đăng nhập để tiếp tục học");
+      setModalType("login") ;
+      setIsOpen(true);
+    }
   };
 
-  const flattenedCourses = enrolledCourses.flat(Infinity);
-  const isEnrolled = courseDetail?._id && flattenedCourses.includes(courseDetail._id);
+  // const flattenedCourses = enrolledCourses.flat(Infinity);
+  const isEnrolled = courseDetail?._id && enrolledCourses.includes(courseDetail._id);
   
   const isInCart = cart.some((item) => item._id === courseDetail?._id);
 
@@ -314,7 +314,30 @@ const CoursePage = () => {
           </div>
         </TabPanel>
       </Tabs>
+      <Modal
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              onClose={() => setIsOpen(false)}
+              title={
+                modalType === "login"
+                  ? "Đăng nhập vào HocPython"
+                  : "Đăng ký tài khoản"
+              }
+            >
+              {modalType === "login" ? (
+                <LoginFormComponent
+                  switchToRegister={() => setModalType("register")}
+                  setIsOpen={setIsOpen}
+                  onLoginSuccess={handleLoginSuccess}
+                />
+              ) : (
+                <RegisterFormComponent
+                  switchToLogin={() => setModalType("login")}
+                />
+              )}
+            </Modal>
     </div>
+    
   );
 };
 

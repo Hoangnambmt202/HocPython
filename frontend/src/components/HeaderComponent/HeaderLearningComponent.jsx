@@ -33,7 +33,7 @@ const HeaderLearningComponent = () => {
   }, [dispatch, slug]);
   
   const { courseDetail } = useSelector((state) => state.course);
-  console.log(courseDetail)
+ 
   const goBack = () => {
     if (window.history.length > 2) {
       navigate(-1);

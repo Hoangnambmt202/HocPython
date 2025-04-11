@@ -24,6 +24,7 @@ const getProgress = async (slug) => {
 
 const getLastLesson = async (slug) => {
   try {
+    
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/progress/${slug}/last-lesson`, { withCredentials: true });
     return response.data;
   } catch (error) {
@@ -31,10 +32,10 @@ const getLastLesson = async (slug) => {
   }
 };
 
-const updateLastLesson = async (courseId, lessonId, chapterId) => {
+const updateLastLesson = async (slug, lessonId, chapterId) => {
   try {
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/progress/last-lesson`, {
-      courseId,
+   
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/progress/${slug}/last-lesson`, {
       lessonId,
       chapterId
     }, { withCredentials: true });
