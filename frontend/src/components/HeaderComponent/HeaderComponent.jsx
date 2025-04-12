@@ -53,7 +53,7 @@ const HeaderComponent = () => {
     
     fetchUser();
     fetchEnrolled();
-  }, [user, dispatch]);
+  }, []);
 
   const handleLoginSuccess = (userData) => {
       dispatch(setUser(userData)); 

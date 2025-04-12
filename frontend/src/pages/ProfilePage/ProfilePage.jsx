@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-
-
 import {
   BookCheck,
   BookMarked,
@@ -14,17 +12,17 @@ import {
   University,
   User,
 } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import Modal from "../../components/ModalComponent/ModalComponent";
+import {Helmet} from "react-helmet-async";
 import { useMutation } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
+
 import UserService from "../../services/UserService";
+import Modal from "../../components/ModalComponent/ModalComponent";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { setUser } from "../../redux/slides/userSlides";
-import {Helmet} from "react-helmet-async";
-const ProfilePage = () => {
-  
 
+const ProfilePage = () => {
   const savedArticles = [
     { id: 1, title: "Article 1", description: "Description of article 1" },
     { id: 2, title: "Article 2", description: "Description of article 2" },
@@ -32,6 +30,8 @@ const ProfilePage = () => {
   ];
 
   const user = useSelector((state) => state.user.user); // Lấy user từ Redux
+  const enrolledCourses = useSelector((state) => state.progress.enrolledCourses);
+  console.log(enrolledCourses)
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(true);
   const [toast, setToast] = useState({ show: false, message: "", color: "" });
@@ -215,7 +215,7 @@ const ProfilePage = () => {
   return (
     <>
       <Helmet>
-  <title>HocPython | Profile</title>
+  <title>HocPython | Trang cá nhân</title>
 </Helmet>
     <div className="container mx-auto p-4 bg-white">
       {toast.show && (
@@ -430,10 +430,10 @@ const ProfilePage = () => {
                           name=""
                           id=""
                         >
-                          <option value="1">Chọn chuyên ngành</option>
-                          <option value="2">Chuyên ngành 1</option>
-                          <option value="3">Chuyên ngành 2</option>
-                          <option value="4">Chuyên ngành 3</option>
+                          <option >Chọn chuyên ngành</option>
+                          <option value="1">Chuyên ngành 1</option>
+                          <option value="2">Chuyên ngành 2</option>
+                          <option value="3">Chuyên ngành 3</option>
                         </select>
                       </div>
                     </div>
@@ -513,6 +513,21 @@ const ProfilePage = () => {
                 Khóa học của tôi
               </h3>
               <p>Bạn đã hoàn thành 3/8 khóa học.</p>
+              <div className="flex justify-end">
+              {
+                // enrolledCourses?.map((course) => (
+                //   <div key={course.id}>
+                //     <span className="text-gray-500">
+                //       {course.title}
+                //     </span>
+                //   </div>
+                // ))
+
+              }
+              <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
+                Xem tất cả
+              </button>
+              </div>
             </div>
             <div>
               <select className="w-fit border p-2 rounded-md">

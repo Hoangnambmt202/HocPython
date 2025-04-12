@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Fa500Px } from 'react-icons/fa';
 import YouTube from 'react-youtube';
 
 // eslint-disable-next-line react/prop-types
@@ -7,6 +8,7 @@ const YouTubePlayer = ({ url, onProgress, onVideoComplete }) => {
   const [duration, setDuration] = useState(0);
   const [hasReachedThreshold, setHasReachedThreshold] = useState(false);
   const progressCheckInterval = useRef(null);
+  const lastSavedProgress = useRef(0);
 
   const getVideoId = (url) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -31,14 +33,15 @@ const YouTubePlayer = ({ url, onProgress, onVideoComplete }) => {
       const currentTime = player.getCurrentTime();
       const progress = (currentTime / duration) * 100;
 
-      // Gọi callback để cập nhật tiến độ
+      // Gọi callback để cập nhật tiến độ hiển thị
       if (onProgress) {
         onProgress(progress);
       }
 
-      // Kiểm tra nếu đã xem 80% video và chưa đánh dấu hoàn thành
-      if (progress >= 80 && !hasReachedThreshold) {
+      // Chỉ lưu tiến độ khi đạt chính xác 80% và chưa lưu trước đó
+      if (Math.round(progress) === 80 && !hasReachedThreshold) {
         setHasReachedThreshold(true);
+        lastSavedProgress.current = progress;
         if (onVideoComplete) {
           onVideoComplete(true);
         }

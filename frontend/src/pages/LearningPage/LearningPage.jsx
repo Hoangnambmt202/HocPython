@@ -1,20 +1,20 @@
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Menu, MoveRight } from "lucide-react";
+import DOMPurify from 'dompurify';
+import { Helmet } from "react-helmet-async";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {useDispatch, useSelector} from "react-redux";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Menu, MoveRight } from "lucide-react";
 
 import YouTubePlayer from "../../components/YoutubePlayer/YoutubePlayer";
 import CodeEditor from "../../components/CodeEditorComponent/CodeEditorComponent";
-import {useDispatch, useSelector} from "react-redux";
 
-import { Helmet } from "react-helmet-async";
-import { useParams } from "react-router-dom";
-import DOMPurify from 'dompurify';
 import LessonService from "../../services/LessonService";
 import CourseService from "../../services/CourseService";
-import { setContent, fetchContentStart } from "../../redux/slides/courseContentSlices";
 import ProgressService from "../../services/ProgressService";
-import { updateLessonProgress, setLastLesson } from "../../redux/slides/progressSlice";
 import { setCourseDetail } from "../../redux/slides/coursesSlices";
 import { updateCourseProgress } from "../../redux/slides/progressSlice";
+import { setContent, fetchContentStart } from "../../redux/slides/courseContentSlices";
+import { updateLessonProgress, setLastLesson } from "../../redux/slides/progressSlice";
 
 const LearningPage = () => {
   const { slug } = useParams();
@@ -23,9 +23,7 @@ const LearningPage = () => {
   const [currentLesson, setCurrentLesson] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openChapters, setOpenChapters] = useState({});
- 
   const courseDetail = useSelector((state) => state.course.courseDetail);
-
   const [userCode, setUserCode] = useState("");
   const [testResults, setTestResults] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +32,7 @@ const LearningPage = () => {
   const [videoProgress, setVideoProgress] = useState(0);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
-  // Tách riêng hàm loadProgress để có thể gọi lại khi cần
+  // Load progress
   const loadProgress = async () => {
     try {
       setIsLoadingProgress(true);
@@ -373,9 +371,15 @@ const LearningPage = () => {
     setVideoProgress(progress);
   };
 
-  const handleVideoComplete = async () => {
-    if (currentLesson && currentLesson.lesson.type === "video") {
-      await updateProgress(currentLesson.lesson._id, true);
+  const handleVideoComplete = async (isCompleted) => {
+    if (currentLesson && currentLesson.lesson.type === "video" && isCompleted) {
+      // Kiểm tra xem bài học đã hoàn thành chưa
+      const isLessonCompleted = lessonProgress[slug]?.[currentLesson.lesson._id]?.completed;
+      
+      // Chỉ cập nhật nếu bài học chưa hoàn thành
+      if (!isLessonCompleted) {
+        await updateProgress(currentLesson.lesson._id, true);
+      }
     }
   };
   
@@ -649,53 +653,17 @@ const LearningPage = () => {
     );
   };
 
-  // Tính tổng số bài học và tiến độ
-  const calculateCourseProgress = () => {
-    if (!content || !lessonProgress[slug]) return { totalLessons: 0, completedLessons: 0, progress: 0 };
-
-    let totalLessons = 0;
-    let completedLessons = 0;
-
-    content.forEach(chapter => {
-      if (chapter.lessons) {
-        totalLessons += chapter.lessons.length;
-        chapter.lessons.forEach(lesson => {
-          if (lessonProgress[slug][lesson._id]?.completed) {
-            completedLessons++;
-          }
-        });
-      }
-    });
-
-    const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-
-    return { totalLessons, completedLessons, progress };
-  };
-
   return (
     <>
       <Helmet>
   <title>{courseDetail?.title || "HocPython | Khóa học"} </title>
 </Helmet>
       <div className={`flex ${isSidebarOpen ? "w-9/12" : "w-full"} bg-white flex-col`}>
-        <div className="bg-white p-4">
+        <div className="bg-white p-4 pb-28">
           {currentLesson && (
             <>
             <h2 className="text-2xl font-bold mb-4">{currentLesson.lesson.title}</h2>
-              {!isLoadingProgress && (
-                <div className="mb-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className="bg-green-600 h-2.5 rounded-full" 
-                      style={{ width: `${calculateCourseProgress().progress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Tiến độ khóa học: {calculateCourseProgress().progress}% 
-                    ({calculateCourseProgress().completedLessons}/{calculateCourseProgress().totalLessons} bài học)
-                  </p>
-                </div>
-              )}
+             
             </>
           )}
           {renderLessonContent()}

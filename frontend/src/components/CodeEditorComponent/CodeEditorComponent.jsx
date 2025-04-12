@@ -18,7 +18,7 @@ const CodeEditor = ({ value, onChange, readOnly = false, language = 'python' }) 
   };
 
   return (
-    <div className="h-[400px] border border-gray-300 rounded-lg overflow-hidden">
+    <div className="h-[300px] border border-gray-300 rounded-lg overflow-hidden">
       <Editor
         height="100%"
         defaultLanguage={language}
