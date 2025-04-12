@@ -14,6 +14,7 @@ import { setContent, fetchContentStart } from "../../redux/slides/courseContentS
 import ProgressService from "../../services/ProgressService";
 import { updateLessonProgress, setLastLesson } from "../../redux/slides/progressSlice";
 import { setCourseDetail } from "../../redux/slides/coursesSlices";
+import { updateCourseProgress } from "../../redux/slides/progressSlice";
 
 const LearningPage = () => {
   const { slug } = useParams();
@@ -66,9 +67,9 @@ const LearningPage = () => {
   useEffect(() => {
     const fetchCourseAndProgress = async () => {
       try {
-        dispatch(fetchContentStart());
-        const res = await CourseService.getCourses(slug);
-        dispatch(setContent(res.data.content));
+      dispatch(fetchContentStart());
+      const res = await CourseService.getCourses(slug);
+      dispatch(setContent(res.data.content));
         dispatch(setCourseDetail(res.data));
 
         // Load progress và last lesson
@@ -96,27 +97,27 @@ const LearningPage = () => {
         }
 
         // Nếu không có last lesson, hiển thị bài đầu tiên
-        if (res.data.content && res.data.content.length > 0) {
-          const firstChapter = res.data.content.find(chapter => 
-            chapter.lessons && chapter.lessons.length > 0
-          );
+      if (res.data.content && res.data.content.length > 0) {
+        const firstChapter = res.data.content.find(chapter => 
+          chapter.lessons && chapter.lessons.length > 0
+        );
+        
+        if (firstChapter) {
+          const sortedLessons = [...firstChapter.lessons].sort((a, b) => a.order - b.order);
+          const firstLesson = sortedLessons.find(lesson => lesson.order === 0) || sortedLessons[0];
           
-          if (firstChapter) {
-            const sortedLessons = [...firstChapter.lessons].sort((a, b) => a.order - b.order);
-            const firstLesson = sortedLessons.find(lesson => lesson.order === 0) || sortedLessons[0];
-            
-            if (firstLesson) {
-              setCurrentLesson({
-                lesson: firstLesson,
-                chapterId: firstChapter._id
-              });
-              setOpenChapters(prev => ({
-                ...prev,
-                [firstChapter._id]: true
-              }));
-            }
+          if (firstLesson) {
+            setCurrentLesson({
+              lesson: firstLesson,
+              chapterId: firstChapter._id
+            });
+            setOpenChapters(prev => ({
+              ...prev,
+              [firstChapter._id]: true
+            }));
           }
         }
+      }
       } catch (error) {
         console.error("Error loading course and progress:", error);
       }
@@ -377,7 +378,7 @@ const LearningPage = () => {
       await updateProgress(currentLesson.lesson._id, true);
     }
   };
-
+  
   const renderLessonContent = () => {
     if (!currentLesson) return <p className="text-center text-gray-500">Vui lòng chọn bài học</p>;
     const { lesson } = currentLesson;
@@ -587,13 +588,28 @@ const LearningPage = () => {
   // Cập nhật tiến độ khi hoàn thành bài học
   const updateProgress = async (lessonId, completed = true) => {
     try {
-      await ProgressService.saveProgress(
+      const response = await ProgressService.saveProgress(
         courseDetail._id,
         lessonId,
         completed
       );
       
-      // Cập nhật Redux
+      // Cập nhật Redux state ngay lập tức với dữ liệu mới nhất
+      dispatch(updateCourseProgress({
+        progress: response.progress || 0,
+        totalLessons: response.totalLessons || 0,
+        completedLessons: response.completedLessons || 0
+      }));
+
+      // Cập nhật thông tin khóa học nếu có thay đổi
+      if (response.course) {
+        dispatch(setCourseDetail({
+          ...courseDetail,
+          totalLessons: response.totalLessons
+        }));
+      }
+      
+      // Cập nhật lessonProgress trong Redux
       dispatch(updateLessonProgress({
         courseId: slug,
         lessonId,
@@ -608,6 +624,9 @@ const LearningPage = () => {
           chapterId: currentLesson.chapterId
         }));
       }
+
+      // Phát ra sự kiện để HeaderLearningComponent cập nhật
+      window.dispatchEvent(new CustomEvent('progressUpdated'));
     } catch (error) {
       console.error("Error updating progress:", error);
     }
@@ -630,15 +649,54 @@ const LearningPage = () => {
     );
   };
 
+  // Tính tổng số bài học và tiến độ
+  const calculateCourseProgress = () => {
+    if (!content || !lessonProgress[slug]) return { totalLessons: 0, completedLessons: 0, progress: 0 };
+
+    let totalLessons = 0;
+    let completedLessons = 0;
+
+    content.forEach(chapter => {
+      if (chapter.lessons) {
+        totalLessons += chapter.lessons.length;
+        chapter.lessons.forEach(lesson => {
+          if (lessonProgress[slug][lesson._id]?.completed) {
+            completedLessons++;
+          }
+        });
+      }
+    });
+
+    const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+    return { totalLessons, completedLessons, progress };
+  };
+
   return (
     <>
       <Helmet>
-  <title>HocPython | {courseDetail?.title} </title>
+  <title>{courseDetail?.title || "HocPython | Khóa học"} </title>
 </Helmet>
       <div className={`flex ${isSidebarOpen ? "w-9/12" : "w-full"} bg-white flex-col`}>
         <div className="bg-white p-4">
           {currentLesson && (
+            <>
             <h2 className="text-2xl font-bold mb-4">{currentLesson.lesson.title}</h2>
+              {!isLoadingProgress && (
+                <div className="mb-4">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className="bg-green-600 h-2.5 rounded-full" 
+                      style={{ width: `${calculateCourseProgress().progress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Tiến độ khóa học: {calculateCourseProgress().progress}% 
+                    ({calculateCourseProgress().completedLessons}/{calculateCourseProgress().totalLessons} bài học)
+                  </p>
+                </div>
+              )}
+            </>
           )}
           {renderLessonContent()}
         </div>

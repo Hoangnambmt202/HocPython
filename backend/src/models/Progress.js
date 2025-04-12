@@ -44,7 +44,7 @@ progressSchema.pre('save', function(next) {
     
     this.completedLessons = completed;
     this.progress = this.totalLessons > 0 
-      ? (completed / this.totalLessons) * 100 
+      ? Math.round((completed / this.totalLessons) * 100) 
       : 0;
   }
   next();

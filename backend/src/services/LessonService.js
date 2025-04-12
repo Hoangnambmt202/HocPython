@@ -8,6 +8,7 @@ const config = require('../config/config');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
+const ChapterService = require("./ChapterService");
 
 // Tạo queue để xử lý việc chạy code
 const codeExecutionQueue = new Queue('code-execution', {
@@ -109,18 +110,34 @@ const runCode = async (codeData) => {
 
 // Tạo bài học
 const createLesson = async (chapterId, data) => {
-  const chapter = await Chapter.findById(chapterId);
-  if (!chapter) throw new Error("Chapter không tồn tại");
+  try {
+    const chapter = await Chapter.findById(chapterId);
+    if (!chapter) {
+      throw new Error("Chương không tồn tại");
+    }
 
-  const newLesson = new Lesson({
-    ...data,
-    chapterId
-  });
+    const newLesson = new Lesson({
+      ...data,
+      chapterId
+    });
 
-  await newLesson.save();
-  chapter.lessons.push(newLesson._id);
-  await chapter.save();
-  return newLesson;
+    await newLesson.save();
+
+    // Thêm bài học vào chương
+    if (!chapter.lessons) {
+      chapter.lessons = [];
+    }
+    chapter.lessons.push(newLesson._id);
+    await chapter.save();
+
+    // Cập nhật tổng số bài học trong chương
+    await ChapterService.updateChapterLessonCount(chapterId);
+
+    return newLesson;
+  } catch (error) {
+    console.error("Error creating lesson:", error);
+    throw error;
+  }
 };
 
 // Lấy bài học theo chapter
@@ -135,19 +152,52 @@ const getAllLessons = async () => {
 
 // Cập nhật bài học
 const updateLesson = async (lessonId, data) => {
-  console.log(lessonId);
-  console.log(data);
-  return await Lesson.findByIdAndUpdate(lessonId, data, { new: true });
+  try {
+    const updatedLesson = await Lesson.findByIdAndUpdate(
+      lessonId,
+      data,
+      { new: true }
+    );
+
+    if (!updatedLesson) {
+      throw new Error("Bài học không tồn tại");
+    }
+
+    return updatedLesson;
+  } catch (error) {
+    console.error("Error updating lesson:", error);
+    throw error;
+  }
 };
 
 // Xóa bài học
 const deleteLesson = async (lessonId) => {
-  const lesson = await Lesson.findById(lessonId);
-  const chapter = await Chapter.findById(lesson.chapterId);
-  
-  chapter.lessons.pull(lessonId);
-  await chapter.save();
-  await Lesson.deleteOne({ _id: lessonId });
+  try {
+    const lesson = await Lesson.findById(lessonId);
+    if (!lesson) {
+      throw new Error("Bài học không tồn tại");
+    }
+
+    const chapterId = lesson.chapterId;
+
+    // Xóa bài học
+    await Lesson.findByIdAndDelete(lessonId);
+
+    // Cập nhật chương
+    const chapter = await Chapter.findById(chapterId);
+    if (chapter) {
+      chapter.lessons = chapter.lessons.filter(id => id.toString() !== lessonId);
+      await chapter.save();
+
+      // Cập nhật tổng số bài học trong chương
+      await ChapterService.updateChapterLessonCount(chapterId);
+    }
+
+    return { success: true, message: "Xóa bài học thành công" };
+  } catch (error) {
+    console.error("Error deleting lesson:", error);
+    throw error;
+  }
 };
 
 // Phương thức để kiểm tra kết quả của một job

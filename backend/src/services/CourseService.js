@@ -2,11 +2,42 @@ const Course = require("../models/Course");
 require("../models/Chapter"); 
 const slugify = require("slugify");
 
+// Hàm tính tổng số bài học trong khóa học
+const calculateTotalLessons = async (courseId) => {
+  try {
+    const course = await Course.findById(courseId)
+      .populate({
+        path: 'content',
+        populate: {
+          path: 'lessons'
+        }
+      });
+
+    if (!course) {
+      throw new Error('Khóa học không tồn tại');
+    }
+
+    let totalLessons = 0;
+    course.content.forEach(chapter => {
+      if (chapter.lessons && Array.isArray(chapter.lessons)) {
+        totalLessons += chapter.lessons.length;
+      }
+    });
+
+    // Cập nhật tổng số bài học vào khóa học
+    course.totalLessons = totalLessons;
+    await course.save();
+
+    return totalLessons;
+  } catch (error) {
+    console.error('Error calculating total lessons:', error);
+    throw error;
+  }
+};
+
 // Tạo khóa học
 const createCourse = async (data) => {
   try {
-  
-  
     const slug = slugify(data.title, { lower: true, strict: true });
     const newCourse = new Course({
       title: data.title,
@@ -18,17 +49,17 @@ const createCourse = async (data) => {
       thumbnail: data.thumbnail || "/src/assets/imgs/default-thumbnail.jpg",
       categoryId: data.categoryId,
       tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-      isPublished: data.isPublished
+      isPublished: data.isPublished,
+      totalLessons: 0 // Khởi tạo tổng số bài học là 0
     });
 
     await newCourse.save();
     return newCourse;
-    
   } catch (error) {
     console.error("❌ Lỗi trong CourseService:", error);
     throw error;
   }
-}
+};
 
 // Lấy tất cả khóa học
 const getAllCourses = async () => {
@@ -87,58 +118,58 @@ const getCourseBySlug = async (slug) => {
   }
 };
 
-  const updateCourse = async (courseId, data) => {
-    try {
-      console.log("📥 Dữ liệu nhận từ frontend:", data);
-  
-      // Cập nhật khóa học
-      const updatedCourse = await Course.findByIdAndUpdate(
-        courseId,
-        {
-          title: data.title,
-          description: data.description,
-          lecturerId: data.lecturerId,
-          categoryId: data.categoryId,
-          price: data.price,
-          isPublished: data.isPublished,
-          thumbnail: data.thumbnail,
-        },
-        { new: true, runValidators: true }
-      );
-  
-      if (!updatedCourse) {
-        return { status: "error", message: "Không tìm thấy khóa học!" };
-      }
-      
-      await updatedCourse.save();
-  
-      return {
-        status: "success",
-        message: "Cập nhật khóa học thành công!",
-        data: updatedCourse,
-      };
-    } catch (error) {
-      console.error("❌ Lỗi khi cập nhật khóa học:", error);
-      return { status: "error", message: "Lỗi khi cập nhật khóa học" };
-    }
-  };
-  
-const deleteCourse = async (courseId) => {
-  
+// Cập nhật khóa học
+const updateCourse = async (courseId, data) => {
   try {
-    const updateCourse = await Course.findByIdAndDelete(courseId)
-    return  {
+    const updatedCourse = await Course.findByIdAndUpdate(
+      courseId,
+      {
+        title: data.title,
+        description: data.description,
+        lecturerId: data.lecturerId,
+        categoryId: data.categoryId,
+        price: data.price,
+        isPublished: data.isPublished,
+        thumbnail: data.thumbnail,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCourse) {
+      return { status: "error", message: "Không tìm thấy khóa học!" };
+    }
+
+    // Tính lại tổng số bài học sau khi cập nhật
+    await calculateTotalLessons(courseId);
+    
+    await updatedCourse.save();
+
+    return {
+      status: "success",
+      message: "Cập nhật khóa học thành công!",
+      data: updatedCourse,
+    };
+  } catch (error) {
+    console.error("❌ Lỗi khi cập nhật khóa học:", error);
+    return { status: "error", message: "Lỗi khi cập nhật khóa học" };
+  }
+};
+
+// Xóa khóa học
+const deleteCourse = async (courseId) => {
+  try {
+    const deletedCourse = await Course.findByIdAndDelete(courseId);
+    if (!deletedCourse) {
+      throw new Error("Khóa học không tồn tại");
+    }
+    return {
       status: "success",
       message: "Xóa khóa học thành công",
-    
-    }
+    };
+  } catch (error) {
+    console.error("Lỗi khi xóa khóa học:", error);
+    throw error;
   }
-  catch (error) {
-    console.log(error)
-    
-  }
-
-
 };
 
 module.exports = {
@@ -147,4 +178,5 @@ module.exports = {
   getCourseBySlug,
   updateCourse,
   deleteCourse,
+  calculateTotalLessons
 };

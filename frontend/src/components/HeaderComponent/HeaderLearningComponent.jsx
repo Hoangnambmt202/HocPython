@@ -1,29 +1,50 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {  useEffect, useState } from "react";
+import { useEffect } from "react";
 import ProgressCircle from "../ProcessCircle/ProcessCircle";
-import { ChevronLeft, CircleHelp,  NotebookPen } from "lucide-react";
+import { ChevronLeft, CircleHelp, NotebookPen } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchContentStart, setContent } from "../../redux/slides/courseContentSlices";
 import CourseService from "../../services/CourseService";
 import { setCourseDetail } from "../../redux/slides/coursesSlices";
+import ProgressService from "../../services/ProgressService";
+import { updateCourseProgress } from "../../redux/slides/progressSlice";
 
 const HeaderLearningComponent = () => {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [progress, setProgress] = useState(0); // Tiến độ học tập
   const { slug } = useParams();
+  const { courseProgress } = useSelector(state => state.progress);
+  const { courseDetail } = useSelector(state => state.course);
+
+  // Hàm lấy tiến độ mới nhất
+  const fetchLatestProgress = async () => {
+    try {
+      const progressData = await ProgressService.getProgress(slug);
+      if (progressData.data) {
+        dispatch(updateCourseProgress({
+          progress: progressData.data.progress || 0,
+          totalLessons: progressData.data.totalLessons || 0,
+          completedLessons: progressData.data.completedLessons || 0
+        }));
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy tiến độ mới nhất:", error);
+    }
+  };
+
+  // Load dữ liệu khóa học và tiến độ ban đầu
   useEffect(() => {
     const fetchCourse = async () => {
-      if (!slug) return; // Chờ slug có giá trị
+      if (!slug) return;
   
       dispatch(fetchContentStart());
       try {
         const res = await CourseService.getCourses(slug);
-        console.log(res);
-  
         dispatch(setContent(res.data.content));
         dispatch(setCourseDetail(res.data));
+
+        // Lấy tiến độ khóa học
+        await fetchLatestProgress();
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu khóa học:", error);
       }
@@ -31,14 +52,24 @@ const HeaderLearningComponent = () => {
   
     fetchCourse();
   }, [dispatch, slug]);
-  
-  const { courseDetail } = useSelector((state) => state.course);
- 
+
+  // Lắng nghe sự kiện progressUpdated từ LearningPage
+  useEffect(() => {
+    const handleProgressUpdated = () => {
+      fetchLatestProgress();
+    };
+
+    window.addEventListener('progressUpdated', handleProgressUpdated);
+    return () => {
+      window.removeEventListener('progressUpdated', handleProgressUpdated);
+    };
+  }, [slug]);
+
   const goBack = () => {
     if (window.history.length > 2) {
       navigate(-1);
     } else {
-      navigate("/"); // Quay về trang chủ nếu không có lịch sử
+      navigate("/");
     }
   };
 
@@ -54,15 +85,18 @@ const HeaderLearningComponent = () => {
               HocPython
             </div>
           </Link>
-          {/* Hiển thị tiêu đề khóa học */}
           <h2 className="text-lg font-bold">{courseDetail?.title || "Đang tải..."}</h2>
         </div>
         <div className="flex items-center">
           <ul className="flex items-center px-4 text-white gap-4 text-sm">
             <li>
-              <ProgressCircle progress={progress} size={40} strokeWidth={4} />
+              <ProgressCircle 
+                progress={courseProgress?.progress || 0} 
+                size={40} 
+                strokeWidth={4} 
+              />
             </li>
-            <li>0/10 bài học</li>
+            <li>{courseProgress?.completedLessons || 0}/{courseProgress?.totalLessons || 0} bài học</li>
             <li>
               <button className="flex hover:cursor-pointer">
                 <NotebookPen size={18} className="mr-2" />

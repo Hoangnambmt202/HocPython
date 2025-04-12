@@ -22,6 +22,7 @@ const courseSchema = new mongoose.Schema({
     level: { type: String, enum: [ "Beginner", "Advanced"], default: "Beginner" },
     requirements: [{ type: String }], // Danh sách yêu cầu đầu vào
     objectives: [{ type: String }],  // Học viên đạt được gì sau khóa học
+    totalLessons: { type: Number, default: 0 } // Tổng số bài học trong khóa học
 }, { timestamps: true });
 
 const Course = mongoose.model('Course', courseSchema);

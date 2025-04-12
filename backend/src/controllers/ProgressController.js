@@ -21,11 +21,11 @@ const getProgress = async (req, res, next) => {
   try {
     const { slug } = req.params;
     const userId = req.user._id;
-
     const progress = await ProgressService.getProgress(userId, slug);
     
     res.json({
       success: true,
+      messsage: "Lấy tiến độ thành công",
       data: progress
     });
   } catch (error) {
@@ -37,11 +37,10 @@ const getLastLesson = async (req, res, next) => {
   try {
     const { slug } = req.params;
     const userId = req.user._id;
-
     const lastLesson = await ProgressService.getLastLesson(userId, slug);
-    
     res.json({
       success: true,
+      message: "Lấy bài học cuối cùng thành công",
       data: lastLesson
     });
   } catch (error) {

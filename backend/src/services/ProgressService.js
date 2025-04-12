@@ -37,97 +37,170 @@ const updateProgress = async (userId, courseId, lessonId) => {
     }
 };
 
+// Hàm tính tổng số bài học
+const calculateTotalLessons = (content) => {
+  if (!content || !Array.isArray(content)) return 0;
+  
+  return content.reduce((total, chapter) => {
+    if (!chapter || !chapter.lessons || !Array.isArray(chapter.lessons)) return total;
+    return total + chapter.lessons.length;
+  }, 0);
+};
+
 // Lưu tiến độ học tập
 const saveProgress = async (userId, courseId, lessonId, completed) => {
-  let progress = await Progress.findOne({ userId, courseId });
-
-  if (!progress) {
+  try {
+    let progress = await Progress.findOne({ userId, courseId });
     const course = await Course.findById(courseId);
+
     if (!course) {
       throw new Error('Không tìm thấy khóa học');
     }
 
-    const totalLessons = course.content.reduce((total, chapter) => {
-      return total + (chapter.lessons ? chapter.lessons.length : 0);
-    }, 0);
+    if (!progress) {
+      progress = new Progress({
+        userId,
+        courseId,
+        totalLessons: course.totalLessons || 0,
+        completedLessons: 0,
+        progress: 0,
+        lessonProgress: new Map()
+      });
+    } else {
+      // Cập nhật totalLessons từ Course nếu có thay đổi
+      progress.totalLessons = course.totalLessons || 0;
+    }
 
-    progress = new Progress({
-      userId,
-      courseId,
-      totalLessons
+    // Đảm bảo lessonProgress tồn tại
+    if (!progress.lessonProgress) {
+      progress.lessonProgress = new Map();
+    }
+
+    // Cập nhật trạng thái bài học
+    progress.lessonProgress.set(lessonId.toString(), {
+      completed,
+      timestamp: new Date()
     });
+
+    // Tính số bài học đã hoàn thành
+    const completedLessons = Array.from(progress.lessonProgress.values())
+      .filter(lesson => lesson.completed).length;
+
+    // Cập nhật tiến độ
+    progress.completedLessons = completedLessons;
+    progress.progress = progress.totalLessons > 0 
+      ? Math.round((completedLessons / progress.totalLessons) * 100) 
+      : 0;
+
+    await progress.save();
+
+    // Trả về dữ liệu tiến độ mới nhất kèm thông tin khóa học
+    return {
+      progress: progress.progress,
+      totalLessons: progress.totalLessons,
+      completedLessons: progress.completedLessons,
+      lessonProgress: progress.lessonProgress,
+      course: {
+        _id: course._id,
+        title: course.title,
+        slug: course.slug
+      }
+    };
+  } catch (error) {
+    console.error("Error saving progress:", error);
+    throw error;
   }
-
-  // Đảm bảo lessonProgress tồn tại
-  if (!progress.lessonProgress) {
-    progress.lessonProgress = new Map(); // hoặc {}
-  }
-
-  progress.lessonProgress.set(lessonId.toString(), {
-    completed,
-    timestamp: new Date()
-  });
-
-  await progress.save();
-  return progress;
 };
-
 
 // Lấy tiến độ của khóa học
 const getProgress = async (userId, slug) => {
-  const progress = await Progress.findOne({ userId, slug });
-  
-  if (!progress) {
-    return {
-      lessonProgress: {},
-      completedLessons: 0,
-      totalLessons: 0,
-      progress: 0
-    };
-  }
+  try {
+    const course = await Course.findOne({ slug });
+    if (!course) {
+      throw new Error('Không tìm thấy khóa học');
+    }
 
-  return progress;
+    const progress = await Progress.findOne({ userId, courseId: course._id });
+    
+    if (!progress) {
+      // Tạo progress mới với totalLessons từ Course
+      return {
+        lessonProgress: {},
+        completedLessons: 0,
+        totalLessons: course.totalLessons || 0,
+        progress: 0
+      };
+    }
+
+    // Cập nhật totalLessons từ Course nếu có thay đổi
+    if (progress.totalLessons !== course.totalLessons) {
+      progress.totalLessons = course.totalLessons || 0;
+      progress.progress = progress.totalLessons > 0 
+        ? Math.round((progress.completedLessons / progress.totalLessons) * 100) 
+        : 0;
+      await progress.save();
+    }
+
+    return progress;
+  } catch (error) {
+    console.error("Error getting progress:", error);
+    throw error;
+  }
 };
 
 // Lấy bài học cuối cùng
 const getLastLesson = async (userId, slug) => {
-  
-  const progress = await Progress.findOne({ userId, slug });
-  
-  if (!progress || !progress.lastLesson) {
-    return null;
-  }
+  try {
+    const course = await Course.findOne({ slug });
+    if (!course) {
+      throw new Error('Không tìm thấy khóa học');
+    }
 
-  return progress.lastLesson;
+    const progress = await Progress.findOne({ userId, courseId: course._id });
+    
+    if (!progress || !progress.lastLesson) {
+      return null;
+    }
+
+    return progress.lastLesson;
+  } catch (error) {
+    console.error("Error getting last lesson:", error);
+    throw error;
+  }
 };
 
 // Cập nhật bài học cuối cùng
-const updateLastLesson = async (userId, courseId, lessonId, chapterId) => {
-  let progress = await Progress.findOne({ userId, courseId });
-  
-  if (!progress) {
-    const course = await Course.findById(courseId);
+const updateLastLesson = async (userId, slug, lessonId, chapterId) => {
+  try {
+    const course = await Course.findOne({ slug });
     if (!course) {
-      throw new ApiError(404, 'Không tìm thấy khóa học');
+      throw new Error('Không tìm thấy khóa học');
     }
 
-    progress = new Progress({
-      userId,
-      courseId,
-      totalLessons: course.content.reduce((total, chapter) => {
-        return total + (chapter.lessons ? chapter.lessons.length : 0);
-      }, 0)
-    });
+    let progress = await Progress.findOne({ userId, courseId: course._id });
+    
+    if (!progress) {
+      progress = new Progress({
+        userId,
+        courseId: course._id,
+        totalLessons: course.totalLessons || 0,
+        completedLessons: 0,
+        progress: 0
+      });
+    }
+
+    progress.lastLesson = {
+      lessonId,
+      chapterId,
+      timestamp: new Date()
+    };
+
+    await progress.save();
+    return progress.lastLesson;
+  } catch (error) {
+    console.error("Error updating last lesson:", error);
+    throw error;
   }
-
-  progress.lastLesson = {
-    lessonId,
-    chapterId,
-    timestamp: new Date()
-  };
-
-  await progress.save();
-  return progress.lastLesson;
 };
 
 module.exports = {
