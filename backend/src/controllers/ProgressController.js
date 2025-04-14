@@ -65,9 +65,26 @@ const updateLastLesson = async (req, res, next) => {
   }
 };
 
+// Controller mới cho admin
+const getStudentProgress = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const progress = await ProgressService.getStudentProgress(userId);
+    
+    res.json({
+      success: true,
+      message: "Lấy tiến độ học viên thành công",
+      data: progress
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   saveProgress,
   getProgress,
   getLastLesson,
-  updateLastLesson
+  updateLastLesson,
+  getStudentProgress
 };

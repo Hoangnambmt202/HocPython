@@ -5,6 +5,8 @@ import progressReducer from "./slides/progressSlice";
 import enrollmentReducer from "./slides/enrollSlice";
 import courseContentReducer from "./slides/courseContentSlices"
 import courseReducer from "./slides/coursesSlices";
+import notificationReducer from "./slides/notificationSlides";
+
 const store = configureStore({
   reducer: {
     user: userReducer,
@@ -13,6 +15,7 @@ const store = configureStore({
     progress: progressReducer,
     courseContent: courseContentReducer,
     course : courseReducer,
+    notification: notificationReducer,
   },
 });
 

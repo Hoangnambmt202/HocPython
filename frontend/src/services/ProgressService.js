@@ -24,7 +24,6 @@ const getProgress = async (slug) => {
 
 const getLastLesson = async (slug) => {
   try {
-    
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/progress/${slug}/last-lesson`, { withCredentials: true });
     return response.data;
   } catch (error) {
@@ -34,7 +33,6 @@ const getLastLesson = async (slug) => {
 
 const updateLastLesson = async (slug, lessonId, chapterId) => {
   try {
-   
     const response = await axios.post(`${import.meta.env.VITE_API_URL}/progress/${slug}/last-lesson`, {
       lessonId,
       chapterId
@@ -45,9 +43,23 @@ const updateLastLesson = async (slug, lessonId, chapterId) => {
   }
 };
 
+// Phương thức mới cho admin
+const getStudentProgress = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/progress/admin/student/${userId}/progress`, 
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export default {
   saveProgress,
   getProgress,
   getLastLesson,
-  updateLastLesson
+  updateLastLesson,
+  getStudentProgress
 }; 

@@ -27,7 +27,7 @@ const ManageStudents = () => {
       const fetchStudents = async () => {
         try {
           const role = "user";
-          const response = await UserService.getAllUser(role);
+          const response = await UserService.getUserByRole(role);
           if (response?.data) {
             setStudents(response?.data);
           }
@@ -56,7 +56,7 @@ const ManageStudents = () => {
       setIsOpen(false);
       setToast({show: true, message: response.message, color: "green"});
       const role = "user";
-      const getStudents = await UserService.getAllUser(role);
+      const getStudents = await UserService.getUserByRole(role);
       if(getStudents.data) {
         setStudents(getStudents.data);
       }

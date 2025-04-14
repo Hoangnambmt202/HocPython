@@ -1,17 +1,74 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-
-const studentsData = [
-  { id: 1, name: "Nguyễn Văn A", email: "a@gmail.com", progress: 80, lessons: 10, completed: 8 },
-  { id: 2, name: "Trần Thị B", email: "b@gmail.com", progress: 40, lessons: 10, completed: 4 },
-  { id: 3, name: "Lê Văn C", email: "c@gmail.com", progress: 20, lessons: 10, completed: 2 },
-];
+import UserService from "../../services/UserService";
+import ProgressService from "../../services/ProgressService";
 
 export default function StudentProgressAdmin() {
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentsData, setStudentsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudentProgress = async () => {
+      try {
+        setLoading(true);
+        // Lấy danh sách học viên
+        const role = "user";
+        const studentsRes = await UserService.getUserByRole(role);
+        const students = studentsRes.data;
+
+        // Lấy tiến độ cho từng học viên
+        const studentsWithProgress = await Promise.all(
+          students.map(async (student) => {
+            try {
+              const progressRes = await ProgressService.getStudentProgress(student._id);
+              const progressData = progressRes.data;
+
+              return {
+                id: student._id,
+                name: student.name,
+                email: student.email,
+                progress: progressData.summary.averageProgress,
+                lessons: progressData.summary.totalLessons,
+                completed: progressData.summary.totalCompletedLessons,
+                activeCourses: progressData.summary.activeCourses,
+                totalCourses: progressData.summary.totalCourses,
+                courseProgress: progressData.courses
+              };
+            } catch (error) {
+              console.error(`Error processing student ${student._id}:`, error);
+              return {
+                id: student._id,
+                name: student.name,
+                email: student.email,
+                progress: 0,
+                lessons: 0,
+                completed: 0,
+                activeCourses: 0,
+                totalCourses: 0,
+                courseProgress: []
+              };
+            }
+          })
+        );
+
+        setStudentsData(studentsWithProgress);
+      } catch (error) {
+        console.error("Error fetching student progress:", error);
+        setStudentsData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentProgress();
+  }, []);
+
+  if (loading) {
+    return <div className="p-6">Đang tải dữ liệu...</div>;
+  }
 
   return (
     <div className="p-6 grid grid-cols-3 gap-6">
@@ -23,7 +80,7 @@ export default function StudentProgressAdmin() {
         </div>
         <div className="text-center">
           <h3 className="text-lg font-bold">Hoàn thành trung bình</h3>
-          <p className="text-2xl">{(studentsData.reduce((acc, s) => acc + s.progress, 0) / studentsData.length).toFixed(1)}%</p>
+          <p className="text-2xl">{(studentsData.reduce((acc, s) => acc + s.progress, 0) / (studentsData.length || 1)).toFixed(1)}%</p>
         </div>
         <div className="text-center">
           <h3 className="text-lg font-bold">Học viên chậm tiến độ</h3>
@@ -59,6 +116,7 @@ export default function StudentProgressAdmin() {
                   <th className="p-2 text-left">Tên</th>
                   <th className="p-2 text-left">Email</th>
                   <th className="p-2">Tiến độ</th>
+                  <th className="p-2">Khóa học</th>
                   <th className="p-2">Hành động</th>
                 </tr>
               </thead>
@@ -68,8 +126,12 @@ export default function StudentProgressAdmin() {
                     <td className="p-2">{student.name}</td>
                     <td className="p-2">{student.email}</td>
                     <td className="p-2">{student.progress}%</td>
+                    <td className="p-2">{student.activeCourses}/{student.totalCourses}</td>
                     <td className="p-2">
-                      <button onClick={() => setSelectedStudent(student)}>
+                      <button 
+                        onClick={() => setSelectedStudent(student)}
+                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      >
                         Xem chi tiết
                       </button>
                     </td>
@@ -86,17 +148,48 @@ export default function StudentProgressAdmin() {
         <h3 className="text-lg font-bold mb-4">Chi tiết học viên</h3>
         {selectedStudent ? (
           <div>
-            <p><strong>Tên:</strong> {selectedStudent.name}</p>
-            <p><strong>Email:</strong> {selectedStudent.email}</p>
-            <p><strong>Tiến độ:</strong> {selectedStudent.progress}%</p>
-            <h4 className="mt-4 font-bold">Bài học đã hoàn thành</h4>
-            <ul>
-              {Array.from({ length: selectedStudent.lessons }, (_, i) => (
-                <li key={i} className={i < selectedStudent.completed ? "text-green-600" : "text-gray-400"}>
-                  {i + 1}. Bài học {i + 1} {i < selectedStudent.completed ? "✅" : "⏳"}
-                </li>
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-600">Tên học viên</h4>
+                <p className="text-lg">{selectedStudent.name}</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-600">Email</h4>
+                <p className="text-lg">{selectedStudent.email}</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-600">Tiến độ trung bình</h4>
+                <p className="text-lg">{selectedStudent.progress}%</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-600">Tổng bài học đã hoàn thành</h4>
+                <p className="text-lg">{selectedStudent.completed}/{selectedStudent.lessons}</p>
+              </div>
+            </div>
+
+            <h4 className="font-bold text-lg mt-6 mb-4">Chi tiết từng khóa học</h4>
+            <div className="space-y-4">
+              {selectedStudent.courseProgress.map((course, index) => (
+                <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <h5 className="font-semibold">{course.courseTitle}</h5>
+                    <span className="text-sm text-gray-600">
+                      Cập nhật lần cuối: {course.lastAccessed ? new Date(course.lastAccessed).toLocaleDateString() : 'Chưa bắt đầu'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 mb-2">
+                    <span>{course.completedLessons}/{course.totalLessons} bài học</span>
+                    <span className="text-blue-600">{course.progress}% hoàn thành</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full" 
+                      style={{ width: `${course.progress}%` }}
+                    ></div>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         ) : (
           <p>Chọn một học viên để xem chi tiết</p>

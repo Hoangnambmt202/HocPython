@@ -29,6 +29,8 @@ import StudentProgressAdmin from "../pages/Admin/StudentProgressManagement";
 import CartPage from "../pages/CartPage/CartPage";
 import CategoriesManagement from "../pages/Admin/CategoriesManagement";
 import ChaptersManagement from "../pages/Admin/ChaptersManagement";
+import NotificationPage from "../pages/NotificationPage/NotificationPage";
+import AdminNotificationPage from "../pages/Admin/AdminNotificationPage";
 const routes = [
   {
    
@@ -57,6 +59,10 @@ const routes = [
       {
         path: "/order/checkout",
         page: CheckoutPage,
+      },
+      {
+        path: "/notifications",
+        page: NotificationPage,
       }
     ]
   },
@@ -155,6 +161,10 @@ const routes = [
       {
         path: "statistic",
         page: StatisticManagement,
+      },
+      {
+        path: "notifications",
+        page: AdminNotificationPage,
       },
       {
         path: "settings",

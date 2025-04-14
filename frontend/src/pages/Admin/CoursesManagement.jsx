@@ -45,7 +45,7 @@ const CourseManagement = () => {
     const fetchLecturers = async () => {
       try {
         const role = "lecturer";
-        const response = await UserService.getAllUser(role);
+        const response = await UserService.getUserByRole(role);
         if (response?.data) {
           setLecturers(response.data);
         }

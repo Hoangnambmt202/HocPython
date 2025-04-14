@@ -203,10 +203,56 @@ const updateLastLesson = async (userId, slug, lessonId, chapterId) => {
   }
 };
 
+// Lấy tiến độ của học viên (dành cho admin)
+const getStudentProgress = async (studentId) => {
+  try {
+    // Lấy tất cả khóa học
+    const courses = await Course.find({});
+    
+    // Lấy tiến độ của học viên trong tất cả khóa học
+    const progressPromises = courses.map(async (course) => {
+      const progress = await Progress.findOne({ userId: studentId, courseId: course._id });
+      
+      return {
+        courseId: course._id,
+        courseTitle: course.title,
+        courseSlug: course.slug,
+        progress: progress ? progress.progress : 0,
+        completedLessons: progress ? progress.completedLessons : 0,
+        totalLessons: course.totalLessons || 0,
+        lastAccessed: progress?.updatedAt || null
+      };
+    });
+
+    const progressResults = await Promise.all(progressPromises);
+
+    // Tính toán thống kê tổng thể
+    const totalProgress = progressResults.reduce((acc, curr) => acc + curr.progress, 0);
+    const averageProgress = progressResults.length > 0 ? totalProgress / progressResults.length : 0;
+    const totalCompletedLessons = progressResults.reduce((acc, curr) => acc + curr.completedLessons, 0);
+    const totalLessons = progressResults.reduce((acc, curr) => acc + curr.totalLessons, 0);
+
+    return {
+      courses: progressResults,
+      summary: {
+        averageProgress: Math.round(averageProgress),
+        totalCompletedLessons,
+        totalLessons,
+        totalCourses: progressResults.length,
+        activeCourses: progressResults.filter(p => p.progress > 0).length
+      }
+    };
+  } catch (error) {
+    console.error("Error getting student progress:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   updateProgress,
   saveProgress,
   getProgress,
   getLastLesson,
-  updateLastLesson
+  updateLastLesson,
+  getStudentProgress
 };

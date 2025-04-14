@@ -104,17 +104,16 @@ const CoursePage = () => {
   
 };
   const handleStartLearn = () => {
-    enrollMutation.mutate();
     if(!user){
       alert("Vui lòng đăng nhập để tiếp tục học");
       setModalType("login") ;
       setIsOpen(true);
     }
+    enrollMutation.mutate();
   };
 
-  // const flattenedCourses = enrolledCourses.flat(Infinity);
-  const isEnrolled = courseDetail?._id && enrolledCourses.includes(courseDetail._id);
   
+  const isEnrolled = courseDetail?._id && enrolledCourses.includes(courseDetail._id);
   const isInCart = cart.some((item) => item._id === courseDetail?._id);
 
   

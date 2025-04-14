@@ -24,8 +24,12 @@ const logoutUser = async () => {
     const res = await axios.post(`${import.meta.env.VITE_API_URL}/user/sign-up`,data);
     return res.data;
 }
-const getAllUser = async (role) => {
+const getUserByRole = async (role) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getAll?role=${role}`, { withCredentials: true })
+    return res.data
+}
+const getAllUser = async () => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getAll`, { withCredentials: true })
     return res.data
 }
 const getDetailUser = async () => {
@@ -47,6 +51,7 @@ export default {
     loginUser,
     logoutUser,
     registerUser,
+    getUserByRole,
     getAllUser,
     getDetailUser,
     updateUser,

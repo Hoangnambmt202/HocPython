@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Search, Bell, ChevronDown, MessageSquare, ChevronUp } from "lucide-react";
+import { Search, ChevronDown, MessageSquare, ChevronUp } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, setUser } from "../../redux/slides/userSlides";
 import UserService from "../../services/UserService";
 import ToastMessageComponent from '../ToastMessageComponent/ToastMessageComponent'
+import NotificationList from "../NotificationList/NotificationList";
 
 
 const HeaderAdmin = () => {
@@ -93,10 +94,7 @@ const HeaderAdmin = () => {
 
         {/* Thông báo & tài khoản */}
         <div className="flex items-center space-x-6">
-          <button className="relative p-2 rounded-lg hover:bg-gray-100">
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          <NotificationList />
           <button>
             <MessageSquare size={20} />
           </button>
@@ -140,12 +138,12 @@ const HeaderAdmin = () => {
                     </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/admin/settings"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Cài đặt
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <button

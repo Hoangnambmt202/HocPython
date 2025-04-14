@@ -145,7 +145,22 @@ const deleteUser = (id) => {
     }
   });
 };
-const getAllUser = (role) => {
+
+const getAllUser = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.find();
+      resolve({
+        status: "OK",
+        message: "Danh sách người dùng",
+        data: user,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+const getUserByRole = (role) => {
   return new Promise(async (resolve, reject) => {
     try {
       let filter = {};
@@ -194,7 +209,7 @@ module.exports = {
   loginUser,
   updateUser,
   deleteUser,
-  getAllUser,
+  getUserByRole,
   getDetailUser,
-
+  getAllUser,
 };

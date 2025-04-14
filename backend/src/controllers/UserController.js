@@ -136,8 +136,19 @@ const deleteUser = async (req, res) => {
 };
 const getAllUser = async (req, res) => {
   try {
+    const response = await UserService.getAllUser();
+    return res.status(200).json(response);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
+const getUserByRole = async (req, res) => {
+  try {
     const {role} = req.query;
-    const response = await UserService.getAllUser(role);
+    const response = await UserService.getUserByRole(role);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
@@ -183,7 +194,8 @@ module.exports = {
   logoutUser,
   updateUser,
   deleteUser,
-  getAllUser,
+  getUserByRole,
   getDetailUser,
   refreshToken,
+  getAllUser,
 };
