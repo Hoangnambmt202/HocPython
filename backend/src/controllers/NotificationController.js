@@ -52,7 +52,6 @@ const getUserNotifications = async (req, res) => {
       success: true,
       data: notifications
     });
-    console.log(notifications)
   } catch (error) {
     res.status(500).json({ 
       success: false,

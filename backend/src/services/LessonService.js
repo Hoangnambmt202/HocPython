@@ -3,77 +3,77 @@ const Chapter = require("../models/Chapter");
 const { Queue } = require('bullmq');
 const fs = require('fs').promises;
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-const config = require('../config/config');
-const { exec } = require('child_process');
-const { promisify } = require('util');
-const execAsync = promisify(exec);
+// const { v4: uuidv4 } = require('uuid');
+// const config = require('../config/config');
+// const { exec } = require('child_process');
+// const { promisify } = require('util');
+// const execAsync = promisify(exec);
 const ChapterService = require("./ChapterService");
 
 // Tạo queue để xử lý việc chạy code
-const codeExecutionQueue = new Queue('code-execution', {
-  connection: {
-    host: config.redis.host,
-    port: config.redis.port
-  }
-});
+// const codeExecutionQueue = new Queue('code-execution', {
+//   connection: {
+//     host: config.redis.host,
+//     port: config.redis.port
+//   }
+// });
 
 // Sandbox directory for code execution
-const SANDBOX_DIR = path.join(process.cwd(), 'temp');
+// const SANDBOX_DIR = path.join(process.cwd(), 'temp');
 
 // Ensure sandbox directory exists
-const ensureSandboxDir = async () => {
-  try {
-    await fs.access(SANDBOX_DIR);
-  } catch {
-    await fs.mkdir(SANDBOX_DIR, { recursive: true });
-  }
-};
+// const ensureSandboxDir = async () => {
+//   try {
+//     await fs.access(SANDBOX_DIR);
+//   } catch {
+//     await fs.mkdir(SANDBOX_DIR, { recursive: true });
+//   }
+// };
 
 // Clean up sandbox files
-const cleanupSandbox = async (filePath) => {
-  try {
-    await fs.unlink(filePath);
-  } catch (error) {
-    console.error('Error cleaning up sandbox:', error);
-  }
-};
+// const cleanupSandbox = async (filePath) => {
+//   try {
+//     await fs.unlink(filePath);
+//   } catch (error) {
+//     console.error('Error cleaning up sandbox:', error);
+//   }
+// };
 
 // Execute Python code
-const executePythonCode = async (code, input = '') => {
-  // Create unique file name
-  const fileName = `code_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.py`;
-  const filePath = path.join(SANDBOX_DIR, fileName);
+// const executePythonCode = async (code, input = '') => {
+//   // Create unique file name
+//   const fileName = `code_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.py`;
+//   const filePath = path.join(SANDBOX_DIR, fileName);
 
-  try {
-    // Ensure sandbox directory exists
-    await ensureSandboxDir();
+//   try {
+//     // Ensure sandbox directory exists
+//     await ensureSandboxDir();
 
-    // Write code to file
-    await fs.writeFile(filePath, code);
+//     // Write code to file
+//     await fs.writeFile(filePath, code);
 
-    // Execute code with input
-    const { stdout, stderr } = await execAsync(`python ${filePath}`, {
-      timeout: 5000,
-      input: input
-    });
+//     // Execute code with input
+//     const { stdout, stderr } = await execAsync(`python ${filePath}`, {
+//       timeout: 5000,
+//       input: input
+//     });
 
-    return {
-      output: stdout.trim(),
-      error: stderr || null
-    };
-  } catch (error) {
-    return {
-      output: null,
-      error: error.stderr || error.message
-    };
-  } finally {
-    // Clean up
-    await cleanupSandbox(filePath);
-  }
-};
+//     return {
+//       output: stdout.trim(),
+//       error: stderr || null
+//     };
+//   } catch (error) {
+//     return {
+//       output: null,
+//       error: error.stderr || error.message
+//     };
+//   } finally {
+//     // Clean up
+//     await cleanupSandbox(filePath);
+//   }
+// };
 
-// Phương thức để xử lý yêu cầu chạy code
+// // Phương thức để xử lý yêu cầu chạy code
 const runCode = async (codeData) => {
   const { code, testCases } = codeData;
   

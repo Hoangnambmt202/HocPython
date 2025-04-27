@@ -38,7 +38,7 @@ const updateNotification = async (notificationId, data) => {
   const res = await axios.put(`${import.meta.env.VITE_API_URL}/notifications/update/${notificationId}`, data, {
     withCredentials: true
   });
-  console.log("data từ frontend:",data)
+
   return res.data;
 };
 const deleteNotification = async (notificationId) => {

@@ -31,7 +31,9 @@ const ProfilePage = () => {
   ];
 
   const user = useSelector((state) => state.user.user);
-  const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
+  const enrolledCourses = useSelector(
+    (state) => state.enrollment.enrolledCourses
+  );
   const progress = useSelector((state) => state.progress.courseProgress);
   const [isEditing, setIsEditing] = useState(false);
   const [optionsState, setOptionsState] = useState("1");
@@ -55,6 +57,58 @@ const ProfilePage = () => {
       setToast(error.response?.data?.message || "Đã xảy ra lỗi!");
     },
   });
+  const avatarMutation = useMutation({
+    mutationFn: (file) => UserService.uploadAvatar(file), // Đơn giản hóa không cần truyền access_token
+    onSuccess: (data) => {
+      setToast({
+        show: true,
+        message: "Cập nhật avatar thành công",
+        color: "green",
+        duration: 2000,
+      });
+      console.log(data)
+      dispatch(setUser({ ...user, 
+        avatar: data.avatar } ));
+    },
+    onError: (error) => {
+      setToast({
+        show: true,
+        message: error.response?.data?.error || "Lỗi khi cập nhật avatar",
+        color: "red",
+        duration: 2000,
+      });
+    },
+  });
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Kiểm tra loại file
+    if (!file.type.match("image.*")) {
+      setToast({
+        show: true,
+        message: "Vui lòng chọn file ảnh",
+        color: "red",
+        duration: 2000,
+      });
+      return;
+    }
+
+    // Kiểm tra kích thước file (ví dụ: tối đa 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setToast({
+        show: true,
+        message: "Kích thước ảnh không được vượt quá 2MB",
+        color: "red",
+        duration: 2000,
+      });
+      return;
+    }
+
+    avatarMutation.mutate(file);
+    
+  };
 
   const handleModalEdit = () => {
     setModalOpen(true);
@@ -155,10 +209,7 @@ const ProfilePage = () => {
                 </div>
                 <div className="text-gray-600 flex justify-start items-center mb-2">
                   <span className="mr-2">
-                    <Dot
-                      className="text-red-500"
-                      size={18}
-                    />
+                    <Dot className="text-red-500" size={18} />
                   </span>
                   <span className="text-sm">Đã Mở</span>
                 </div>
@@ -173,7 +224,9 @@ const ProfilePage = () => {
                     </span>
                     Khóa học của tôi
                   </h3>
-                  <p className="text-gray-500">Bạn chưa đăng nhập để xem khóa học. Vui lòng đăng nhập!</p>
+                  <p className="text-gray-500">
+                    Bạn chưa đăng nhập để xem khóa học. Vui lòng đăng nhập!
+                  </p>
                 </div>
                 <div>
                   <select className="w-fit border p-2 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -203,8 +256,12 @@ const ProfilePage = () => {
                     key={article.id}
                     className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
                   >
-                    <h5 className="text-md font-semibold text-gray-800">{article.title}</h5>
-                    <p className="text-gray-600 text-sm mt-2">{article.description}</p>
+                    <h5 className="text-md font-semibold text-gray-800">
+                      {article.title}
+                    </h5>
+                    <p className="text-gray-600 text-sm mt-2">
+                      {article.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -231,7 +288,11 @@ const ProfilePage = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-xl shadow-md">
           <div className="flex flex-col py-10 md:flex-row gap-8">
             <div className="md:w-1/4 container mx-auto px-4 mb-4 md:mb-0">
-              <Modal isOpen={modalOpen} title="Chỉnh sửa thông tin" onClose={() => setModalOpen(false)}>
+              <Modal
+                isOpen={modalOpen}
+                title="Chỉnh sửa thông tin"
+                onClose={() => setModalOpen(false)}
+              >
                 <div className="w-full p-4 scrollbar-hide">
                   <form className="">
                     {isEditing ? (
@@ -242,9 +303,26 @@ const ProfilePage = () => {
                             alt={`User Avatar ${user.name}`}
                             className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
                           />
-                          <button className="mt-4 rounded-full bg-blue-500 text-white p-2 hover:bg-blue-600 transition-colors">
-                            <Camera width="1.25rem" height="1.25rem" />
-                          </button>
+                          <label
+                            htmlFor="avatar-upload"
+                            className="mt-4 rounded-full bg-blue-500 text-white p-2 hover:bg-blue-600 transition-colors cursor-pointer"
+                          >
+                            {avatarMutation.isPending ? (
+                              <span className="text-sm">Đang tải lên...</span>
+                            ) : (
+                              <>
+                                <Camera width="1.25rem" height="1.25rem" />
+                                <input
+                                  id="avatar-upload"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleAvatarChange}
+                                  className="hidden"
+                                  disabled={avatarMutation.isPending}
+                                />
+                              </>
+                            )}
+                          </label>
                         </div>
                         <div className="mb-4">
                           <label
@@ -308,7 +386,9 @@ const ProfilePage = () => {
                               type="date"
                               id="birth"
                               name="birth"
-                              placeholder={user?.birth || "Chưa cập nhật ngày sinh"}
+                              placeholder={
+                                user?.birth || "Chưa cập nhật ngày sinh"
+                              }
                               value={editedData?.birth}
                               onChange={handleChange}
                               className="mt-1 block w-full px-3 py-2 border text-gray-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -366,7 +446,9 @@ const ProfilePage = () => {
                           >
                             Họ và tên
                           </label>
-                          <p className="mt-2 text-gray-800">{editedData.name}</p>
+                          <p className="mt-2 text-gray-800">
+                            {editedData.name}
+                          </p>
                         </div>
                         <div className="mb-4">
                           <label
@@ -375,7 +457,9 @@ const ProfilePage = () => {
                           >
                             Ngày sinh
                           </label>
-                          <p className="mt-2 text-gray-800">{editedData.birth}</p>
+                          <p className="mt-2 text-gray-800">
+                            {editedData.birth}
+                          </p>
                         </div>
                         <div className="mb-4">
                           <label
@@ -384,7 +468,9 @@ const ProfilePage = () => {
                           >
                             Email
                           </label>
-                          <p className="mt-2 text-gray-800">{editedData.email}</p>
+                          <p className="mt-2 text-gray-800">
+                            {editedData.email}
+                          </p>
                         </div>
                         <div className="mb-4 grid grid-cols-2 gap-4">
                           <div>
@@ -394,7 +480,9 @@ const ProfilePage = () => {
                             >
                               Số điện thoại
                             </label>
-                            <p className="mt-2 text-gray-800">{editedData.phone}</p>
+                            <p className="mt-2 text-gray-800">
+                              {editedData.phone}
+                            </p>
                           </div>
                           <div>
                             <label
@@ -403,7 +491,9 @@ const ProfilePage = () => {
                             >
                               Ngày sinh
                             </label>
-                            <p className="mt-2 text-gray-800">{editedData.birth}</p>
+                            <p className="mt-2 text-gray-800">
+                              {editedData.birth}
+                            </p>
                           </div>
                         </div>
                         <div className="mb-4 grid grid-cols-2 gap-4">
@@ -442,7 +532,7 @@ const ProfilePage = () => {
                   </form>
                   {mutation.isPending && <LoadingComponent />}
                   <div className="flex justify-end mt-4">
-                    <button 
+                    <button
                       onClick={handleSave}
                       className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                     >
@@ -451,7 +541,7 @@ const ProfilePage = () => {
                   </div>
                 </div>
               </Modal>
-              
+
               <div className="bg-gray-50 p-6 rounded-xl shadow-sm">
                 <img
                   src={user.avatar}
@@ -462,67 +552,86 @@ const ProfilePage = () => {
                   <h3 className="text-xl font-semibold text-center mr-2">
                     {user?.name || "Guest"}
                   </h3>
-                  <button 
+                  <button
                     onClick={handleModalEdit}
                     className="text-gray-400 hover:text-blue-600 transition-colors"
                   >
                     <SquarePen width="1rem" height="1rem" />
                   </button>
                 </div>
-                
+
                 <div className="mt-6 space-y-3">
                   <div className="text-gray-600 flex items-center p-2 hover:bg-gray-100 rounded-md transition-colors">
                     <span className="mr-3 text-blue-500">
                       <Mail size={18} />
                     </span>
-                    <span className="text-sm">{user?.email || "Chưa cập nhật email"}</span>
+                    <span className="text-sm">
+                      {user?.email || "Chưa cập nhật email"}
+                    </span>
                   </div>
-                  
+
                   <div className="text-gray-600 flex items-center p-2 hover:bg-gray-100 rounded-md transition-colors">
                     <span className="mr-3 text-blue-500">
                       <Cake size={18} />
                     </span>
-                    <span className="text-sm">{user?.birth || "Chưa cập nhật ngày sinh"}</span>
+                    <span className="text-sm">
+                      {user?.birth || "Chưa cập nhật ngày sinh"}
+                    </span>
                   </div>
-                  
+
                   <div className="text-gray-600 flex items-center p-2 hover:bg-gray-100 rounded-md transition-colors">
                     <span className="mr-3 text-blue-500">
                       <Phone size={18} />
                     </span>
-                    <span className="text-sm">{user?.phone || "Chưa cập nhật số điện thoại"}</span>
+                    <span className="text-sm">
+                      {user?.phone || "Chưa cập nhật số điện thoại"}
+                    </span>
                   </div>
-                  
+
                   <div className="text-gray-600 flex items-center p-2 hover:bg-gray-100 rounded-md transition-colors">
                     <span className="mr-3 text-blue-500">
                       <University size={18} />
                     </span>
-                    <span className="text-sm">{user?.school || "Chưa cập nhật trường học"}</span>
+                    <span className="text-sm">
+                      {user?.school || "Chưa cập nhật trường học"}
+                    </span>
                   </div>
-                  
+
                   <div className="text-gray-600 flex items-center p-2 hover:bg-gray-100 rounded-md transition-colors">
                     <span className="mr-3 text-blue-500">
                       <GraduationCap size={18} />
                     </span>
-                    <span className="text-sm">{user?.major || "Chưa cập nhật chuyên ngành"}</span>
+                    <span className="text-sm">
+                      {user?.major || "Chưa cập nhật chuyên ngành"}
+                    </span>
                   </div>
-                  
+
                   <div className="text-gray-600 flex items-center p-2 hover:bg-gray-100 rounded-md transition-colors">
                     <span className="mr-3 text-blue-500">
                       <User size={18} />
                     </span>
-                    <span className="text-sm">{user?.role || "Chưa cập nhật role"}</span>
+                    <span className="text-sm">
+                      {user?.role || "Chưa cập nhật role"}
+                    </span>
                   </div>
-                  
+
                   <div className="text-gray-600 flex items-center p-2 hover:bg-gray-100 rounded-md transition-colors">
                     <span className="mr-3">
-                      <Dot className={user?.isActive ? "text-green-500" : "text-red-500"} size={18} />
+                      <Dot
+                        className={
+                          user?.isActive ? "text-green-500" : "text-red-500"
+                        }
+                        size={18}
+                      />
                     </span>
-                    <span className="text-sm">{user?.isActive ? "Đang hoạt động" : "Đã khóa"}</span>
+                    <span className="text-sm">
+                      {user?.isActive ? "Đang hoạt động" : "Đã khóa"}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="md:w-3/4 px-4 container mx-auto">
               <header className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 border-b pb-4">
                 <div>
@@ -533,9 +642,9 @@ const ProfilePage = () => {
                     Khóa học của tôi
                   </h3>
                   <p className="text-gray-500">
-                    {enrolledCourses?.length > 0 
+                    {enrolledCourses?.length > 0
                       ? `Bạn đã đăng ký ${enrolledCourses.length} khóa học`
-                      : 'Bạn chưa đăng ký khóa học nào'}
+                      : "Bạn chưa đăng ký khóa học nào"}
                   </p>
                 </div>
                 <div className="mt-4 md:mt-0">
@@ -546,23 +655,24 @@ const ProfilePage = () => {
                   </select>
                 </div>
               </header>
-              
+
               <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
                 {enrolledCourses && enrolledCourses.length > 0 ? (
                   enrolledCourses.map((enrollment) => {
                     const course = enrollment.courseId;
                     const courseProgress = progress[course?._id] || {};
-                    const completedLessons = courseProgress.completedLessons || 0;
+                    const completedLessons =
+                      courseProgress.completedLessons || 0;
                     const totalLessons = courseProgress.totalLessons || 0;
                     const progressPercentage = courseProgress.progress || 0;
 
                     return (
-                      <div 
+                      <div
                         key={course?._id}
                         className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
                       >
-                        <img 
-                          src={course?.thumbnail} 
+                        <img
+                          src={course?.thumbnail}
                           alt={course?.title}
                           className="w-full h-40 object-cover"
                         />
@@ -588,7 +698,7 @@ const ProfilePage = () => {
                               {completedLessons}/{totalLessons} bài học
                             </div>
                           </div>
-                          <Link 
+                          <Link
                             to={`/learning/${course?.slug}`}
                             className="mt-4 block text-center py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                           >
@@ -601,34 +711,37 @@ const ProfilePage = () => {
                 ) : (
                   <div className="col-span-full bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md">
                     <p className="text-blue-700">
-                      Bạn chưa đăng ký khóa học nào. Hãy khám phá các khóa học của chúng tôi!
+                      Bạn chưa đăng ký khóa học nào. Hãy khám phá các khóa học
+                      của chúng tôi!
                     </p>
                   </div>
                 )}
               </div>
               <div className="flex flex-wrap items-center justify-center mb-6">
-                <Link 
+                <Link
                   to="/courses"
                   className="mt-4 md:mt-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   Xem tất cả khóa học
                 </Link>
               </div>
-              
+
               <h4 className="text-2xl flex font-bold items-center mt-10 mb-4 text-blue-600 border-b pb-2">
                 <span className="mr-2">
                   <BookMarked />
                 </span>
                 Saved Articles
               </h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {savedArticles.map((article) => (
                   <div
                     key={article.id}
                     className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
                   >
-                    <h5 className="text-lg font-semibold text-gray-800 mb-2">{article.title}</h5>
+                    <h5 className="text-lg font-semibold text-gray-800 mb-2">
+                      {article.title}
+                    </h5>
                     <p className="text-gray-600">{article.description}</p>
                     <div className="mt-4 flex justify-end">
                       <button className="text-blue-600 text-sm hover:text-blue-800 transition-colors">

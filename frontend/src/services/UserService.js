@@ -47,7 +47,18 @@ const deleteUser = async (userId) => {
     return res.data;
 };
 
+const uploadAvatar = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
 
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/cloudinary/avatar`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+     withCredentials: true
+    });
+    return response.data;
+  }
 export default {
     loginUser,
     logoutUser,
@@ -56,5 +67,6 @@ export default {
     getAllUser,
     getDetailUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    uploadAvatar,
 }

@@ -59,18 +59,18 @@ const loginUser = async (req, res) => {
     const { access_token, refresh_token, ...userData } = response;
 
     res.cookie('access_token', access_token, {
-      httpOnly: true, // Không thể truy cập từ JavaScript
+      httpOnly: true, 
       secure:  true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      domain: '.hocpython-backend.onrender.com' // Đảm bảo khớp domain
+      domain: '.hocpython-backend.onrender.com' 
     });
     res.cookie('refresh_token',refresh_token,{
       httpOnly: true, 
       secure:  true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      domain: '.hocpython-backend.onrender.com' // Đảm bảo khớp domain
+      domain: '.hocpython-backend.onrender.com' 
     });
   
      return res.status(200).json(response);

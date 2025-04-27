@@ -94,7 +94,7 @@ const HeaderAdmin = () => {
 
         {/* Thông báo & tài khoản */}
         <div className="flex items-center space-x-6">
-          <NotificationList />
+          {/* <NotificationList /> */}
           <button>
             <MessageSquare size={20} />
           </button>

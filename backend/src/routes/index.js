@@ -19,6 +19,6 @@ const routes = (app) => {
    app.use('/api/lessons',lessonRouter)
    app.use('/api/quiz',quizRouter)
    app.use('/api/notifications', notificationRoutes);
-   app.use('/api/upload', cloudinaryRoutes)
+   app.use('/api/cloudinary', cloudinaryRoutes)
 }
 module.exports = routes;
