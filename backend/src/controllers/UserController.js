@@ -60,13 +60,17 @@ const loginUser = async (req, res) => {
 
     res.cookie('access_token', access_token, {
       httpOnly: true, // Không thể truy cập từ JavaScript
-      secure:  req.secure || process.env.NODE_ENV === "production", // Chỉ bật true nếu dùng HTTPS
-      sameSite: 'Strict', // Ngăn cookie gửi từ trang khác
+      secure:  true,
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      domain: '.hocpython-backend.onrender.com' // Đảm bảo khớp domain
     });
     res.cookie('refresh_token',refresh_token,{
       httpOnly: true, 
-      secure:  req.secure || process.env.NODE_ENV === "production", 
-      sameSite: 'Strict',
+      secure:  true,
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      domain: '.hocpython-backend.onrender.com' // Đảm bảo khớp domain
     });
   
      return res.status(200).json(response);
