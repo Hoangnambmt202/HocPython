@@ -75,11 +75,7 @@ const routes = [
     page: PaymentFailure,
   }
 ,
-  {
-    path: "*",
-    page: NotFoundPage,
-    
-  },
+ 
   {
     path: "/course",
     layout: CoursesLayout,
@@ -172,7 +168,12 @@ const routes = [
       }
       
     ]
-  }
- 
+  },
+  {
+    path: "*",
+    page: NotFoundPage,
+    
+  },
 ];
+
 export default routes;
