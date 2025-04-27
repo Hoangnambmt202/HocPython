@@ -160,24 +160,18 @@ const getAllUser = () => {
     }
   });
 };
-const getUserByRole = (role) => {
-  return new Promise(async (resolve, reject) => {
+const getUserByRole = async (role) => {
+ 
     try {
-      let filter = {};
-      if (role) {
-        filter.role = role; // Lọc theo role nếu được cung cấp
-      }
-      const user = await User.find(filter);
-      resolve({
-        status: "OK",
-        message: "Danh sách người dùng",
-        data: user,
-      });
+      const filter = role ? { role } : {}; 
+      const users = await User.find(filter);
+      return users
     } catch (e) {
       reject(e);
     }
-  });
+
 };
+
 const getDetailUser = (id) => {
   return new Promise(async (resolve, reject) => {
     try {

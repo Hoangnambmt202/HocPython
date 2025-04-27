@@ -147,15 +147,17 @@ const getAllUser = async (req, res) => {
 
 const getUserByRole = async (req, res) => {
   try {
-    const {role} = req.query;
-    const response = await UserService.getUserByRole(role);
-    return res.status(200).json(response);
-  } catch (e) {
-    return res.status(404).json({
-      message: e,
-    });
+      const { role } = req.query;
+      if (!role) {
+          return res.status(400).json({ message: "Thiếu role" });
+      }
+      const response = await UserService.getUserByRole(role);
+      res.status(200).json({status: "success", message:`DS User theo role: ${role}`, data: response});
+  } catch (error) {
+      res.status(500).json({ message: "Error getting users by role", error });
   }
 };
+
 const getDetailUser = async (req, res) => {
   try {
     const userId = req.user._id; // Lấy _id từ token đã giải mã
