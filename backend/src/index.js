@@ -9,15 +9,15 @@ const app = express();
 const PORT = process.env.PORT;
 
 // Middleware
-// Trên server hocpython-backend.onrender.com
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://hoc-python.vercel.app/', 'https://hocpython-backend.onrender.com'],
+  origin: ['http://localhost:5173', 'https://hoc-python.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Cho phép tất cả các route
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
