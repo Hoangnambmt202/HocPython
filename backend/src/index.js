@@ -17,7 +17,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Cho phép tất cả các route
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
