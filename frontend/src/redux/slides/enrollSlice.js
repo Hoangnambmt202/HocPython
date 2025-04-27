@@ -20,7 +20,7 @@ const enrollmentSlice = createSlice({
   },
 });
 
-export const { enrollCourseStart, setEnrolledCourses, enrollCourseFailure, resetEnrollmentState, setEnroll } =
+export const { enrollCourseStart, setEnrolledCourses, } =
   enrollmentSlice.actions;
 
 export default enrollmentSlice.reducer;

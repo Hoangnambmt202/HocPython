@@ -25,9 +25,10 @@ const logoutUser = async () => {
     return res.data;
 }
 const getUserByRole = async (role) => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getAll?role=${role}`, { withCredentials: true })
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getUserByRole?role=${role}`, { withCredentials: true })
     return res.data
 }
+
 const getAllUser = async () => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getAll`, { withCredentials: true })
     return res.data

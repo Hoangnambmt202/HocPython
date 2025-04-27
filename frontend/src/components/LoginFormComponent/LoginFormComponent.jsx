@@ -58,7 +58,7 @@ const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => 
     if (!value.trim()) {
       error = `${name === "email" ? "Email hoặc số điện thoại" : "Mật khẩu"} không được để trống`;
     } else if (name === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      error = "Email không hợp lệ";
+      error = "Email không hợp lệ. Vd: Example@gmail.com";
     } else if (name === "password" && value.length < 5) {
       error = "Mật khẩu phải có ít nhất 5 ký tự";
     }

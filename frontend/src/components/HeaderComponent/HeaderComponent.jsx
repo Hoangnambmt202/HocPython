@@ -127,11 +127,7 @@ const HeaderComponent = () => {
               isOpen={isOpen}
               setIsOpen={setIsOpen}
               onClose={() => setIsOpen(false)}
-              title={
-                modalType === "login"
-                  ? "Đăng nhập vào HocPython"
-                  : "Đăng ký tài khoản"
-              }
+              
             >
               {modalType === "login" ? (
                 <LoginFormComponent

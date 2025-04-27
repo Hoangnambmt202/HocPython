@@ -16,6 +16,7 @@ import { updateCourseProgress } from "../../redux/slides/progressSlice";
 import { setContent, fetchContentStart } from "../../redux/slides/courseContentSlices";
 import { updateLessonProgress, setLastLesson } from "../../redux/slides/progressSlice";
 
+
 const LearningPage = () => {
   const { slug } = useParams();
   const dispatch = useDispatch();
@@ -277,95 +278,95 @@ const LearningPage = () => {
     }
   };
   // Phần render chức năng chạy code
-  const renderCodeExecution = () => {
-    return (
-      <div className="mt-4">
-        <CodeEditor 
-          value={userCode} 
-          onChange={(value) => setUserCode(value)}
-        />
+  // const renderCodeExecution = () => {
+  //   return (
+  //     <div className="mt-4">
+  //       <CodeEditor 
+  //         value={userCode} 
+  //         onChange={(value) => setUserCode(value)}
+  //       />
         
-        <div className="mt-2 flex flex-col gap-2">
-          <button
-            onClick={handleRunCode}
-            disabled={isSubmitting}
-            className={`px-4 py-2 rounded ${
-              isSubmitting 
-                ? "bg-gray-400 cursor-not-allowed" 
-                : "bg-green-500 hover:bg-green-600"
-            } text-white`}
-          >
-            {isSubmitting ? "Đang chạy..." : "Chạy thử"}
-          </button>
+  //       <div className="mt-2 flex flex-col gap-2">
+  //         <button
+  //           onClick={handleRunCode}
+  //           disabled={isSubmitting}
+  //           className={`px-4 py-2 rounded ${
+  //             isSubmitting 
+  //               ? "bg-gray-400 cursor-not-allowed" 
+  //               : "bg-green-500 hover:bg-green-600"
+  //           } text-white`}
+  //         >
+  //           {isSubmitting ? "Đang chạy..." : "Chạy thử"}
+  //         </button>
           
-          {jobStatus && (
-            <div className="text-sm text-gray-600">{jobStatus}</div>
-          )}
+  //         {jobStatus && (
+  //           <div className="text-sm text-gray-600">{jobStatus}</div>
+  //         )}
           
-          {testResults.length > 0 && (
-            <div className="space-y-2 mt-4">
-              <h3 className="font-bold">Kết quả kiểm tra:</h3>
-              <div className={`p-4 rounded-lg mb-4 ${
-                testResults.every(r => r.passed) 
-                  ? "bg-green-100 border border-green-200" 
-                  : "bg-red-100 border border-red-200"
-              }`}>
-                <div className="font-semibold flex items-center gap-2">
-                  {testResults.every(r => r.passed) ? (
-                    <>
-                      <span className="text-green-600">✅ Bài làm đạt yêu cầu!</span>
-                      <span className="text-sm text-green-600">
-                        ({testResults.filter(r => r.passed).length}/{testResults.length} test cases đúng)
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-red-600">❌ Bài làm chưa đạt yêu cầu</span>
-                      <span className="text-sm text-red-600">
-                        ({testResults.filter(r => r.passed).length}/{testResults.length} test cases đúng)
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              {testResults.map((result, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-lg mb-2 ${
-                    result.passed ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="font-medium">Test case {index + 1}</div>
-                    <div className={result.passed ? "text-green-600" : "text-red-600"}>
-                      {result.passed 
-                        ? "✅ Đạt yêu cầu" 
-                        : "❌ Chưa đạt yêu cầu"}
-                    </div>
-                  </div>
-                  <div className="text-sm mt-2 bg-white p-3 rounded border">
-                    <div><span className="font-medium">Input:</span> {result.input || '(không có)'}</div>
-                    <div><span className="font-medium">Expected output:</span> {result.expectedOutput}</div>
-                    <div><span className="font-medium">Actual output:</span> {result.actualOutput || '(không có output)'}</div>
-                    {result.error && (
-                      <div className="text-red-600 mt-2">
-                        <span className="font-medium">Lỗi:</span>
-                        <pre className="mt-1 p-2 bg-red-50 rounded text-sm overflow-x-auto">
-                          {result.error.split('\n').map((line, i) => (
-                            <div key={i}>{line}</div>
-                          ))}
-                        </pre>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
+  //         {testResults.length > 0 && (
+  //           <div className="space-y-2 mt-4">
+  //             <h3 className="font-bold">Kết quả kiểm tra:</h3>
+  //             <div className={`p-4 rounded-lg mb-4 ${
+  //               testResults.every(r => r.passed) 
+  //                 ? "bg-green-100 border border-green-200" 
+  //                 : "bg-red-100 border border-red-200"
+  //             }`}>
+  //               <div className="font-semibold flex items-center gap-2">
+  //                 {testResults.every(r => r.passed) ? (
+  //                   <>
+  //                     <span className="text-green-600">✅ Bài làm đạt yêu cầu!</span>
+  //                     <span className="text-sm text-green-600">
+  //                       ({testResults.filter(r => r.passed).length}/{testResults.length} test cases đúng)
+  //                     </span>
+  //                   </>
+  //                 ) : (
+  //                   <>
+  //                     <span className="text-red-600">❌ Bài làm chưa đạt yêu cầu</span>
+  //                     <span className="text-sm text-red-600">
+  //                       ({testResults.filter(r => r.passed).length}/{testResults.length} test cases đúng)
+  //                     </span>
+  //                   </>
+  //                 )}
+  //               </div>
+  //             </div>
+  //             {testResults.map((result, index) => (
+  //               <div
+  //                 key={index}
+  //                 className={`p-3 rounded-lg mb-2 ${
+  //                   result.passed ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"
+  //                 }`}
+  //               >
+  //                 <div className="flex justify-between items-center">
+  //                   <div className="font-medium">Test case {index + 1}</div>
+  //                   <div className={result.passed ? "text-green-600" : "text-red-600"}>
+  //                     {result.passed 
+  //                       ? "✅ Đạt yêu cầu" 
+  //                       : "❌ Chưa đạt yêu cầu"}
+  //                   </div>
+  //                 </div>
+  //                 <div className="text-sm mt-2 bg-white p-3 rounded border">
+  //                   <div><span className="font-medium">Input:</span> {result.input || '(không có)'}</div>
+  //                   <div><span className="font-medium">Expected output:</span> {result.expectedOutput}</div>
+  //                   <div><span className="font-medium">Actual output:</span> {result.actualOutput || '(không có output)'}</div>
+  //                   {result.error && (
+  //                     <div className="text-red-600 mt-2">
+  //                       <span className="font-medium">Lỗi:</span>
+  //                       <pre className="mt-1 p-2 bg-red-50 rounded text-sm overflow-x-auto">
+  //                         {result.error.split('\n').map((line, i) => (
+  //                           <div key={i}>{line}</div>
+  //                         ))}
+  //                       </pre>
+  //                     </div>
+  //                   )}
+  //                 </div>
+  //               </div>
+  //             ))}
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
+  //   );
+  // };
   
   const handleVideoProgress = (progress) => {
     setVideoProgress(progress);
@@ -395,6 +396,7 @@ const LearningPage = () => {
             onProgress={handleVideoProgress}
             onVideoComplete={handleVideoComplete}
           />
+        
           <div className="mt-4">
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div 
@@ -556,38 +558,7 @@ const LearningPage = () => {
       setIsSubmitting(false);
     }
   };
-   // Hàm để kiểm tra kết quả theo định kỳ
-   const startPolling = (id) => {
-    // Xóa interval cũ nếu có
-    if (pollInterval) {
-      clearInterval(pollInterval);
-    }
-    
-    // Tạo interval mới để kiểm tra kết quả
-    const intervalId = setInterval(async () => {
-      try {
-        const result = await LessonService.checkCodeExecutionResult(id);
-        
-        setJobStatus(result.message || result.status);
-        
-        // Nếu đã hoàn thành, hiển thị kết quả và dừng polling
-        if (result.completed) {
-          setTestResults(result.result.results);
-          clearInterval(intervalId);
-        
-          setIsSubmitting(false);
-        }
-      } catch (error) {
-        console.error("Error checking job status:", error);
-        setJobStatus(`Lỗi kiểm tra: ${error.message}`);
-        clearInterval(intervalId);
-       
-        setIsSubmitting(false);
-      }
-    }, 2000); // Kiểm tra mỗi 2 giây
-    
-    
-  };
+
 
   // Cập nhật tiến độ khi hoàn thành bài học
   const updateProgress = async (lessonId, completed = true) => {

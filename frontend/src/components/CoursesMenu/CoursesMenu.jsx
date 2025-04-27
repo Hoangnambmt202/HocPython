@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import EnrollService from "../../services/EnrollService";
 import ProgressService from "../../services/ProgressService";
 import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
-
+import { setAllCourseProgress } from "../../redux/slides/progressSlice";
 const CoursesMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
@@ -29,6 +29,8 @@ const CoursesMenu = () => {
               completedLessons: progressRes.data?.completedLessons || 0,
               totalLessons: progressRes.data?.totalLessons || 0
             };
+          
+            
           } catch (error) {
             console.error(`Error fetching progress for course ${course.courseId._id}:`, error);
             return {
@@ -38,6 +40,7 @@ const CoursesMenu = () => {
               totalLessons: 0
             };
           }
+    
         });
 
         const progressResults = await Promise.all(progressPromises);
@@ -45,8 +48,8 @@ const CoursesMenu = () => {
           acc[curr.courseId] = curr;
           return acc;
         }, {});
-
         setCourseProgress(progressMap);
+        dispatch(setAllCourseProgress(progressMap));
       } catch (error) {
         console.error("Failed to fetch enrolled courses:", error);
       }

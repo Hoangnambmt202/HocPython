@@ -1,21 +1,21 @@
 import { Link } from "react-router-dom";
 import AsideComponent from "../../components/AsideComponent/AsideComponent";
-import { useEffect, useState } from "react";
-import { Clock, User } from "lucide-react";
+import { useEffect } from "react";
+import { Book, Clock } from "lucide-react";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
 import { useDispatch, useSelector } from "react-redux";
 import EnrollService from "../../services/EnrollService";
-import { setEnroll } from "../../redux/slides/enrollSlice";
+import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
 import { Helmet } from "react-helmet-async";
 
 const MyCoursesPage = () => {
   const dispatch = useDispatch();
-  const [progress, setProgress] = useState(40);
+  const allCourseProgress = useSelector((state) => state.progress.allCourseProgress);
   const enrolledCourses = useSelector((state) => state.enrollment.enrolledCourses);
   useEffect (()=>{
     const fetchEnrolledCourses = async () => {
       const res = await EnrollService.allCourseEnroll();
-      dispatch(setEnroll(res.data));
+      dispatch(setEnrolledCourses(res.data));
     }
     fetchEnrolledCourses()
   },[dispatch])
@@ -47,36 +47,46 @@ const MyCoursesPage = () => {
           </header>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-            {enrolledCourses.map((course) => (
-              <Link
-                to={`/course/${course.courseId?.slug}/learn`}
-                key={course._id}
-                className="card bg-gray-100 flex flex-col rounded-lg shadow-md"
-              >
-                <img
-                  src={course.image}
-                  alt={`Course ${course.courseId?.title}`}
-                  className="w-full h-32 object-cover rounded-t-lg"
-                />
-                <div className="p-2 flex-1">
-                  <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">
-                    {course.courseId?.title}
-                  </h3>
-                  <p>{course.price > 0 ? `Giá: ${course.price} VNĐ` : "Miễn phí"}</p>
-                </div>
-                <div className="p-2">
-                  <ProgressBar progress={progress} />
-                </div>
-                <div className="flex justify-between items-center p-2 border-t">
-                  <span className="text-sm flex gap-1 items-center text-gray-500">
-                    <User /> {course.numberStudent}
-                  </span>
-                  <span className="text-sm flex gap-1 items-center text-gray-500">
-                    <Clock />{formatDate(course.enrolledAt)}
-                  </span>
-                </div>
-              </Link>
-            ))}
+            {enrolledCourses.map((course) => {
+               const progressData = allCourseProgress[course.courseId?._id] || {
+                progress: 0,
+                completedLessons: 0,
+                totalLessons: 0
+              };
+              return (
+                <Link
+                  to={`/course/${course.courseId?.slug}/learn`}
+                  key={course._id}
+                  className="card bg-gray-100 flex flex-col rounded-lg shadow-md"
+                >
+                  <img
+                    src={course.image}
+                    alt={`Course ${course.courseId?.title}`}
+                    className="w-full h-32 object-cover rounded-t-lg"
+                  />
+                  <div className="p-2 flex-1">
+                    <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">
+                      {course.courseId?.title}
+                    </h3>
+                    <p>{course.price > 0 ? `Giá: ${course.price} VNĐ` : "Miễn phí"}</p>
+                  </div>
+                  <div className="p-2">
+                    <ProgressBar progress={progressData.progress} />
+                  </div>
+                  <div className="flex justify-between items-center p-2 border-t">
+                    <span className="text-sm flex gap-1 items-center text-gray-500">
+                      <Book /> { progressData.totalLessons} bài học
+                     
+                    </span>
+                    <span className="text-sm flex gap-1 items-center text-gray-500">
+                      <Clock /> {formatDate(course.enrolledAt)}
+                    </span>
+                  </div>
+                </Link>
+              )
+              
+            } 
+            )}
           </div>
         </div>
       </div>

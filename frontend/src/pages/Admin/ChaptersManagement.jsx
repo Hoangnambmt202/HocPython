@@ -176,8 +176,8 @@ const ChaptersManagement = () => {
           ))}
         </tbody>
       </table>
-      <Modal isOpen={isEditOpen} setIsOpen={setIsEditOpen} onClose={()=>{setIsEditOpen(false)}}>
-        <h3 className="text-2xl font-bold">Chỉnh sửa Chương</h3>
+      <Modal isOpen={isEditOpen} title="Chỉnh sửa Chương" setIsOpen={setIsEditOpen} onClose={()=>{setIsEditOpen(false)}}>
+        
         <div className="p-6">
           <input
             type="text"

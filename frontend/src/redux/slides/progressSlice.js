@@ -9,7 +9,8 @@ const initialState = {
     progress: 0,
     totalLessons: 0,
     completedLessons: 0
-  }
+  },
+  allCourseProgress: {} // Lưu toàn bộ tiến độ các khóa học theo courseId
 };
 
 const progressSlice = createSlice({
@@ -56,6 +57,10 @@ const progressSlice = createSlice({
         totalLessons,
         completedLessons
       };
+    },
+  
+    setAllCourseProgress: (state, action) => {
+      state.allCourseProgress = action.payload;
     }
   },
 });
@@ -66,7 +71,8 @@ export const {
   updateLessonProgress,
   setLastLesson,
   resetProgress,
-  updateCourseProgress
+  updateCourseProgress,
+  setAllCourseProgress,
 } = progressSlice.actions;
 
 export default progressSlice.reducer;

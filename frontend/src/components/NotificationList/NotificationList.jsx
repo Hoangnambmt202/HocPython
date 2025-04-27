@@ -18,7 +18,6 @@ const NotificationList = () => {
         const response = await NotificationService.getUserNotifications();
         dispatch(setNotifications(response.data));
        
-        console.log(response.data)
         
       } catch (error) {
         console.error("Error fetching notifications:", error);

@@ -3,8 +3,7 @@ import {
   Edit,
   Trash,
   Plus,
-  ChevronLeft,
-  ChevronRight,
+
   Filter,
   ChevronDown,
   Search,
@@ -117,13 +116,9 @@ const LecturersManagement = () => {
   // Xử lý đăng ký
   const handleSignUp = () => {
     const newErrors = {};
-    
     setErrors(newErrors);
     setIsSubmitting(true);
-  
     mutation.mutate(formData);
-  
-
   };
 
   // Xử lý tìm kiếm
@@ -138,6 +133,7 @@ const LecturersManagement = () => {
       try {
         const role = "lecturer";
         const response = await UserService.getUserByRole(role);
+        
         if (response?.data) {
           setLecturers(response.data);
         }
@@ -158,12 +154,6 @@ const LecturersManagement = () => {
     setLecturers(lecturers.filter((lecturer) => lecturer.id !== id));
   };
 
-  // // Lọc giảng viên theo tìm kiếm
-  // const filteredLecturers = lecturers.filter(
-  //   (lecturer) =>
-  //     lecturer.name.toLowerCase().includes(search.toLowerCase()) ||
-  //     lecturer.email.toLowerCase().includes(search.toLowerCase())
-  // );
 
   
 
@@ -224,7 +214,7 @@ const LecturersManagement = () => {
           </tr>
         </thead>
         <tbody>
-          {lecturers.map((lecturer) => (
+          {lecturers?.map((lecturer) => (
             <tr key={lecturer.id} className="text-center">
               <td className="border border-gray-300 p-2">{lecturer.name}</td>
               <td className="border border-gray-300 p-2">{lecturer.email}</td>
@@ -238,7 +228,7 @@ const LecturersManagement = () => {
                       : "bg-red-100 text-red-800"
                   }`}
                 >
-                  { lecturer.isActive === true
+                  { lecturer?.isActive === true
                       ? "Đang hoạt động"
                       : "Đã khóa"}
                 </span>
