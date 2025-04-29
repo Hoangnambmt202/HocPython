@@ -291,7 +291,8 @@ const LearningPage = () => {
             onProgress={handleVideoProgress}
             onVideoComplete={handleVideoComplete}
           /> */}
-          <iframe src="http://hocpython.infinityfreeapp.com/wp-admin/admin-ajax.php?action=h5p_embed&id=1" width="762" height="490" frameBorder="0" allowfullscreen="allowfullscreen" title="Câu hỏi kiểm tra"></iframe>
+          <iframe src="http://hocpython.infinityfreeapp.com/wp-admin/admin-ajax.php?action=h5p_embed&id=1" width="762" height="490" frameBorder="0" allowfullscreen="allowfullscreen" title="Câu hỏi kiểm tra"></iframe><script src="http://hocpython.infinityfreeapp.com/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charSet="UTF-8"></script>
+
           <div className="mt-4">
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
