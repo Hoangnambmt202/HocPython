@@ -1,5 +1,4 @@
 // src/controllers/uploadController.js
-const { cloudinary } = require('../config/cloudinary');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const multer = require('multer');
@@ -21,12 +20,9 @@ class UploadController {
   // Để upload ảnh đại diện cho người dùng
   static async uploadAvatar(req, res) {
     try {
-      console.log('Upload avatar request received'); // Log kiểm tra request
-      console.log('File:', req.file); // Log kiểm tra file
-      console.log('User:', req.user); // Log kiểm tra user
     
       const imageUrl = req.file.path; // Lấy URL ảnh từ Cloudinary
-      const userId = req.user._id; // Lấy userId từ session hoặc JWT
+      const userId = req.user._id; 
       const user = await User.findByIdAndUpdate(userId, { avatar: imageUrl }, { new: true });
       if (!user) {
         return res.status(404).json({ error: 'User not found' });

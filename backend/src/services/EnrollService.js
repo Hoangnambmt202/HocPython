@@ -35,7 +35,7 @@ const enrollCourse = (userId, courseId) => {
 const getUserEnrollments = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const enrollments = await Enrollment.find({ userId }).populate("courseId", "title numberStudent slug" );
+            const enrollments = await Enrollment.find({ userId }).populate("courseId", "title numberStudent slug thumbnail" );
             resolve({
                 status: "success",
                 message: "Lấy danh sách khóa học đăng ký thành công",

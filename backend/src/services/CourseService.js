@@ -39,6 +39,7 @@ const calculateTotalLessons = async (courseId) => {
 const createCourse = async (data) => {
   try {
     const slug = slugify(data.title, { lower: true, strict: true });
+    
     const newCourse = new Course({
       title: data.title,
       slug: slug,
@@ -124,13 +125,7 @@ const updateCourse = async (courseId, data) => {
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       {
-        title: data.title,
-        description: data.description,
-        lecturerId: data.lecturerId,
-        categoryId: data.categoryId,
-        price: data.price,
-        isPublished: data.isPublished,
-        thumbnail: data.thumbnail,
+        $set: data 
       },
       { new: true, runValidators: true }
     );

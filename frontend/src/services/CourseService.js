@@ -3,7 +3,12 @@ import axios from "axios";
 
 
 const createCourse = async (data) => {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/course/create`,data)
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/course/create`,data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+      })
     return res.data
 }
 const getAllCourses = async () => {
@@ -17,7 +22,12 @@ const getCourses = async (slug) => {
    
 }
 const updateCourse = async (courseId, data) => {
-    const res = await axios.put(`${import.meta.env.VITE_API_URL}/course/update/${courseId}`,data , {withCredentials: true})
+    const res = await axios.put(`${import.meta.env.VITE_API_URL}/course/update/${courseId}`,data , {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+      })
     return res.data
 }
 const deleteCourse = async (courseId) => {
@@ -30,5 +40,6 @@ export default {
     getAllCourses,
     getCourses,
     updateCourse,
-    deleteCourse
+    deleteCourse,
+
 }

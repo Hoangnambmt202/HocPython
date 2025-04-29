@@ -140,24 +140,24 @@ const LearningPage = () => {
 
   useEffect(() => {
     const updateLastLesson = async () => {
-      if (currentLesson) {
-        try {
-          
-          await ProgressService.updateLastLesson(
-            slug,
-            currentLesson.lesson._id,
-            currentLesson.chapterId
-          );
-          
-          dispatch(setLastLesson({
-            slug,
-            lessonId: currentLesson.lesson._id,
-            chapterId: currentLesson.chapterId
-          }));
-        } catch (error) {
-          console.error("Error updating last lesson:", error);
-        }
+      if (!courseDetail || !courseDetail._id || !currentLesson) return;
+      try {
+        
+        await ProgressService.updateLastLesson(
+          slug,
+          currentLesson.lesson._id,
+          currentLesson.chapterId
+        );
+        
+        dispatch(setLastLesson({
+          slug,
+          lessonId: currentLesson.lesson._id,
+          chapterId: currentLesson.chapterId
+        }));
+      } catch (error) {
+        console.error("Error updating last lesson:", error);
       }
+    
     };
 
     updateLastLesson();
@@ -176,198 +176,63 @@ const LearningPage = () => {
       chapterId
     });
   };
-
-  // Navigate to previous lesson
-  const goToPreviousLesson = () => {
-    if (!content || !currentLesson) return;
-    
-    // Flatten all lessons with their chapter info
+  const getSortedLessons = () => {
+    // Lấy danh sách bài học kèm theo thứ tự chương
     const allLessons = [];
+  
     content.forEach(chapter => {
+      const chapterOrder = chapter.order ?? 0;
       if (chapter.lessons && chapter.lessons.length > 0) {
         chapter.lessons.forEach(lesson => {
           allLessons.push({
             lesson,
-            chapterId: chapter._id
+            chapterId: chapter._id,
+            chapterOrder,
+            lessonOrder: lesson.order ?? 0,
           });
         });
       }
     });
-    if (loading) return <p>Đang tải nội dung...</p>;
-  if (error) return <p>Lỗi: {error}</p>;
-   
-    
-    // Sort by chapter order and then by lesson order
+  
+    // Sắp xếp theo chapterOrder rồi đến lessonOrder
     allLessons.sort((a, b) => {
-      const chapterA = content.find(c => c._id === a.chapterId);
-      const chapterB = content.find(c => c._id === b.chapterId);
-      const chapterOrderA = chapterA ? chapterA.order || 0 : 0;
-      const chapterOrderB = chapterB ? chapterB.order || 0 : 0;
-      
-      if (chapterOrderA !== chapterOrderB) {
-        return chapterOrderA - chapterOrderB;
+      if (a.chapterOrder !== b.chapterOrder) {
+        return a.chapterOrder - b.chapterOrder;
       }
-      
-      return a.lesson.order - b.lesson.order;
+      return a.lessonOrder - b.lessonOrder;
     });
-    
-    // Find current lesson index
+  
+    return allLessons;
+  };
+  
+  const goToPreviousLesson = () => {
+    if (!currentLesson) return;
+    const allLessons = getSortedLessons();
     const currentIndex = allLessons.findIndex(
       item => item.lesson._id === currentLesson.lesson._id
     );
-    
-    // Go to previous if exists
+  
     if (currentIndex > 0) {
       const prevLesson = allLessons[currentIndex - 1];
       setCurrentLesson(prevLesson);
-      
-      // Open the chapter containing this lesson
-      setOpenChapters(prev => ({
-        ...prev,
-        [prevLesson.chapterId]: true
-      }));
+      setOpenChapters(prev => ({ ...prev, [prevLesson.chapterId]: true }));
     }
   };
-
   // Navigate to next lesson
   const goToNextLesson = () => {
-    if (!content || !currentLesson) return;
-    
-    // Flatten all lessons with their chapter info
-    const allLessons = [];
-    content.forEach(chapter => {
-      if (chapter.lessons && chapter.lessons.length > 0) {
-        chapter.lessons.forEach(lesson => {
-          allLessons.push({
-            lesson,
-            chapterId: chapter._id
-          });
-        });
-      }
-    });
-    
-    // Sort by chapter order and then by lesson order
-    allLessons.sort((a, b) => {
-      const chapterA = content.find(c => c._id === a.chapterId);
-      const chapterB = content.find(c => c._id === b.chapterId);
-      const chapterOrderA = chapterA ? chapterA.order || 0 : 0;
-      const chapterOrderB = chapterB ? chapterB.order || 0 : 0;
-      
-      if (chapterOrderA !== chapterOrderB) {
-        return chapterOrderA - chapterOrderB;
-      }
-      
-      return a.lesson.order - b.lesson.order;
-    });
-    
-    // Find current lesson index
+    if (!currentLesson) return;
+    const allLessons = getSortedLessons();
     const currentIndex = allLessons.findIndex(
       item => item.lesson._id === currentLesson.lesson._id
     );
-    
-    // Go to next if exists
+  
     if (currentIndex < allLessons.length - 1) {
       const nextLesson = allLessons[currentIndex + 1];
       setCurrentLesson(nextLesson);
-      
-      // Open the chapter containing this lesson
-      setOpenChapters(prev => ({
-        ...prev,
-        [nextLesson.chapterId]: true
-      }));
+      setOpenChapters(prev => ({ ...prev, [nextLesson.chapterId]: true }));
     }
   };
-  // Phần render chức năng chạy code
-  // const renderCodeExecution = () => {
-  //   return (
-  //     <div className="mt-4">
-  //       <CodeEditor 
-  //         value={userCode} 
-  //         onChange={(value) => setUserCode(value)}
-  //       />
-        
-  //       <div className="mt-2 flex flex-col gap-2">
-  //         <button
-  //           onClick={handleRunCode}
-  //           disabled={isSubmitting}
-  //           className={`px-4 py-2 rounded ${
-  //             isSubmitting 
-  //               ? "bg-gray-400 cursor-not-allowed" 
-  //               : "bg-green-500 hover:bg-green-600"
-  //           } text-white`}
-  //         >
-  //           {isSubmitting ? "Đang chạy..." : "Chạy thử"}
-  //         </button>
-          
-  //         {jobStatus && (
-  //           <div className="text-sm text-gray-600">{jobStatus}</div>
-  //         )}
-          
-  //         {testResults.length > 0 && (
-  //           <div className="space-y-2 mt-4">
-  //             <h3 className="font-bold">Kết quả kiểm tra:</h3>
-  //             <div className={`p-4 rounded-lg mb-4 ${
-  //               testResults.every(r => r.passed) 
-  //                 ? "bg-green-100 border border-green-200" 
-  //                 : "bg-red-100 border border-red-200"
-  //             }`}>
-  //               <div className="font-semibold flex items-center gap-2">
-  //                 {testResults.every(r => r.passed) ? (
-  //                   <>
-  //                     <span className="text-green-600">✅ Bài làm đạt yêu cầu!</span>
-  //                     <span className="text-sm text-green-600">
-  //                       ({testResults.filter(r => r.passed).length}/{testResults.length} test cases đúng)
-  //                     </span>
-  //                   </>
-  //                 ) : (
-  //                   <>
-  //                     <span className="text-red-600">❌ Bài làm chưa đạt yêu cầu</span>
-  //                     <span className="text-sm text-red-600">
-  //                       ({testResults.filter(r => r.passed).length}/{testResults.length} test cases đúng)
-  //                     </span>
-  //                   </>
-  //                 )}
-  //               </div>
-  //             </div>
-  //             {testResults.map((result, index) => (
-  //               <div
-  //                 key={index}
-  //                 className={`p-3 rounded-lg mb-2 ${
-  //                   result.passed ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"
-  //                 }`}
-  //               >
-  //                 <div className="flex justify-between items-center">
-  //                   <div className="font-medium">Test case {index + 1}</div>
-  //                   <div className={result.passed ? "text-green-600" : "text-red-600"}>
-  //                     {result.passed 
-  //                       ? "✅ Đạt yêu cầu" 
-  //                       : "❌ Chưa đạt yêu cầu"}
-  //                   </div>
-  //                 </div>
-  //                 <div className="text-sm mt-2 bg-white p-3 rounded border">
-  //                   <div><span className="font-medium">Input:</span> {result.input || '(không có)'}</div>
-  //                   <div><span className="font-medium">Expected output:</span> {result.expectedOutput}</div>
-  //                   <div><span className="font-medium">Actual output:</span> {result.actualOutput || '(không có output)'}</div>
-  //                   {result.error && (
-  //                     <div className="text-red-600 mt-2">
-  //                       <span className="font-medium">Lỗi:</span>
-  //                       <pre className="mt-1 p-2 bg-red-50 rounded text-sm overflow-x-auto">
-  //                         {result.error.split('\n').map((line, i) => (
-  //                           <div key={i}>{line}</div>
-  //                         ))}
-  //                       </pre>
-  //                     </div>
-  //                   )}
-  //                 </div>
-  //               </div>
-  //             ))}
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   );
-  // };
-  
+ 
   const handleVideoProgress = (progress) => {
     setVideoProgress(progress);
   };

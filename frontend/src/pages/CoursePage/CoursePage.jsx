@@ -113,7 +113,7 @@ const CoursePage = () => {
   };
 
   
-  const isEnrolled = courseDetail?._id && enrolledCourses.includes(courseDetail._id);
+  const isEnrolled = courseDetail?._id && Array.isArray(enrolledCourses) && enrolledCourses.includes(courseDetail._id);
   const isInCart = cart.some((item) => item._id === courseDetail?._id);
 
   
@@ -134,7 +134,7 @@ const CoursePage = () => {
         <img
           src={courseDetail?.thumbnail}
           alt={courseDetail?.title}
-          className="w-full md:w-1/3 rounded-xl shadow-lg"
+          className="w-full md:w-1/3 h-[300px] object-fill rounded-xl shadow-lg"
         />
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-900">{courseDetail?.title}</h1>

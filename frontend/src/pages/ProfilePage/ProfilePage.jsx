@@ -34,7 +34,7 @@ const ProfilePage = () => {
   const enrolledCourses = useSelector(
     (state) => state.enrollment.enrolledCourses
   );
-  const progress = useSelector((state) => state.progress.courseProgress);
+  const progress = useSelector((state) => state.progress.allCourseProgress);
   const [isEditing, setIsEditing] = useState(false);
   const [optionsState, setOptionsState] = useState("1");
   const [toast, setToast] = useState({ show: false, message: "", color: "" });
@@ -58,7 +58,7 @@ const ProfilePage = () => {
     },
   });
   const avatarMutation = useMutation({
-    mutationFn: (file) => UserService.uploadAvatar(file), // Đơn giản hóa không cần truyền access_token
+    mutationFn: (file) => UserService.uploadAvatar(file), 
     onSuccess: (data) => {
       setToast({
         show: true,
@@ -66,7 +66,7 @@ const ProfilePage = () => {
         color: "green",
         duration: 2000,
       });
-      console.log(data)
+   
       dispatch(setUser({ ...user, 
         avatar: data.avatar } ));
     },
@@ -656,24 +656,24 @@ const ProfilePage = () => {
                 </div>
               </header>
 
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-4">
                 {enrolledCourses && enrolledCourses.length > 0 ? (
                   enrolledCourses.map((enrollment) => {
                     const course = enrollment.courseId;
-                    const courseProgress = progress[course?._id] || {};
-                    const completedLessons =
-                      courseProgress.completedLessons || 0;
-                    const totalLessons = courseProgress.totalLessons || 0;
-                    const progressPercentage = courseProgress.progress || 0;
-
+                    const {
+                      progress: progressPercentage = 0,
+                      completedLessons = 0,
+                      totalLessons = 0
+                    } = progress[course?._id] || {};
+                    
                     return (
                       <div
                         key={course?._id}
                         className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
                       >
                         <img
-                          src={course?.thumbnail}
-                          alt={course?.title}
+                          src={course.thumbnail}
+                          alt={course.title}
                           className="w-full h-40 object-cover"
                         />
                         <div className="p-4">
@@ -686,6 +686,7 @@ const ProfilePage = () => {
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm text-gray-600">
                               <span>Tiến độ</span>
+                            
                               <span>{progressPercentage}%</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">

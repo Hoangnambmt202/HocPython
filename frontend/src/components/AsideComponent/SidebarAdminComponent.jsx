@@ -25,7 +25,6 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
         { label: "Danh sách học viên", href: "/admin/students" },
         { label: "Danh sách giảng viên", href: "/admin/lecturers" },
         { label: "Tiến độ học tập", href: "/admin/students/progress" },
-        { label: "Chấm điểm bài tập", href: "/admin/students/grading" },
         
       ],
     },

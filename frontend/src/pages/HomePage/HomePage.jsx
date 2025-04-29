@@ -60,9 +60,9 @@ const HomePage = () => {
                           className="card bg-gray-100 flex flex-col rounded-lg shadow-md"
                         >
                           <img
-                            src={course.image}
+                            src={course.thumbnail}
                             alt={`Course ${course.title}`}
-                            className="w-full h-32 object-cover rounded-t-lg"
+                            className="w-full h-32 object-fill rounded-t-lg"
                           />
                           <div className="p-2 flex-1">
                             <h3 className="text-lg min-h-14 line-clamp-2 font-semibold">
@@ -111,7 +111,7 @@ const HomePage = () => {
               className="card bg-gray-100 flex flex-col rounded-lg shadow-md"
             >
               <img
-                src={course.image}
+                src={course.thumbnail}
                 alt={`Course ${course.title}`}
                 className="w-full h-32 object-cover rounded-t-lg"
               />

@@ -18,7 +18,7 @@ const CoursesMenu = () => {
         const res = await EnrollService.allCourseEnroll();
         setCourseEnrolled(res.data);
         dispatch(setEnrolledCourses(res.data));
-
+        
         // Lấy tiến độ cho từng khóa học
         const progressPromises = res.data.map(async (course) => {
           try {
@@ -90,7 +90,7 @@ const CoursesMenu = () => {
                   >
                     <div className="flex items-start">
                       <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                        <img src={course?.thumbnail} alt={course.courseId?.title} className="w-full h-full object-cover rounded-full" />
+                        <img src={course.courseId.thumbnail} alt={course.courseId?.title} className="w-full h-full object-cover rounded-full" />
                       </div>
                       <div className="ml-3 flex-1">
                         <p className="text-sm font-medium text-gray-900">{course.courseId?.title}</p>
