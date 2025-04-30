@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Fa500Px } from 'react-icons/fa';
 import YouTube from 'react-youtube';
 
 // eslint-disable-next-line react/prop-types

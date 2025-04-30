@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   BookCheck,
   BookMarked,
@@ -161,9 +161,7 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
-  useEffect(() => {
-    // Remove loading effect since we're not using it
-  }, [user]);
+  
 
   if (mutation.isLoading) {
     return <LoadingComponent />;
@@ -700,7 +698,7 @@ const ProfilePage = () => {
                             </div>
                           </div>
                           <Link
-                            to={`/learning/${course?.slug}`}
+                            to={`/course/${course?.slug}/learn`}
                             className="mt-4 block text-center py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                           >
                             Tiếp tục học

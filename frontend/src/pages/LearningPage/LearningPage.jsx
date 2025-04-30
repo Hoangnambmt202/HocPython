@@ -28,14 +28,13 @@ import {
   updateLessonProgress,
   setLastLesson,
 } from "../../redux/slides/progressSlice";
+import H5PEmbed from "../../components/H5P_embed";
 
 const LearningPage = () => {
   const { slug } = useParams();
   const dispatch = useDispatch();
   const {
     content = [],
-    loading,
-    error,
   } = useSelector((state) => state.courseContent) || {};
   const [currentLesson, setCurrentLesson] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -69,7 +68,7 @@ const LearningPage = () => {
                   lessonId,
                   completed: true,
                 })
-              );
+              );fv
             }
           }
         );
@@ -284,15 +283,16 @@ const LearningPage = () => {
     const { lesson } = currentLesson;
 
     if (lesson.type === "video") {
+      
       return (
         <div>
           {/* <YouTubePlayer 
             url={lesson.videoUrl} 
             onProgress={handleVideoProgress}
             onVideoComplete={handleVideoComplete}
-          /> */}
-          <iframe src="https://hocpython.infinityfreeapp.com/wp-admin/admin-ajax.php?action=h5p_embed&id=1" width="762" height="490" frameBorder="0" allowfullscreen="allowfullscreen" title="Câu hỏi kiểm tra"></iframe><script src="http://hocpython.infinityfreeapp.com/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charSet="UTF-8"></script>
-
+          />
+           */}
+          <H5PEmbed/>
           <div className="mt-4">
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
@@ -560,7 +560,7 @@ const LearningPage = () => {
   return (
     <>
       <Helmet>
-        <title>{courseDetail?.title || "HocPython | Khóa học"} </title>
+        <title>{courseDetail?.title } </title>
       </Helmet>
       <div
         className={`flex ${
