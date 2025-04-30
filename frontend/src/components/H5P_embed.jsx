@@ -3,6 +3,9 @@ const H5PEmbed = () => {
   const embedCode = `
     <iframe 
       src="https://hocpython.infinityfreeapp.com/wp-admin/admin-ajax.php?action=h5p_embed&id=2"
+      sandbox="allow-scripts allow-same-origin allow-storage-access-by-user-activation"
+      allow="identity-credentials-get"
+      aria-hidden="true"
       width="762" 
       height="490" 
       frameborder="0" 
