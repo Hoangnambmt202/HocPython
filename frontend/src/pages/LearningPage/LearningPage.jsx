@@ -28,13 +28,14 @@ import {
   updateLessonProgress,
   setLastLesson,
 } from "../../redux/slides/progressSlice";
-import H5PEmbed from "../../components/H5P_embed";
 
 const LearningPage = () => {
   const { slug } = useParams();
   const dispatch = useDispatch();
   const {
     content = [],
+    loading,
+    error,
   } = useSelector((state) => state.courseContent) || {};
   const [currentLesson, setCurrentLesson] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -68,7 +69,7 @@ const LearningPage = () => {
                   lessonId,
                   completed: true,
                 })
-              );fv
+              );
             }
           }
         );
@@ -283,16 +284,15 @@ const LearningPage = () => {
     const { lesson } = currentLesson;
 
     if (lesson.type === "video") {
-      
       return (
         <div>
-          {/* <YouTubePlayer 
+          <YouTubePlayer 
             url={lesson.videoUrl} 
             onProgress={handleVideoProgress}
             onVideoComplete={handleVideoComplete}
           />
-           */}
-          <H5PEmbed/>
+          
+
           <div className="mt-4">
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
@@ -560,7 +560,7 @@ const LearningPage = () => {
   return (
     <>
       <Helmet>
-        <title>{courseDetail?.title } </title>
+        <title>{courseDetail?.title || "HocPython | Khóa học"} </title>
       </Helmet>
       <div
         className={`flex ${

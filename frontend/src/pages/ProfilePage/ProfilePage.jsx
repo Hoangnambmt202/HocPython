@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BookCheck,
   BookMarked,
@@ -161,7 +161,9 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
-  
+  useEffect(() => {
+    // Remove loading effect since we're not using it
+  }, [user]);
 
   if (mutation.isLoading) {
     return <LoadingComponent />;
