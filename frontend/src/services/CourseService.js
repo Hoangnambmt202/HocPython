@@ -34,6 +34,9 @@ const deleteCourse = async (courseId) => {
     const res = await axios.delete(`${import.meta.env.VITE_API_URL}/course/delete/${courseId}`, {withCredentials: true})
     return res.data
 }
+const searchCourses = async (keyword) => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/course/search`, {params: {keyword}})
+    return res.data}
 
 export default {
     createCourse,
@@ -41,5 +44,6 @@ export default {
     getCourses,
     updateCourse,
     deleteCourse,
+    searchCourses,
 
 }

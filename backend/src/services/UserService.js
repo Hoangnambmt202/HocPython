@@ -196,6 +196,17 @@ const getDetailUser = (id) => {
     }
   });
 };
+const searchUsers = async (query) => {
+  const searchRegex = new RegExp(query, "i"); // i = ignore case
+  return await User.find({
+    $or: [
+      { name: searchRegex },
+      { email: searchRegex },
+      { phone: searchRegex },
+      { role: searchRegex },
+    ],
+  });
+};
 
 
 module.exports = {
@@ -206,4 +217,5 @@ module.exports = {
   getUserByRole,
   getDetailUser,
   getAllUser,
+  searchUsers,
 };

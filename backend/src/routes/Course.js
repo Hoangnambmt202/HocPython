@@ -6,8 +6,9 @@ const {upload}  = require('../config/cloudinary');
 
 router.post('/create',upload.single('thumbnailFile'), CourseController.createCourse);
 router.get('/all', CourseController.getAllCourses);
+router.get('/search', CourseController.searchCourses);
 router.get('/:slug',CourseController.getCourse);
 router.put('/update/:courseId', authMiddleware, upload.single('thumbnailFile'), CourseController.updateCourse)
-router.delete('/delete/:courseId', authMiddleware, CourseController.deleteCourse)
+router.delete('/delete/:courseId', authMiddleware, CourseController.deleteCourse);
 
 module.exports = router;

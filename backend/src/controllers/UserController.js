@@ -207,6 +207,25 @@ const refreshToken = async (req, res) => {
     });
   }
 };
+const searchUsers = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ message: "Không tìm thấy có từ khóa ! trường này là bắt buộc" });
+    }
+
+    const users = await UserService.searchUsers(q);
+    res.status(200).json({
+      status: "success",
+      message: `Tìm thấy ${users.length} người dùng với từ khóa "${q}"`,
+      data: users,
+
+    });
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 module.exports = {
   createUser,
   loginUser,
@@ -217,4 +236,5 @@ module.exports = {
   getDetailUser,
   refreshToken,
   getAllUser,
+  searchUsers,
 };

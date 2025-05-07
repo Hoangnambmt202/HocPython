@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import config from "../../configs/index";
-
 import Modal from "../ModalComponent/ModalComponent";
 import LoginFormComponent from "../LoginFormComponent/LoginFormComponent";
 import RegisterFormComponent from "../RegisterFormComponent/RegisterFormComponent";
@@ -16,11 +15,12 @@ import CartPage from "../../pages/CartPage/CartPage";
 import { toggleCart } from "../../redux/slides/cartSlides";
 import EnrollService from "../../services/EnrollService";
 import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
+import SearchComponent from "../SearchComponent/SearchComponent";
 
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
-  const [showSearch, setShowSearch] = useState(false);
+  const [showSearchMobile, setShowSearchMobile] = useState(false);
 
   const user = useSelector((state) => state.user.user);
 
@@ -81,9 +81,9 @@ const HeaderComponent = () => {
 
           {user ? (
             <div className="flex items-center justify-end gap-4 xl:hidden lg:hidden md:hidden">
-              <button onClick={() => setShowSearch(!showSearch)}>
+              <button onClick={() => setShowSearchMobile((prev) => !prev)}>
                 <Search
-                  className="text-gray-500"
+                  className={`${showSearchMobile} ? "text-gray-700" : "text-gray-500"`}
                   width="1.25rem"
                   height="1.25rem"
                 />
@@ -123,21 +123,16 @@ const HeaderComponent = () => {
         </div>
 
         {/* Search Bar */}
-        {
-          showSearch && (
-            <div className="flex xl:hidden mt-2">
-            <div className="flex items-center w-full border border-gray-400 rounded-full px-4 py-2">
-              <Search className="text-gray-500" width="1.25rem" height="1.25rem" />
-              <input
-                type="text"
-                className="ml-2 w-full text-sm focus:outline-none"
-                placeholder="Tìm kiếm khóa học..."
-              />
-            </div>
+        <div className="">
+          <div className="hidden md:block">
+            <SearchComponent />
           </div>
-          )
-        }
-        
+          {showSearchMobile && (
+            <div className="block md:hidden mt-2">
+              <SearchComponent />
+            </div>
+          )}
+        </div>
 
         {/* User Actions */}
         {user ? (

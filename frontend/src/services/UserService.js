@@ -59,6 +59,15 @@ const uploadAvatar = async (file) => {
     });
     return response.data;
   }
+  const searchUsers = async (query) => {
+    try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/search?q=${query}`, { withCredentials: true });
+        return res.data;
+    } catch (error) {
+        console.error("Lỗi khi tìm kiếm người dùng:", error.response?.data?.message || error.message);
+    }
+  }
+
 export default {
     loginUser,
     logoutUser,
@@ -69,4 +78,5 @@ export default {
     updateUser,
     deleteUser,
     uploadAvatar,
+    searchUsers,
 }

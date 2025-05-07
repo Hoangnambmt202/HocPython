@@ -13,5 +13,5 @@ router.get('/getAll', authMiddleware, UserController.getAllUser);
 router.get('/getUserByRole', authMiddleware, UserController.getUserByRole);
 router.get('/me', authMiddleware, UserController.getDetailUser);
 router.post("/refresh-token", UserController.refreshToken);
-
+router.get("/search", UserController.searchUsers);
 module.exports = router;

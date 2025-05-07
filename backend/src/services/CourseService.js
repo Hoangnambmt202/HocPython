@@ -166,6 +166,33 @@ const deleteCourse = async (courseId) => {
     throw error;
   }
 };
+const searchCourses = async (query) => {
+  const { keyword } = query;
+
+  if (!keyword) return [];
+
+  const words = keyword.trim().split(/\s+/); // tách từ bằng dấu cách
+  const regexList = words.map((word) => new RegExp(word, "i")); // regex từng từ
+
+  const orConditions = [];
+
+  regexList.forEach((regex) => {
+    orConditions.push({ title: { $regex: regex } });
+    orConditions.push({ slug: { $regex: regex } });
+    orConditions.push({ description: { $regex: regex } });
+    orConditions.push({ category: { $regex: regex } });
+    orConditions.push({ level: { $regex: regex } });
+    orConditions.push({ tags: { $regex: regex } });
+  });
+
+  const searchFilter = {
+    $or: orConditions,
+  };
+
+  return await Course.find(searchFilter).sort({ createdAt: -1 });
+};
+
+
 
 module.exports = {
   createCourse,
@@ -173,5 +200,6 @@ module.exports = {
   getCourseBySlug,
   updateCourse,
   deleteCourse,
-  calculateTotalLessons
+  calculateTotalLessons,
+  searchCourses,
 };
