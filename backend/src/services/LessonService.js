@@ -1,79 +1,77 @@
 const Lesson = require("../models/Lesson");
 const Chapter = require("../models/Chapter");
 const { Queue } = require('bullmq');
-const fs = require('fs').promises;
-const path = require('path');
-// const { v4: uuidv4 } = require('uuid');
-// const config = require('../config/config');
-// const { exec } = require('child_process');
-// const { promisify } = require('util');
-// const execAsync = promisify(exec);
+const { v4: uuidv4 } = require('uuid');
+const config = require('../config/config');
+const { exec } = require('child_process');
+const { promisify } = require('util');
+const execAsync = promisify(exec);
 const ChapterService = require("./ChapterService");
 
-// Tạo queue để xử lý việc chạy code
-// const codeExecutionQueue = new Queue('code-execution', {
-//   connection: {
-//     host: config.redis.host,
-//     port: config.redis.port
-//   }
-// });
 
-// Sandbox directory for code execution
+const codeExecutionQueue = new Queue('code-execution', {
+  connection: {
+    host: config.redis.host,
+    port: config.redis.port
+  }
+});
+
+
 // const SANDBOX_DIR = path.join(process.cwd(), 'temp');
 
-// Ensure sandbox directory exists
-// const ensureSandboxDir = async () => {
-//   try {
-//     await fs.access(SANDBOX_DIR);
-//   } catch {
-//     await fs.mkdir(SANDBOX_DIR, { recursive: true });
-//   }
-// };
 
-// Clean up sandbox files
-// const cleanupSandbox = async (filePath) => {
-//   try {
-//     await fs.unlink(filePath);
-//   } catch (error) {
-//     console.error('Error cleaning up sandbox:', error);
-//   }
-// };
+const ensureSandboxDir = async () => {
+  try {
+    await fs.access(SANDBOX_DIR);
+  } catch {
+    await fs.mkdir(SANDBOX_DIR, { recursive: true });
+  }
+};
 
-// Execute Python code
-// const executePythonCode = async (code, input = '') => {
-//   // Create unique file name
-//   const fileName = `code_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.py`;
-//   const filePath = path.join(SANDBOX_DIR, fileName);
 
-//   try {
-//     // Ensure sandbox directory exists
-//     await ensureSandboxDir();
+const cleanupSandbox = async (filePath) => {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    console.error('Error cleaning up sandbox:', error);
+  }
+};
 
-//     // Write code to file
-//     await fs.writeFile(filePath, code);
 
-//     // Execute code with input
-//     const { stdout, stderr } = await execAsync(`python ${filePath}`, {
-//       timeout: 5000,
-//       input: input
-//     });
+const executePythonCode = async (code, input = '') => {
+  // Create unique file name
+  const fileName = `code_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.py`;
+  const filePath = path.join(SANDBOX_DIR, fileName);
 
-//     return {
-//       output: stdout.trim(),
-//       error: stderr || null
-//     };
-//   } catch (error) {
-//     return {
-//       output: null,
-//       error: error.stderr || error.message
-//     };
-//   } finally {
-//     // Clean up
-//     await cleanupSandbox(filePath);
-//   }
-// };
+  try {
+    // Ensure sandbox directory exists
+    await ensureSandboxDir();
 
-// // Phương thức để xử lý yêu cầu chạy code
+    // Write code to file
+    await fs.writeFile(filePath, code);
+
+    // Execute code with input
+    const { stdout, stderr } = await execAsync(`python ${filePath}`, {
+      timeout: 5000,
+      input: input
+    });
+
+    return {
+      output: stdout.trim(),
+      error: stderr || null
+    };
+  } catch (error) {
+    return {
+      output: null,
+      error: error.stderr || error.message
+    };
+  } finally {
+    // Clean up
+    await cleanupSandbox(filePath);
+  }
+};
+
+
 const runCode = async (codeData) => {
   const { code, testCases } = codeData;
   
@@ -109,28 +107,25 @@ const runCode = async (codeData) => {
 };
 
 // Tạo bài học
-const createLesson = async (chapterId, data) => {
+const createLesson = async (chapterId, data, h5pFile) => {
   try {
     const chapter = await Chapter.findById(chapterId);
     if (!chapter) {
       throw new Error("Chương không tồn tại");
-    }
-
+    }s
     const newLesson = new Lesson({
       ...data,
-      chapterId
+      chapterId,
     });
 
     await newLesson.save();
 
-    // Thêm bài học vào chương
     if (!chapter.lessons) {
       chapter.lessons = [];
     }
     chapter.lessons.push(newLesson._id);
     await chapter.save();
 
-    // Cập nhật tổng số bài học trong chương
     await ChapterService.updateChapterLessonCount(chapterId);
 
     return newLesson;

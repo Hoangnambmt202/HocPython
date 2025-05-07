@@ -51,8 +51,12 @@ const validateTestCases = (testCases) => {
 // Tạo bài giảng mới và cập nhật Chapter
 const createLesson = async (req, res) => {
   try {
+    
     const { chapterId } = req.params;
-    const lesson = await LessonService.createLesson(chapterId, req.body);
+    const lessonData = req.body;
+  
+    const lesson = await LessonService.createLesson(chapterId, lessonData);
+
     res.status(201).json({ status: "success",message: "Tạo bài học thành công", data: lesson });
   } catch (error) {
     res.status(400).json({ status: "error", message: error.message });

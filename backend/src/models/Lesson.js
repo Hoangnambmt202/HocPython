@@ -11,6 +11,7 @@ const lessonSchema = new mongoose.Schema({
   order: { type: Number, required: true }, // Thứ tự bài học
   content: { type: String }, // Markdown cho lý thuyết
   videoUrl: { type: String }, // URL video
+ 
   codeSnippets: [{
     language: { type: String, default: "python" },
     code: { type: String },

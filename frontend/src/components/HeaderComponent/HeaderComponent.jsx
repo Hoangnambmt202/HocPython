@@ -1,38 +1,37 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import config from "../../configs/index";
 
 import Modal from "../ModalComponent/ModalComponent";
 import LoginFormComponent from "../LoginFormComponent/LoginFormComponent";
 import RegisterFormComponent from "../RegisterFormComponent/RegisterFormComponent";
 import CoursesMenu from "../CoursesMenu/CoursesMenu";
-import ProfileMenu from "../ProfileMenu/ProfileMenu"
+import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import NotificationList from "../NotificationList/NotificationList";
 import { Search, ShoppingBag } from "lucide-react";
-import {useDispatch, useSelector} from 'react-redux';
-import { logout,setUser } from "../../redux/slides/userSlides";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, setUser } from "../../redux/slides/userSlides";
 import UserService from "../../services/UserService";
 import CartPage from "../../pages/CartPage/CartPage";
 import { toggleCart } from "../../redux/slides/cartSlides";
 import EnrollService from "../../services/EnrollService";
 import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
 
-
-
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
-  const user = useSelector((state) => state.user.user);
+  const [showSearch, setShowSearch] = useState(false);
 
+  const user = useSelector((state) => state.user.user);
 
   const dispatch = useDispatch();
 
- 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await UserService.getDetailUser(); 
+        const res = await UserService.getDetailUser();
         if (res?.data) {
-          dispatch(setUser(res?.data)); 
+          dispatch(setUser(res?.data));
         }
       } catch (error) {
         console.error("Lỗi khi lấy user:", error);
@@ -44,23 +43,22 @@ const HeaderComponent = () => {
 
       try {
         const response = await EnrollService.allCourseEnroll();
-        const enrolledCourseIds = response.data.map(c => c.courseId._id);
+        const enrolledCourseIds = response.data.map((c) => c.courseId._id);
         dispatch(setEnrolledCourses(enrolledCourseIds));
       } catch (err) {
         console.error("Lỗi tải danh sách đã đăng ký:", err);
       }
     };
-    
+
     fetchUser();
     fetchEnrolled();
   }, []);
 
   const handleLoginSuccess = (userData) => {
-      dispatch(setUser(userData)); 
-      setIsOpen(false); // Đóng modal
-    
+    dispatch(setUser(userData));
+    setIsOpen(false); // Đóng modal
   };
-  
+
   const handleLogout = async () => {
     try {
       await UserService.logoutUser();
@@ -72,77 +70,129 @@ const HeaderComponent = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
-      <div className="container flex justify-between px-4 py-4 mx-auto lg:justify-between">
-        <Link to="/">
-          <div className="text-3xl font-Dosis font-bold text-orange-500">
-            HocPython
-          </div>
-        </Link>
+      <div className="container mx-auto flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* Logo */}
+        <div className="flex justify-between items-center">
+          <Link to={config.routes.home} className="flex items-center gap-2">
+            <div className="text-2xl sm:text-3xl font-Dosis font-bold text-orange-500">
+              HocPython
+            </div>
+          </Link>
+
+          {user ? (
+            <div className="flex items-center justify-end gap-4 xl:hidden lg:hidden md:hidden">
+              <button onClick={() => setShowSearch(!showSearch)}>
+                <Search
+                  className="text-gray-500"
+                  width="1.25rem"
+                  height="1.25rem"
+                />
+              </button>
+
+              <div className="hidden lg:block">
+                <button onClick={() => dispatch(toggleCart())}>
+                  <ShoppingBag className="text-gray-700" />
+                </button>
+              </div>
+              <NotificationList />
+              <ProfileMenu avatar={user?.avatar} handleLogout={handleLogout} />
+              <CartPage />
+            </div>
+          ) : (
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => {
+                  setModalType("register");
+                  setIsOpen(true);
+                }}
+                className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
+              >
+                Đăng ký
+              </button>
+              <button
+                onClick={() => {
+                  setModalType("login");
+                  setIsOpen(true);
+                }}
+                className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600"
+              >
+                Đăng nhập
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Search Bar */}
-        <div className="flex items-center px-4 search rounded-full border border-gray-600 w-[420px]">
-
-          <Search className="text-gray-500" width="1.25rem" height="1.25rem"/> 
-          <input
-            type="text"
-            className="pl-6 pr-4 py-2 flex-grow text-sm focus:outline-none"
-            placeholder="Tìm kiếm khóa học..."
-          />
-        </div>
+        {
+          showSearch && (
+            <div className="flex xl:hidden mt-2">
+            <div className="flex items-center w-full border border-gray-400 rounded-full px-4 py-2">
+              <Search className="text-gray-500" width="1.25rem" height="1.25rem" />
+              <input
+                type="text"
+                className="ml-2 w-full text-sm focus:outline-none"
+                placeholder="Tìm kiếm khóa học..."
+              />
+            </div>
+          </div>
+          )
+        }
+        
 
         {/* User Actions */}
         {user ? (
-          <div className="relative flex items-center gap-4 hover:cursor-pointer">
-            
-            <CoursesMenu/>
-             <button onClick={() => dispatch(toggleCart())}><ShoppingBag width="1.25rem" height="1.25rem"/></button>
-             <CartPage/>
-            <NotificationList/>
-            <ProfileMenu avatar={user?.avatar} handleLogout={handleLogout}/>
-
-            
+          <div className="xl:flex lg:flex md:flex items-center justify-end gap-4 hidden">
+            <CoursesMenu />
+            <div className="hidden lg:block">
+              <button onClick={() => dispatch(toggleCart())}>
+                <ShoppingBag className="text-gray-700" />
+              </button>
+            </div>
+            <NotificationList />
+            <ProfileMenu avatar={user?.avatar} handleLogout={handleLogout} />
+            <CartPage />
           </div>
         ) : (
-          <>
-            <ul className="flex items-center">
-              <li>
-                <button
-                  onClick={() => setModalType("register") || setIsOpen(true)}
-                  className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
-                >
-                  Đăng ký
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setModalType("login") || setIsOpen(true)}
-                  className="px-4 py-2 text-sm font-semibold bg-orange-500 text-white rounded-full hover:bg-orange-600"
-                >
-                  Đăng nhập
-                </button>
-              </li>
-            </ul>
-
-            <Modal
-              isOpen={isOpen}
-              setIsOpen={setIsOpen}
-              onClose={() => setIsOpen(false)}
-              
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={() => {
+                setModalType("register");
+                setIsOpen(true);
+              }}
+              className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
             >
-              {modalType === "login" ? (
-                <LoginFormComponent
-                  switchToRegister={() => setModalType("register")}
-                  setIsOpen={setIsOpen}
-                  onLoginSuccess={handleLoginSuccess}
-                />
-              ) : (
-                <RegisterFormComponent
-                  switchToLogin={() => setModalType("login")}
-                />
-              )}
-            </Modal>
-          </>
+              Đăng ký
+            </button>
+            <button
+              onClick={() => {
+                setModalType("login");
+                setIsOpen(true);
+              }}
+              className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600"
+            >
+              Đăng nhập
+            </button>
+          </div>
         )}
+
+        {/* Modal */}
+        <Modal
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          onClose={() => setIsOpen(false)}
+        >
+          {modalType === "login" ? (
+            <LoginFormComponent
+              switchToRegister={() => setModalType("register")}
+              setIsOpen={setIsOpen}
+              onLoginSuccess={handleLoginSuccess}
+            />
+          ) : (
+            <RegisterFormComponent
+              switchToLogin={() => setModalType("login")}
+            />
+          )}
+        </Modal>
       </div>
     </header>
   );

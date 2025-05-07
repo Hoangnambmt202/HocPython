@@ -48,7 +48,7 @@ const HomePage = () => {
               </select>
             </div>
             <div className="category text-2xl font-bold">Khóa học Miễn phí</div>
-            <div className="grid grid-cols-4 gap-4 ">
+            <div className="grid xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-2 gap-4 ">
               {
                 courses.some((course) => course.price === 0) ? (
                   courses.map((course) => {
@@ -90,8 +90,8 @@ const HomePage = () => {
                   })
 
                 ): (
-                  <p className="border w-full border-blue-400 bg-blue-500 text-center text-white text-base rounded">
-                    Hiện tại chưa có khóa học nào!
+                  <p className=" w-full text-center text-black text-base ">
+                    Đang tải khóa học ...
                   </p>
                 )
               }

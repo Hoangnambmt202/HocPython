@@ -6,6 +6,8 @@ import EnrollService from "../../services/EnrollService";
 import ProgressService from "../../services/ProgressService";
 import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
 import { setAllCourseProgress } from "../../redux/slides/progressSlice";
+import routeConfig from "../../configs/routes";
+
 const CoursesMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
@@ -60,7 +62,7 @@ const CoursesMenu = () => {
 
   return (
     <div className="relative">
-      <button className="relative px-4 py-2 text-sm font-semibold text-black hover:text-blue-500" onClick={() => setIsOpen(true)}>
+      <button className="relative xs:hidden px-4 py-2 text-sm font-semibold text-black hover:text-blue-500" onClick={() => setIsOpen(true)}>
         Khóa học của tôi
       </button>
 
@@ -121,7 +123,7 @@ const CoursesMenu = () => {
             </div>
             
             <div className="p-4 border-t border-gray-100">
-              <Link to="/my-courses"
+              <Link to={routeConfig.myCourses}
                 className="w-full px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
               >
                 Xem tất cả khóa học

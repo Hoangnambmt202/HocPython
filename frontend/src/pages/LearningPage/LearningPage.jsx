@@ -291,7 +291,7 @@ const LearningPage = () => {
             onProgress={handleVideoProgress}
             onVideoComplete={handleVideoComplete}
           />
-          
+     
 
           <div className="mt-4">
             <div className="w-full bg-gray-200 rounded-full h-2.5">

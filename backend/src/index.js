@@ -25,6 +25,9 @@ app.use(cookieParser());
 routes(app);
 const path = require("path");
 
+// Serve nội dung .h5p
+app.use('/storage', express.static(path.join(__dirname, 'storage')));
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {

@@ -1,7 +1,12 @@
 import axios from "axios";
 
 const createLesson = async (chapterId, lessonData) => {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/lessons/${chapterId}/create`, lessonData , {withCredentials: true})
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/lessons/${chapterId}/create`, lessonData ,{
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     return res.data
 }
 const getAllLessons = async () => {
@@ -13,7 +18,12 @@ const getLessonByChapter = async (chapterId) => {
     return res.data
 }
 const updateLesson =  async (id, data) => {
-    const res = await axios.put(`${import.meta.env.VITE_API_URL}/lessons/update/${id}`, data, {withCredentials: true})
+    const res = await axios.put(`${import.meta.env.VITE_API_URL}/lessons/update/${id}`, data, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     return res.data
 }
 const deleteLesson =  async (id) => {

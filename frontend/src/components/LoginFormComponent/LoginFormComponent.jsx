@@ -16,7 +16,7 @@ import UserService from "../../services/UserService";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import InputFormComponent from "../InputFormComponent/InputFormComponent";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
-
+import routeConfig from "../../configs/routes";
 // eslint-disable-next-line react/prop-types
 const LoginFormComponent = ({ switchToRegister, setIsOpen, onLoginSuccess }) => {
   const MENU_ITEMS = [

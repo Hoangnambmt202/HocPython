@@ -4,7 +4,8 @@ const LessonController = require('../controllers/LessonController');
 const {authMiddleware} = require('../middleware/authMiddleWare');
 
 
-router.post("/:chapterId/create", authMiddleware, LessonController.createLesson);
+
+router.post("/:chapterId/create", authMiddleware ,LessonController.createLesson);
 router.get('/all',authMiddleware, LessonController.getAllLessons);
 router.get('/:chapterId',authMiddleware, LessonController.getLessonsByChapter);
 router.put('/update/:lessonId', authMiddleware, LessonController.updateLesson);

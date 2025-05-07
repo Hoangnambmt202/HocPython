@@ -58,34 +58,34 @@ const loginUser = async (req, res) => {
     const response = await UserService.loginUser(req.body);
     const { access_token, refresh_token, ...userData } = response;
 
-    res.cookie('access_token', access_token, {
-      httpOnly: true, 
-      secure:  true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      domain: '.hocpython-backend.onrender.com' 
-    });
-    res.cookie('refresh_token',refresh_token,{
-      httpOnly: true, 
-      secure:  true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      domain: '.hocpython-backend.onrender.com' 
-    });
     // res.cookie('access_token', access_token, {
-    //     httpOnly: true, 
-    //     secure:  false,
-    //     sameSite: 'Strict',
-    //     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-    //     // domain: '.hocpython-backend.onrender.com' 
-    //   });
-    //   res.cookie('refresh_token',refresh_token,{
-    //     httpOnly: true, 
-    //     secure:  false,
-    //     sameSite: 'Strict',
-    //     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-    //     // domain: '.hocpython-backend.onrender.com' 
-    //   });
+    //   httpOnly: true, 
+    //   secure:  true,
+    //   sameSite: 'none',
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    //   domain: '.hocpython-backend.onrender.com' 
+    // });
+    // res.cookie('refresh_token',refresh_token,{
+    //   httpOnly: true, 
+    //   secure:  true,
+    //   sameSite: 'none',
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    //   domain: '.hocpython-backend.onrender.com' 
+    // });
+    res.cookie('access_token', access_token, {
+        httpOnly: true, 
+        secure:  false,
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+        // domain: '.hocpython-backend.onrender.com' 
+      });
+      res.cookie('refresh_token',refresh_token,{
+        httpOnly: true, 
+        secure:  false,
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+        // domain: '.hocpython-backend.onrender.com' 
+      });
      return res.status(200).json(response);
 
 

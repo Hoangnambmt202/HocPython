@@ -31,37 +31,39 @@ import CategoriesManagement from "../pages/Admin/CategoriesManagement";
 import ChaptersManagement from "../pages/Admin/ChaptersManagement";
 import NotificationPage from "../pages/NotificationPage/NotificationPage";
 import AdminNotificationPage from "../pages/Admin/AdminNotificationPage";
+
+import routeConfig from "../configs/routes";
 const routes = [
   {
    
     layout: MainLayout,
     children:[
       {
-        path: "/",
+        path: routeConfig.home,
         page: HomePage
       },
       {
-        path: "/profile",
+        path: routeConfig.profile,
         page: ProfilePage,
       },
       {
-        path: "/my-courses",
+        path: routeConfig.myCourses,
         page: MyCoursesPage,
       },
       {
-        path: "/cart",
+        path: routeConfig.cart,
         page: CartPage,
       },
       {
-        path: "/order/payment",
+        path: routeConfig.payment,
         page: PaymentPage,
       },
       {
-        path: "/order/checkout",
+        path: routeConfig.checkout,
         page: CheckoutPage,
       },
       {
-        path: "/notifications",
+        path: routeConfig.notifications,
         page: NotificationPage,
       }
     ]

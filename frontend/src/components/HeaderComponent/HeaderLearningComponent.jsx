@@ -8,6 +8,7 @@ import CourseService from "../../services/CourseService";
 import { setCourseDetail } from "../../redux/slides/coursesSlices";
 import ProgressService from "../../services/ProgressService";
 import { updateCourseProgress } from "../../redux/slides/progressSlice";
+import routeConfig from "../../configs/routes";
 
 const HeaderLearningComponent = () => {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const HeaderLearningComponent = () => {
     if (window.history.length > 2) {
       navigate(-1);
     } else {
-      navigate("/");
+      navigate(routeConfig.home);
     }
   };
 
@@ -80,7 +81,7 @@ const HeaderLearningComponent = () => {
           <button onClick={goBack} className="flex justify-center py-3 px-4 text-white hover:bg-slate-800">
             <ChevronLeft size={20} />
           </button>
-          <Link to="/">
+          <Link to={routeConfig.home}>
             <div className="text-3xl font-Dosis font-bold text-orange-500">
               HocPython
             </div>

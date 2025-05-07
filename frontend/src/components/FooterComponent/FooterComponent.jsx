@@ -4,7 +4,7 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 const FooterComponent = () => {
   return (
     <footer className="py-12 bg-gray-100 border-t-2 border-gray-500 shadow-xl ">
-      <div className="container grid gap-8 px-4 mx-auto  md:grid-cols-4 mb-8">
+      <div className="container grid gap-8 px-4 mx-auto xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-4 grid-cols-2 mb-8">
         <div className="">
           <h1 className="text-3xl font-Dosis text-orange-500  font-bold">HocPython</h1>
           <p className="text-gray-500">Học lập trình online</p>
