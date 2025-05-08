@@ -46,7 +46,7 @@ const MyCoursesPage = () => {
             </div>
           </header>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
             {enrolledCourses.map((course) => {
                const progressData = allCourseProgress[course.courseId?._id] || {
                 progress: 0,
@@ -60,7 +60,7 @@ const MyCoursesPage = () => {
                   className="card bg-gray-100 flex flex-col rounded-lg shadow-md"
                 >
                   <img
-                    src={course.image}
+                    src={course.courseId?.thumbnail}
                     alt={`Course ${course.courseId?.title}`}
                     className="w-full h-32 object-cover rounded-t-lg"
                   />
@@ -71,7 +71,7 @@ const MyCoursesPage = () => {
                     <p>{course.price > 0 ? `Giá: ${course.price} VNĐ` : "Miễn phí"}</p>
                   </div>
                   <div className="p-2">
-                    <ProgressBar progress={progressData.progress} />
+                    <ProgressBar progress={progressData.progress} completedLessons={progressData.completedLessons} totalLessons={progressData.totalLessons} />
                   </div>
                   <div className="flex justify-between items-center p-2 border-t">
                     <span className="text-sm flex gap-1 items-center text-gray-500">

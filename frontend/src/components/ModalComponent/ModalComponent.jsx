@@ -3,15 +3,16 @@ import styles from "./Modal.module.scss";
 import { X } from "lucide-react";
 
 // eslint-disable-next-line react/prop-types
-const Modal = ({ isOpen, onClose, children, title }) => {
+const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={styles["modal-overlay"]}>
-      <div className={`${styles["modal-container"]} ${styles["modal-open"]}`}>
+    <div className="fixed top-0 bottom-0 right-0 left-0 !mt-0 inset-0 z-50 flex items-center justify-center">
+
+      <div className={`${styles["modal-container"]} ${styles["modal-open"]} `}>
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">{title}</h2>
+        <div className="flex justify-end items-center">
+        
             <button onClick={onClose} className={styles["close-btn"]}>
               <X />
             </button>
@@ -21,6 +22,8 @@ const Modal = ({ isOpen, onClose, children, title }) => {
         {/* Body */}
         <div className={styles["modal-body"]}>{children}</div>
       </div>
+    <div className={styles["modal-overlay"]}>
+    </div>
     </div>
   );
 };

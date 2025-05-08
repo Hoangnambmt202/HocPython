@@ -7,6 +7,7 @@ import ProgressService from "../../services/ProgressService";
 import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
 import { setAllCourseProgress } from "../../redux/slides/progressSlice";
 import routeConfig from "../../configs/routes";
+import ProgressBar from "../ProgressBar/ProgressBar";
 
 const CoursesMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -99,22 +100,9 @@ const CoursesMenu = () => {
                         <p className="text-xs text-gray-500 mb-2"></p>
                         
                         {/* Progress Bar */}
-                        <div className="w-full">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs text-gray-500">
-                              {progress.completedLessons}/{progress.totalLessons} bài học
-                            </span>
-                            <span className="text-xs font-medium text-orange-500">
-                              {progress.progress}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className="bg-orange-500 h-1.5 rounded-full transition-all duration-300"
-                              style={{ width: `${progress.progress}%` }}
-                            />
-                          </div>
-                        </div>
+                        <ProgressBar progress={progress.progress} completedLessons={
+                          progress.completedLessons} totalLessons={progress.totalLessons}/>
+                      
                       </div>
                     </div>
                   </Link>

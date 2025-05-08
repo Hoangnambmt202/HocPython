@@ -30,6 +30,7 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
           <li>
             <Link
               to={config.routes.profile}
+              onClick={() => setIsProfileOpen(false)}
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               <User className="mr-2" />
@@ -39,6 +40,7 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
           <li>
             <Link
               to={config.routes.myCourses}
+              onClick={() => setIsProfileOpen(false)}
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               <BookCheck className="mr-2" />
@@ -49,6 +51,7 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
           <li>
             <Link
               to="/saved-posts"
+              onClick={() => setIsProfileOpen(false)}
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               <BookMarked className="mr-2" />
@@ -58,6 +61,7 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
           <li>
             <Link
               to="/settings"
+              onClick={() => setIsProfileOpen(false)}
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               <Settings className="mr-2" />
@@ -67,6 +71,7 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
           <li>
             <Link
               to="/support"
+              onClick={() => setIsProfileOpen(false)}
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               <MessageCircleQuestion className="mr-2" />
@@ -75,7 +80,12 @@ const ProfileMenu = ({ avatar, handleLogout }) => {
           </li>
           <li>
             <button
-              onClick={handleLogout}
+              onClick={
+                () => {
+                  handleLogout();
+                  setIsProfileOpen(false);
+                }
+              }
               className="flex w-full text-left items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
             >
               <LogOut className="mr-2" />
