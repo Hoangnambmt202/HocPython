@@ -6,6 +6,8 @@ const config = require('../config/config');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
+const fs = require('fs').promises;
+const path = require('path');
 const ChapterService = require("./ChapterService");
 
 
@@ -17,7 +19,7 @@ const codeExecutionQueue = new Queue('code-execution', {
 });
 
 
-// const SANDBOX_DIR = path.join(process.cwd(), 'temp');
+const SANDBOX_DIR = path.join(process.cwd(), 'temp');
 
 
 const ensureSandboxDir = async () => {

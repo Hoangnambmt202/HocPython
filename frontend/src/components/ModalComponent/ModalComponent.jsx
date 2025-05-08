@@ -9,7 +9,7 @@ const Modal = ({ isOpen, onClose, children }) => {
   return (
     <div className="fixed top-0 bottom-0 right-0 left-0 !mt-0 inset-0 z-50 flex items-center justify-center">
 
-      <div className={`${styles["modal-container"]} ${styles["modal-open"]} `}>
+      <div className={`${styles["modal-container"]} ${styles["modal-open"]} scrollbar-hide `}>
         {/* Header */}
         <div className="flex justify-end items-center">
         

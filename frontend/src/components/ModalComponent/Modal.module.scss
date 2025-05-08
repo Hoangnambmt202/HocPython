@@ -5,11 +5,11 @@
   .modal-container { 
     @apply bg-slate-100 rounded-xl shadow-lg lg:p-6 md:p-6 p-6 md:min-w-[500px] lg:min-w-[500px] xl:min-w-[500px] absolute top-16 z-[100];
     max-width: 80%;
-    max-height: 560px;
+    max-height: 500px;
     transform: scale(0);
     opacity: 0;
     transition: transform 0.2s ease-out, opacity 0.3s ease-out;
-   
+    overflow-y: auto ;
    
   }
   @keyframes ScaleIn {

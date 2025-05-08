@@ -22,6 +22,7 @@
   import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
   import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
   import { setUser } from "../../redux/slides/userSlides";
+import ProgressBar from "../../components/ProgressBar/ProgressBar";
 
   const ProfilePage = () => {
     const savedArticles = [
@@ -29,7 +30,8 @@
       { id: 2, title: "Article 2", description: "Description of article 2" },
       // Add more articles as needed
     ];
-
+    
+    
     const user = useSelector((state) => state.user.user);
     const enrolledCourses = useSelector(
       (state) => state.enrollment.enrolledCourses
@@ -40,6 +42,7 @@
     const [toast, setToast] = useState({ show: false, message: "", color: "" });
     const [modalOpen, setModalOpen] = useState(false);
     const [editedData, setEditedData] = useState({});
+    const [sortOption, setSortOption] = useState("latest");
     const dispatch = useDispatch();
 
     const mutation = useMutation({
@@ -79,6 +82,7 @@
         });
       },
     });
+    
 
     const handleAvatarChange = (e) => {
       const file = e.target.files[0];
@@ -109,6 +113,7 @@
       avatarMutation.mutate(file);
       
     };
+    
 
     const handleModalEdit = () => {
       setModalOpen(true);
@@ -299,7 +304,7 @@
                         <>
                           <div className="mb-8 flex flex-col items-center">
                             <img
-                              src={user.avatar}
+                              src={user?.avatar}
                               alt={`User Avatar ${user.name}`}
                               className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
                             />
@@ -648,15 +653,15 @@
                     </p>
                   </div>
                   <div className="mt-4 md:mt-0">
-                    <select className="w-full md:w-auto border p-2 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    <select className="w-full md:w-auto border p-2 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
                       <option value="latest">Mới nhất</option>
-                      <option value="popular">Phổ biến</option>
+                      <option value="oldest">Cũ nhất</option>
                       <option value="free">Miễn phí</option>
                     </select>
                   </div>
                 </header>
 
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 grid-cols-2  gap-4 mb-4">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 grid-cols-2  gap-4 mb-4">
                   {enrolledCourses && enrolledCourses.length > 0 ? (
                     enrolledCourses.map((enrollment) => {
                       const course = enrollment.courseId;
@@ -683,22 +688,11 @@
                             <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                               {course?.description}
                             </p>
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-sm text-gray-600">
-                                <span>Tiến độ</span>
-                              
-                                <span>{progressPercentage}%</span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                  style={{ width: `${progressPercentage}%` }}
-                                />
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {completedLessons}/{totalLessons} bài học
-                              </div>
-                            </div>
+                            <ProgressBar
+                              progress={progressPercentage}
+                              completedLessons={completedLessons}
+                              totalLessons={totalLessons}
+                            />
                             <Link
                               to={`/course/${course?.slug}/learn`}
                               className="mt-4 block text-center py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"

@@ -115,9 +115,9 @@ const runCode = async (req, res) => {
   try {
     const { code, testCases, lessonId } = req.body;
     
-    console.log('=== Request Debug ===');
-    console.log('Received code:', code);
-    console.log('Test cases:', JSON.stringify(testCases, null, 2));
+    // console.log('=== Request Debug ===');
+    // console.log('Received code:', code);
+    // console.log('Test cases:', JSON.stringify(testCases, null, 2));
     
     // Validate input
     if (!code || !testCases || !lessonId) {
