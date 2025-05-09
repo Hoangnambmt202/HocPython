@@ -6,9 +6,13 @@ const config = require('../config/config');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
-const fs = require('fs').promises;
+const fs = require('fs-extra');
+
 const path = require('path');
 const ChapterService = require("./ChapterService");
+const unzipper = require("unzipper");
+const util = require("util");
+
 
 
 const codeExecutionQueue = new Queue('code-execution', {
@@ -109,15 +113,18 @@ const runCode = async (codeData) => {
 };
 
 // Tạo bài học
-const createLesson = async (chapterId, data, h5pFile) => {
+const createLesson = async (chapterId, data) => {
   try {
+    
     const chapter = await Chapter.findById(chapterId);
     if (!chapter) {
       throw new Error("Chương không tồn tại");
-    }s
+    }
+    
     const newLesson = new Lesson({
       ...data,
       chapterId,
+
     });
 
     await newLesson.save();

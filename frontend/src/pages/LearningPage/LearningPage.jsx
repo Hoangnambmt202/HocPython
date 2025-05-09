@@ -49,6 +49,20 @@ const LearningPage = () => {
   const [videoProgress, setVideoProgress] = useState(0);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
+  // Load h5p resizer script when needed
+  useEffect(() => {
+    if (currentLesson?.lesson?.h5pUrl) {
+      const script = document.createElement('script');
+      script.src = "https://app.Lumi.education/api/v1/h5p/core/js/h5p-resizer.js";
+      script.charset = "UTF-8";
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [currentLesson?.lesson?.h5pUrl]);
+
   // Load progress
   const loadProgress = async () => {
     try {
@@ -81,6 +95,10 @@ const LearningPage = () => {
       setIsLoadingProgress(false);
     }
   };
+  speechSynthesis.getVoices().forEach(v => {
+  console.log(v.name, v.lang);
+});
+
 
   // Load course content và progress ban đầu
   useEffect(() => {
@@ -151,6 +169,9 @@ const LearningPage = () => {
     };
 
     fetchCourseAndProgress();
+    if (window.speechSynthesis.getVoices().length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {};
+  }
   }, [dispatch, slug]);
 
   // Thêm useEffect để reload progress mỗi khi component mount
@@ -278,78 +299,171 @@ const LearningPage = () => {
     }
   };
 
+  // Handle H5P completion
+  const handleH5PComplete = async () => {
+    if (currentLesson && currentLesson.lesson.h5pUrl) {
+      // Check if lesson is already completed
+      const isLessonCompleted =
+        lessonProgress[slug]?.[currentLesson.lesson._id]?.completed;
+
+      // Only update if not completed
+      if (!isLessonCompleted) {
+        await updateProgress(currentLesson.lesson._id, true);
+      }
+    }
+  };
+  const stripHtmlTags = (html) => {
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || "";
+};
+const speakText = (htmlString) => {
+
+  const text = stripHtmlTags(htmlString);
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "vi-VN";
+
+  // Chọn voice tiếng Việt (nếu có)
+  const voices = speechSynthesis.getVoices();
+  const vietnameseVoice = voices.find(voice => voice.lang === "vi-VN");
+
+  if (vietnameseVoice) {
+    utterance.voice = vietnameseVoice;
+  }
+
+  speechSynthesis.cancel(); // dừng đoạn đang đọc nếu có
+  speechSynthesis.speak(utterance);
+};
+
+
+
+
   const renderLessonContent = () => {
     if (!currentLesson)
       return <p className="text-center text-gray-500">Vui lòng chọn bài học</p>;
     const { lesson } = currentLesson;
-
-    if (lesson.type === "video") {
-      return (
-        <div>
-          <YouTubePlayer 
-            url={lesson.videoUrl} 
-            onProgress={handleVideoProgress}
-            onVideoComplete={handleVideoComplete}
+ if (lesson.type === "video") {
+      if(lesson.h5pUrl) {
+        return (
+          <div className="h5p-container">
+          <iframe 
+            src={lesson.h5pUrl}
+            width="100%" 
+            height="720" 
+            frameBorder="0"
+            allowFullScreen="allowfullscreen"
+            allow="geolocation *; microphone *; camera *; midi *; encrypted-media *"
+            onLoad={() => {
+              // Add event listener for H5P completion if possible
+              // This depends on how your H5P implementation works
+              // You might need to handle this differently
+              window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'h5p-content-completed') {
+                  handleH5PComplete();
+                }
+              });
+            }}
           />
-     
-
+          
+          {/* H5P completion UI - you may want to improve this based on your needs */}
           <div className="mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div
-                className="bg-blue-600 h-2.5 rounded-full"
-                style={{ width: `${videoProgress}%` }}
-              ></div>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Tiến độ xem: {Math.round(videoProgress)}%
-              {videoProgress >= 80 &&
-                !lessonProgress[slug]?.[lesson._id]?.completed &&
-                " - Bạn đã hoàn thành bài học này!"}
+            <p className="text-sm text-gray-600">
+              {lessonProgress[slug]?.[lesson._id]?.completed 
+                ? "✅ Bạn đã hoàn thành bài học này!" 
+                : "Hãy hoàn thành hoạt động để đánh dấu bài học này!"}
             </p>
+            {!lessonProgress[slug]?.[lesson._id]?.completed && (
+              <button
+                onClick={() => updateProgress(lesson._id, true)}
+                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Đánh dấu đã hoàn thành
+              </button>
+            )}
           </div>
         </div>
-      );
+        )
+      }
+      else {
+        
+        return (
+          <div>
+            <YouTubePlayer 
+              url={lesson.videoUrl} 
+              onProgress={handleVideoProgress}
+              onVideoComplete={handleVideoComplete}
+            />
+  
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full"
+                  style={{ width: `${videoProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                Tiến độ xem: {Math.round(videoProgress)}%
+                {videoProgress >= 80 &&
+                  !lessonProgress[slug]?.[lesson._id]?.completed &&
+                  " - Bạn đã hoàn thành bài học này!"}
+              </p>
+            </div>
+            
+          </div>
+        );
+      }
     } else if (lesson.type === "practice") {
       return (
         <>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Bài tập:</h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <CodeEditor
-                value={lesson.practice?.initialCode}
-                readOnly={true}
-                language="python"
-              />
+        <div>
+          <div className="flex gap-2 items-center mb-4">
+
+            <div className="mb-4 flex-1">
+              <h3 className="text-lg font-semibold mb-2">Bài tập:</h3>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <CodeEditor
+                  value={lesson.practice?.initialCode}
+                  readOnly={true}
+                  language="python"
+                />
+              </div>
+            </div>
+
+            <div className="mb-4 flex-1">
+              <h3 className="text-lg font-semibold mb-2">Viết code của bạn:</h3>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 ">
+                <CodeEditor
+                  value={userCode}
+                  onChange={(value) => setUserCode(value)}
+                  language="python"
+                />
+
+                
+              </div>
             </div>
           </div>
-
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-2">Viết code của bạn:</h3>
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
-              <CodeEditor
-                value={userCode}
-                onChange={(value) => setUserCode(value)}
-                language="python"
-              />
-
-              <div className="mt-4 flex flex-col gap-2">
-                <button
-                  onClick={handleRunCode}
-                  disabled={isSubmitting}
-                  className={`px-4 py-2 rounded ${
-                    isSubmitting
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600"
-                  } text-white`}
-                >
-                  {isSubmitting ? "Đang chạy..." : "Chạy thử"}
-                </button>
-
-                {jobStatus && (
+        {jobStatus && (
                   <div className="text-sm text-gray-600">{jobStatus}</div>
                 )}
 
+                  <div className="mt-4 flex flex-col gap-2">
+                  <button
+                    onClick={handleRunCode}
+                    disabled={isSubmitting}
+                    className={`px-4 py-2 rounded ${
+                      isSubmitting
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-600"
+                    } text-white`}
+                  >
+                    {isSubmitting ? "Đang chạy..." : "Chạy thử"}
+                  </button>
+
+                  
+                </div>
                 {testResults.length > 0 && (
+                  <>
                   <div className="mt-4">
                     <h3 className="font-bold mb-2">Kết quả kiểm tra:</h3>
                     <div
@@ -435,21 +549,33 @@ const LearningPage = () => {
                       </div>
                     ))}
                   </div>
+                  </>
                 )}
-              </div>
-            </div>
-          </div>
+        </div>
         </>
       );
     } else {
-      const clearContent = DOMPurify.sanitize(lesson.content || "");
-      return (
-        <div
-          className="prose prose-lg prose-gray max-w-none"
-          dangerouslySetInnerHTML={{ __html: clearContent }}
-        />
-      );
-    }
+  const clearContent = DOMPurify.sanitize(lesson.content || "");
+  return (
+    <div>
+      <div
+        className="prose prose-lg prose-gray max-w-none"
+        dangerouslySetInnerHTML={{ __html: clearContent }}
+      />
+      
+      {/* Nút nghe nội dung */}
+      <div className="mt-4">
+        <button
+          onClick={() => speakText(lesson.content)}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          🔊 Nghe nội dung
+        </button>
+      </div>
+    </div>
+  );
+}
+
   };
 
   const handleRunCode = async () => {

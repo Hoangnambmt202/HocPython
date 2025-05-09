@@ -10,8 +10,8 @@ const lessonSchema = new mongoose.Schema({
   },
   order: { type: Number, required: true }, // Thứ tự bài học
   content: { type: String }, // Markdown cho lý thuyết
-  videoUrl: { type: String }, // URL video
- 
+  videoUrl: { type: String, default: null }, // URL video youtube hoặc video khác
+  h5pUrl: { type: String, default: null }, // URL H5P
   codeSnippets: [{
     language: { type: String, default: "python" },
     code: { type: String },
@@ -24,7 +24,9 @@ const lessonSchema = new mongoose.Schema({
       input: String,
       expectedOutput: String 
     }]
-  }
+  },
+  duration: { type: Number, default: 0 }, // Thời gian học (phút),
+  
 }, { timestamps: true });
 
 const Lesson = mongoose.model("Lesson", lessonSchema);

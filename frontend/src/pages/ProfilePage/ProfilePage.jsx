@@ -298,7 +298,15 @@ import ProgressBar from "../../components/ProgressBar/ProgressBar";
                   title="Chỉnh sửa thông tin"
                   onClose={() => setModalOpen(false)}
                 >
+               
                   <div className="w-full p-4 scrollbar-hide">
+                  {toast.show && (
+            <ToastMessageComponent
+              message={toast.message}
+              color={toast.color}
+              onClose={() => setToast({ ...toast, show: false })}
+            />
+          )}
                     <form className="">
                       {isEditing ? (
                         <>

@@ -18,9 +18,10 @@ const CodeEditor = ({ value, onChange, readOnly = false, language = 'python' }) 
   };
 
   return (
-    <div className="h-[300px] border border-gray-300 rounded-lg overflow-hidden">
+    <div className="h-[200px] border border-gray-300 rounded-lg overflow-hidden">
       <Editor
-        height="100%"
+        height="200px"
+        width="300px"
         defaultLanguage={language}
         defaultValue={value}
         // theme={isDarkMode ? 'vs-dark' : 'light'}

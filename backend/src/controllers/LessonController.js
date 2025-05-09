@@ -54,8 +54,10 @@ const createLesson = async (req, res) => {
     
     const { chapterId } = req.params;
     const lessonData = req.body;
-  
-    const lesson = await LessonService.createLesson(chapterId, lessonData);
+    const h5pFile = req.file;
+    console.log("Uploaded file:", req.file);
+
+    const lesson = await LessonService.createLesson(chapterId, lessonData, h5pFile);
 
     res.status(201).json({ status: "success",message: "Tạo bài học thành công", data: lesson });
   } catch (error) {

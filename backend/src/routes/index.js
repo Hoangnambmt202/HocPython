@@ -9,6 +9,7 @@ const progressRouter = require('../routes/Progress');
 const notificationRoutes = require('../routes/Notification');
 const cloudinaryRoutes = require('../routes/Cloudinary');
 
+
 const routes = (app) => {
 
    app.use('/api/user',userRouter)
@@ -21,6 +22,7 @@ const routes = (app) => {
    app.use('/api/quiz',quizRouter)
    app.use('/api/notifications', notificationRoutes);
    app.use('/api/cloudinary', cloudinaryRoutes);
+   
 
 
 }

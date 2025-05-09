@@ -17,17 +17,19 @@ const LessonManagement = () => {
   const [showForm, setShowForm] = useState(false);
 
 
-  // Form state với đầy đủ trường dữ liệu
-  const [formData, setFormData] = useState({
-    title: "",
-    type: "theory",
-    order: 0,
-    content: "",
-    videoUrl: "",
-    chapterId: "",
-    codeSnippets: [],
-    practice: { initialCode: "", testCases: [] },
-  });
+// Form state với đầy đủ trường dữ liệu
+const [formData, setFormData] = useState({
+  title: "",
+  type: "theory",
+  order: 0,
+  content: "",
+  videoUrl: "",
+  h5pUrl: "",
+  h5pFile: null,
+  useH5p: false,
+  chapterId: "",
+  practice: { initialCode: "", testCases: [] },
+});
 
   // Lấy danh sách bài học theo chapter
   useEffect(() => {
@@ -58,37 +60,7 @@ const LessonManagement = () => {
     fetchAllLessons();
   }, []);
 
-  // Xử lý thêm/chỉnh sửa bài học
-  // const handleSubmit = async () => {
-  //   try {
-      
-  //     if (editLesson) {
-  //       const id = editLesson._id;
-  //       const updated = await LessonService.updateLesson(id, formData);
-  //       const res = await LessonService.getAllLessons();
-  //       setLessons(res.data);
-  //       setToast({ show: true, color: "green", message: updated.message });
-  //     } else {
-  //       const chapterId = formData.chapterId;
-  //       const newLesson = await LessonService.createLesson(chapterId, formData);
-  //       const res = await LessonService.getAllLessons();
-  //       setLessons(res.data);
 
-  //       setToast({ show: true, color: "green", message: newLesson.message });
-  //     }
-  //     resetForm();
-
-
-
-
-  //   } catch (error) {
-  //     setToast({
-  //       show: true,
-  //       color: "red",
-  //       message: error.message || "Có lỗi xảy ra",
-  //     });
-  //   }
-  // };
   const handleSubmit = async () => {
     try {
       const data = new FormData();
@@ -98,18 +70,17 @@ const LessonManagement = () => {
       data.append("content", formData.content);
       data.append("videoUrl", formData.videoUrl);
       data.append("chapterId", formData.chapterId);
-      data.append("h5pFile", formData.h5pFile); 
-  
-      data.append("codeSnippets", JSON.stringify(formData.codeSnippets));
+      data.append("h5pUrl", formData.h5pUrl)
+      data.append("h5pFile", formData.h5pFile);
       data.append("practice", JSON.stringify(formData.practice));
-  
+
       let response;
       if (editLesson) {
         response = await LessonService.updateLesson(editLesson._id, data);
       } else {
         response = await LessonService.createLesson(formData.chapterId, data);
       }
-  
+
       setToast({ show: true, color: "green", message: response.message });
       const res = await LessonService.getAllLessons();
       setLessons(res.data);
@@ -122,7 +93,6 @@ const LessonManagement = () => {
       });
     }
   };
-  
 
   const handleDelete = async (lessonId) => {
     const response = await LessonService.deleteLesson(lessonId);
@@ -131,58 +101,78 @@ const LessonManagement = () => {
   };
 
   // Reset form
-  const resetForm = () => {
-    setFormData({
-      title: "",
-      type: "theory",
-      order: lessons.length + 1,
-      content: "",
-      videoUrl: "",
-      chapterId: chapters.length > 0 ? chapters[0]._id : "",
-      codeSnippets: [],
-      practice: { initialCode: "", testCases: [] },
-    });
-    setEditLesson(null);
-    setShowForm(false);
-  };
+const resetForm = () => {
+  setFormData({
+    title: "",
+    type: "theory",
+    order: lessons.length + 1,
+    content: "",
+    videoUrl: "",
+    h5pUrl: "",
+    h5pFile: null,
+    useH5p: false,
+    chapterId: chapters.length > 0 ? chapters[0]._id : "",
+    practice: { initialCode: "", testCases: [] },
+  });
+  setEditLesson(null);
+  setShowForm(false);
+};
 
-  // Xử lý edit bài học
-  const handleEdit = (lesson) => {
-    setFormData({
-      title: lesson.title,
-      type: lesson.type,
-      order: lesson.order,
-      content: lesson.content,
-      videoUrl: lesson.videoUrl,
-      chapterId:
-        lesson.chapterId || (chapters.length > 0 ? chapters[0]._id : ""),
-      codeSnippets: lesson.codeSnippets,
-      practice: lesson.practice,
-    });
-    setEditLesson(lesson);
-    setShowForm(true);
-  };
+  /// Xử lý edit bài học
+const handleEdit = (lesson) => {
+  setFormData({
+    title: lesson.title,
+    type: lesson.type,
+    order: lesson.order,
+    content: lesson.content,
+    videoUrl: lesson.videoUrl || "",
+    h5pUrl: lesson.h5pUrl || "",
+    useH5p: !!lesson.h5pUrl, // Đặt useH5p thành true nếu có h5pUrl
+    h5pFile: null, // Không thể lấy lại file đã tải lên
+    chapterId: lesson.chapterId || (chapters.length > 0 ? chapters[0]._id : ""),
+    practice: lesson.practice || { initialCode: "", testCases: [] },
+  });
+  setEditLesson(lesson);
+  setShowForm(true);
+};
 
-  // Render nội dung theo loại bài học
-  const renderContent = (lesson) => {
-    switch (lesson.type) {
-      case "video":
+ // Render nội dung theo loại bài học
+const renderContent = (lesson) => {
+  switch (lesson.type) {
+    case "video":
+      if (lesson.h5pUrl) {
+        return (
+          <div>
+            <div className="mb-2 text-sm text-gray-600">H5P Interactive Video</div>
+            <iframe 
+              src={lesson.h5pUrl} 
+              width="100%" 
+              height="400" 
+              frameBorder="0" 
+              allowFullScreen
+              title="Interactive Content"
+            ></iframe>
+          </div>
+        );
+      } else {
         return (
           <>
+            <div className="mb-2 text-sm text-gray-600">YouTube Video</div>
             <YouTubePlayer url={lesson.videoUrl} />
           </>
         );
+      }
 
-      case "practice":
-        return (
-          <CodeEditor value={lesson.practice?.initialCode} readOnly={true} />
-        );
-      case "theory":
-        return <p>{lesson.content}</p>;
-      default:
-        return null;
-    }
-  };
+    case "practice":
+      return (
+        <CodeEditor value={lesson.practice?.initialCode} readOnly={true} />
+      );
+    case "theory":
+      return <p>{lesson.content}</p>;
+    default:
+      return null;
+  }
+};
 
   // Get lesson type icon
   const getLessonTypeIcon = (type) => {
@@ -336,38 +326,77 @@ const LessonManagement = () => {
 
             {/* Các trường dynamic theo loại bài học */}
             {formData.type === "video" && (
-              <>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    URL Video
-                  </label>
-                  <input
-                    value={formData.videoUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, videoUrls: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                    placeholder="Nhập đường dẫn video (URL)"
-                  />
-                </div>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    File H5P (nếu có)
-                  </label>
-                  <input
-                    type="file"
-                    accept=".h5p"
-                    onChange={(e) => {
-                      setFormData({ ...formData, h5pFile: e.target.files[0] });
-                    }}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                  <small className="text-gray-500">
-                    Tùy chọn. Tải lên để thêm tương tác vào video.
-                  </small>
-                </div>
-              </>
-            )}
+  <div className="mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-3">
+      Chọn loại nội dung video
+    </label>
+    <div className="flex items-center space-x-6 mb-4">
+      <div className="flex items-center">
+        <input 
+          type="radio" 
+          id="videoUrl" 
+          name="videoType" 
+          checked={!formData.useH5p}
+          onChange={() => setFormData({ ...formData, useH5p: false })} 
+          className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+        />
+        <label htmlFor="videoUrl" className="ml-2 text-sm font-medium text-gray-700">
+          Video URL (YouTube)
+        </label>
+      </div>
+      <div className="flex items-center">
+        <input 
+          type="radio" 
+          id="h5pUrl" 
+          name="videoType" 
+          checked={formData.useH5p}
+          onChange={() => setFormData({ ...formData, useH5p: true })} 
+          className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+        />
+        <label htmlFor="h5pUrl" className="ml-2 text-sm font-medium text-gray-700">
+          H5P Interactive Video
+        </label>
+      </div>
+    </div>
+    
+    {!formData.useH5p ? (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          URL Video (YouTube)
+        </label>
+        <input
+          value={formData.videoUrl}
+          onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+          placeholder="Nhập đường dẫn video YouTube (URL)"
+        />
+      </div>
+    ) : (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Link Embed Interactive Video (H5P)
+        </label>
+        <input
+          value={formData.h5pUrl}
+          onChange={(e) => setFormData({ ...formData, h5pUrl: e.target.value })}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+          placeholder="Nhập link embed từ Lumi hoặc H5P"
+        />
+        <div className="mt-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tải lên file H5P (tùy chọn)
+          </label>
+          <input
+            type="file"
+            accept=".h5p"
+            onChange={(e) => setFormData({ ...formData, h5pFile: e.target.files[0] })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+          />
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
             {formData.type === "practice" && (
               <>
