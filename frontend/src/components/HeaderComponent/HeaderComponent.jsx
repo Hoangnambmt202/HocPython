@@ -16,6 +16,7 @@ import { toggleCart } from "../../redux/slides/cartSlides";
 import EnrollService from "../../services/EnrollService";
 import { setEnrolledCourses } from "../../redux/slides/enrollSlice";
 import SearchComponent from "../SearchComponent/SearchComponent";
+import CourseService from "../../services/CourseService";
 
 const HeaderComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,61 +80,75 @@ const HeaderComponent = () => {
             </div>
           </Link>
 
-       {/* Mobile */}
-            {user ? (
-              <>
+          {/* Mobile */}
+          {user ? (
+            <>
               <div className="flex items-center justify-end gap-4 xl:hidden lg:hidden md:hidden">
-              <button onClick={() => setShowSearchMobile((prev) => !prev)}>
-                <Search
-                  className={`${showSearchMobile} ? "text-gray-700" : "text-gray-500"`}
-                  width="1.25rem"
-                  height="1.25rem"
-                />
-              </button>
+                <button onClick={() => setShowSearchMobile((prev) => !prev)}>
+                  <Search
+                    className={`${showSearchMobile} ? "text-gray-700" : "text-gray-500"`}
+                    width="1.25rem"
+                    height="1.25rem"
+                  />
+                </button>
 
-              <div className="hidden lg:block">
-                <button onClick={() => dispatch(toggleCart())}>
-                  <ShoppingBag className="text-gray-700" />
-                </button>
+                <div className="hidden lg:block">
+                  <button onClick={() => dispatch(toggleCart())}>
+                    <ShoppingBag className="text-gray-700" />
+                  </button>
+                </div>
+                <NotificationList />
+                <ProfileMenu
+                  avatar={user?.avatar}
+                  handleLogout={handleLogout}
+                />
+                <CartPage />
               </div>
-              <NotificationList />
-              <ProfileMenu avatar={user?.avatar} handleLogout={handleLogout} />
-              <CartPage />
+            </>
+          ) : (
+            <div className="flex items-center justify-end gap-2 xl:hidden lg:hidden md:hidden">
+              <button
+                onClick={() => {
+                  setModalType("register");
+                  setIsOpen(true);
+                }}
+                className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
+              >
+                Đăng ký
+              </button>
+              <button
+                onClick={() => {
+                  setModalType("login");
+                  setIsOpen(true);
+                }}
+                className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600"
+              >
+                Đăng nhập
+              </button>
             </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-end gap-2 xl:hidden lg:hidden md:hidden">
-                <button
-                  onClick={() => {
-                    setModalType("register");
-                    setIsOpen(true);
-                  }}
-                  className="px-4 py-2 text-sm font-semibold text-black hover:text-blue-500"
-                >
-                  Đăng ký
-                </button>
-                <button
-                  onClick={() => {
-                    setModalType("login");
-                    setIsOpen(true);
-                  }}
-                  className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600"
-                >
-                  Đăng nhập
-                </button>
-              </div>
-            )}
-         
+          )}
         </div>
 
         {/* Search Bar */}
         <div className="">
           <div className="hidden md:block">
-            <SearchComponent />
+            <SearchComponent
+              placeholder="Tìm kiếm khóa học..."
+              searchFunction={CourseService.searchCourses}
+              resultKey="title"
+              resultImageKey="thumbnail"
+              resultLinkPrefix="/course/"
+            />
           </div>
           {showSearchMobile && (
             <div className="block md:hidden mt-2">
-              <SearchComponent />
+              <SearchComponent
+                placeholder="Tìm kiếm khóa học..."
+                searchFunction={CourseService.searchCourses}
+                resultKey="title"
+                resultImageKey="thumbnail"
+                resultLinkPrefix="/course/"
+              />
             </div>
           )}
         </div>

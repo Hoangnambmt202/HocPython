@@ -100,7 +100,8 @@ const CourseManagement = () => {
     }
   };
   // Trong CourseManagement.jsx
-  const handleCourseAdded = async () => {
+ const handleCourseAdded = async () => {
+  try {
     const response = await CourseService.getAllCourses();
     if (response.data) {
       setCourses(response.data);
@@ -111,21 +112,39 @@ const CourseManagement = () => {
       message: "Thêm khóa học thành công!",
       color: "green",
     });
-  };
+  } catch (error) {
+    console.error("Lỗi khi tải danh sách khóa học mới:", error);
+    setToast({
+      show: true,
+      message: "Thêm thành công nhưng không thể tải danh sách mới",
+      color: "orange",
+    });
+  }
+};
 
-  const handleCourseUpdated = (updatedCourse) => {
-    setCourses((prevCourses) =>
-      prevCourses.map((course) =>
-        course._id === updatedCourse._id ? updatedCourse : course
-      )
-    );
+  const handleCourseUpdated = async (updatedCourse) => {
+  try {
+    // Gọi API để lấy dữ liệu mới nhất từ server
+    const response = await CourseService.getAllCourses();
+    if (response.data) {
+      setCourses(response.data);
+    }
+    
     setIsAddCourseModalOpen(false);
     setToast({
       show: true,
       message: "Cập nhật khóa học thành công!",
       color: "green",
     });
-  };
+  } catch (error) {
+    console.error("Lỗi khi tải danh sách khóa học mới:", error);
+    setToast({
+      show: true,
+      message: "Cập nhật thành công nhưng không thể tải danh sách mới",
+      color: "orange",
+    });
+  }
+};
   return (
     <>
       <Helmet>

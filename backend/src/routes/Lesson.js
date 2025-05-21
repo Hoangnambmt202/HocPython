@@ -28,6 +28,9 @@ router.get('/:chapterId',authMiddleware, LessonController.getLessonsByChapter);
 router.put('/update/:lessonId', authMiddleware, LessonController.updateLesson);
 router.delete('/delete/:lessonId',authMiddleware, LessonController.deleteLesson);
 router.post('/run-code', authMiddleware, LessonController.runCode);
+router.post('/text-to-speech', LessonController.textToSpeech)
+
+
 
 
 module.exports = router;

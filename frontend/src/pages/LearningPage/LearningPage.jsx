@@ -14,7 +14,7 @@ import {
 
 import YouTubePlayer from "../../components/YoutubePlayer/YoutubePlayer";
 import CodeEditor from "../../components/CodeEditorComponent/CodeEditorComponent";
-
+import TextToSpeechButton from "../../components/TextToSpeechBtn/TextToSpeechBtn";
 import LessonService from "../../services/LessonService";
 import CourseService from "../../services/CourseService";
 import ProgressService from "../../services/ProgressService";
@@ -52,8 +52,9 @@ const LearningPage = () => {
   // Load h5p resizer script when needed
   useEffect(() => {
     if (currentLesson?.lesson?.h5pUrl) {
-      const script = document.createElement('script');
-      script.src = "https://app.Lumi.education/api/v1/h5p/core/js/h5p-resizer.js";
+      const script = document.createElement("script");
+      script.src =
+        "https://app.Lumi.education/api/v1/h5p/core/js/h5p-resizer.js";
       script.charset = "UTF-8";
       document.body.appendChild(script);
 
@@ -95,10 +96,7 @@ const LearningPage = () => {
       setIsLoadingProgress(false);
     }
   };
-  speechSynthesis.getVoices().forEach(v => {
-  console.log(v.name, v.lang);
-});
-
+  
 
   // Load course content và progress ban đầu
   useEffect(() => {
@@ -170,8 +168,8 @@ const LearningPage = () => {
 
     fetchCourseAndProgress();
     if (window.speechSynthesis.getVoices().length === 0) {
-    window.speechSynthesis.onvoiceschanged = () => {};
-  }
+      window.speechSynthesis.onvoiceschanged = () => {};
+    }
   }, [dispatch, slug]);
 
   // Thêm useEffect để reload progress mỗi khi component mount
@@ -226,33 +224,33 @@ const LearningPage = () => {
     });
   };
   const getSortedLessons = () => {
-    // Lấy danh sách bài học kèm theo thứ tự chương
-    const allLessons = [];
+  const allLessons = [];
 
-    content.forEach((chapter) => {
-      const chapterOrder = chapter.order ?? 0;
-      if (chapter.lessons && chapter.lessons.length > 0) {
-        chapter.lessons.forEach((lesson) => {
-          allLessons.push({
-            lesson,
-            chapterId: chapter._id,
-            chapterOrder,
-            lessonOrder: lesson.order ?? 0,
-          });
+  content.forEach((chapter) => {
+    const chapterOrder = chapter.order ?? 0;
+    if (chapter.lessons && chapter.lessons.length > 0) {
+      chapter.lessons.forEach((lesson) => {
+        allLessons.push({
+          lesson,
+          chapterId: chapter._id,
+          chapterOrder,
+          lessonOrder: lesson.order ?? 0,
         });
-      }
-    });
+      });
+    }
+  });
 
-    // Sắp xếp theo chapterOrder rồi đến lessonOrder
-    allLessons.sort((a, b) => {
-      if (a.chapterOrder !== b.chapterOrder) {
-        return a.chapterOrder - b.chapterOrder;
-      }
-      return a.lessonOrder - b.lessonOrder;
-    });
+  // Sắp xếp theo thứ tự chương và bài học
+  allLessons.sort((a, b) => {
+    if (a.chapterOrder !== b.chapterOrder) {
+      return a.chapterOrder - b.chapterOrder;  // Sắp xếp theo thứ tự chương
+    }
+    return a.lessonOrder - b.lessonOrder;  // Sắp xếp theo thứ tự bài học trong chương
+  });
 
-    return allLessons;
-  };
+  return allLessons;
+};
+
 
   const goToPreviousLesson = () => {
     if (!currentLesson) return;
@@ -269,18 +267,43 @@ const LearningPage = () => {
   };
   // Navigate to next lesson
   const goToNextLesson = () => {
-    if (!currentLesson) return;
-    const allLessons = getSortedLessons();
-    const currentIndex = allLessons.findIndex(
-      (item) => item.lesson._id === currentLesson.lesson._id
+  if (!currentLesson) return;  // Nếu không có bài học hiện tại, thoát ra
+
+  const allLessons = getSortedLessons();  // Lấy tất cả bài học đã sắp xếp
+  const currentIndex = allLessons.findIndex(
+    (item) => item.lesson._id === currentLesson.lesson._id
+  );  // Tìm vị trí của bài học hiện tại trong danh sách bài học
+
+  // Kiểm tra xem có bài học tiếp theo trong cùng chương không
+  const currentChapterLessons = allLessons.filter(
+    (item) => item.chapterId === currentLesson.chapterId
+  );
+  
+  const nextLessonInCurrentChapter = currentChapterLessons.find(
+    (item) => item.lesson.order === currentLesson.lesson.order + 1
+  );
+
+  if (nextLessonInCurrentChapter) {
+    // Nếu có bài học tiếp theo trong cùng chương
+    setCurrentLesson(nextLessonInCurrentChapter);  // Cập nhật bài học hiện tại
+    setOpenChapters((prev) => ({ ...prev, [nextLessonInCurrentChapter.chapterId]: true }));  // Mở chương chứa bài học tiếp theo
+  } else {
+    // Nếu không có bài học tiếp theo trong chương hiện tại, chuyển sang chương tiếp theo
+    const nextChapter = allLessons.find(
+      (item) => item.chapterOrder > currentLesson.chapterOrder
     );
 
-    if (currentIndex < allLessons.length - 1) {
-      const nextLesson = allLessons[currentIndex + 1];
-      setCurrentLesson(nextLesson);
-      setOpenChapters((prev) => ({ ...prev, [nextLesson.chapterId]: true }));
+    if (nextChapter) {
+      const firstLessonInNextChapter = allLessons.find(
+        (item) => item.chapterOrder === nextChapter.chapterOrder
+      );
+      setCurrentLesson(firstLessonInNextChapter);  // Cập nhật bài học tiếp theo
+      setOpenChapters((prev) => ({ ...prev, [firstLessonInNextChapter.chapterId]: true }));  // Mở chương tiếp theo
     }
-  };
+  }
+};
+
+
 
   const handleVideoProgress = (progress) => {
     setVideoProgress(progress);
@@ -312,89 +335,65 @@ const LearningPage = () => {
       }
     }
   };
-  const stripHtmlTags = (html) => {
-  const temp = document.createElement("div");
-  temp.innerHTML = html;
-  return temp.textContent || temp.innerText || "";
-};
-const speakText = (htmlString) => {
-
-  const text = stripHtmlTags(htmlString);
-
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "vi-VN";
-
-  // Chọn voice tiếng Việt (nếu có)
-  const voices = speechSynthesis.getVoices();
-  const vietnameseVoice = voices.find(voice => voice.lang === "vi-VN");
-
-  if (vietnameseVoice) {
-    utterance.voice = vietnameseVoice;
-  }
-
-  speechSynthesis.cancel(); // dừng đoạn đang đọc nếu có
-  speechSynthesis.speak(utterance);
-};
-
-
 
 
   const renderLessonContent = () => {
     if (!currentLesson)
       return <p className="text-center text-gray-500">Vui lòng chọn bài học</p>;
     const { lesson } = currentLesson;
- if (lesson.type === "video") {
-      if(lesson.h5pUrl) {
+    if (lesson.type === "video") {
+      if (lesson.h5pUrl) {
         return (
           <div className="h5p-container">
-          <iframe 
-            src={lesson.h5pUrl}
-            width="100%" 
-            height="720" 
-            frameBorder="0"
-            allowFullScreen="allowfullscreen"
-            allow="geolocation *; microphone *; camera *; midi *; encrypted-media *"
-            onLoad={() => {
-              // Add event listener for H5P completion if possible
-              // This depends on how your H5P implementation works
-              // You might need to handle this differently
-              window.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'h5p-content-completed') {
-                  handleH5PComplete();
-                }
-              });
-            }}
-          />
-          
-          {/* H5P completion UI - you may want to improve this based on your needs */}
-          <div className="mt-4">
-            <p className="text-sm text-gray-600">
-              {lessonProgress[slug]?.[lesson._id]?.completed 
-                ? "✅ Bạn đã hoàn thành bài học này!" 
-                : "Hãy hoàn thành hoạt động để đánh dấu bài học này!"}
-            </p>
-            {!lessonProgress[slug]?.[lesson._id]?.completed && (
-              <button
-                onClick={() => updateProgress(lesson._id, true)}
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Đánh dấu đã hoàn thành
-              </button>
-            )}
+            <iframe
+              src={lesson.h5pUrl}
+              width="100%"
+              height="720"
+              frameBorder="0"
+              allowFullScreen="allowfullscreen"
+              allow="geolocation *; microphone *; camera *; midi *; encrypted-media *"
+              onLoad={() => {
+                // Add event listener for H5P completion if possible
+                // This depends on how your H5P implementation works
+                // You might need to handle this differently
+                window.addEventListener("message", (event) => {
+                  if (
+                    event.data &&
+                    event.data.type === "h5p-content-completed"
+                  ) {
+                    handleH5PComplete();
+                  }
+                });
+              }}
+            />
+
+            {/* H5P completion UI - you may want to improve this based on your needs */}
+            <div className="mt-4">
+              <p className="text-sm text-gray-600">
+                {lessonProgress[slug]?.[lesson._id]?.completed
+                  ? "✅ Bạn đã hoàn thành bài học này!"
+                  : "Hãy hoàn thành hoạt động để đánh dấu bài học này!"}
+              </p>
+              {!lessonProgress[slug]?.[lesson._id]?.completed && (
+                <button
+                  onClick={() => updateProgress(lesson._id, true)}
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Đánh dấu đã hoàn thành
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-        )
-      }
-      else {
-        
+        );
+      } else {
         return (
           <div>
-            <YouTubePlayer 
-              url={lesson.videoUrl} 
+            <YouTubePlayer
+              url={lesson.videoUrl}
               onProgress={handleVideoProgress}
               onVideoComplete={handleVideoComplete}
             />
-  
+
             <div className="mt-4">
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
@@ -409,173 +408,159 @@ const speakText = (htmlString) => {
                   " - Bạn đã hoàn thành bài học này!"}
               </p>
             </div>
-            
           </div>
         );
       }
     } else if (lesson.type === "practice") {
       return (
         <>
-        <div>
-          <div className="flex gap-2 items-center mb-4">
-
-            <div className="mb-4 flex-1">
-              <h3 className="text-lg font-semibold mb-2">Bài tập:</h3>
-              <div className="bg-white p-4 rounded-lg border border-gray-200">
-                <CodeEditor
-                  value={lesson.practice?.initialCode}
-                  readOnly={true}
-                  language="python"
-                />
-              </div>
-            </div>
-
-            <div className="mb-4 flex-1">
-              <h3 className="text-lg font-semibold mb-2">Viết code của bạn:</h3>
-              <div className="bg-white p-4 rounded-lg border border-gray-200 ">
-                <CodeEditor
-                  value={userCode}
-                  onChange={(value) => setUserCode(value)}
-                  language="python"
-                />
-
-                
-              </div>
-            </div>
-          </div>
-        {jobStatus && (
-                  <div className="text-sm text-gray-600">{jobStatus}</div>
-                )}
-
-                  <div className="mt-4 flex flex-col gap-2">
-                  <button
-                    onClick={handleRunCode}
-                    disabled={isSubmitting}
-                    className={`px-4 py-2 rounded ${
-                      isSubmitting
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-green-500 hover:bg-green-600"
-                    } text-white`}
-                  >
-                    {isSubmitting ? "Đang chạy..." : "Chạy thử"}
-                  </button>
-
-                  
+          <div>
+            <div className="flex gap-2 items-center mb-4">
+              <div className="mb-4 flex-1">
+                <h3 className="text-lg font-semibold mb-2">Bài tập:</h3>
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <CodeEditor
+                    value={lesson.practice?.initialCode}
+                    readOnly={true}
+                    language="python"
+                  />
                 </div>
-                {testResults.length > 0 && (
-                  <>
-                  <div className="mt-4">
-                    <h3 className="font-bold mb-2">Kết quả kiểm tra:</h3>
+              </div>
+
+              <div className="mb-4 flex-1">
+                <h3 className="text-lg font-semibold mb-2">
+                  Viết code của bạn:
+                </h3>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 ">
+                  <CodeEditor
+                    value={userCode}
+                    onChange={(value) => setUserCode(value)}
+                    language="python"
+                  />
+                </div>
+              </div>
+            </div>
+            {jobStatus && (
+              <div className="text-sm text-gray-600">{jobStatus}</div>
+            )}
+
+            <div className="mt-4 flex flex-col gap-2">
+              <button
+                onClick={handleRunCode}
+                disabled={isSubmitting}
+                className={`px-4 py-2 rounded ${
+                  isSubmitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600"
+                } text-white`}
+              >
+                {isSubmitting ? "Đang chạy..." : "Chạy thử"}
+              </button>
+            </div>
+            {testResults.length > 0 && (
+              <>
+                <div className="mt-4">
+                  <h3 className="font-bold mb-2">Kết quả kiểm tra:</h3>
+                  <div
+                    className={`p-4 rounded-lg mb-4 ${
+                      testResults.every((r) => r.passed)
+                        ? "bg-green-100 border border-green-200"
+                        : "bg-red-100 border border-red-200"
+                    }`}
+                  >
+                    <div className="font-semibold flex items-center gap-2">
+                      {testResults.every((r) => r.passed) ? (
+                        <>
+                          <span className="text-green-600">
+                            ✅ Bài làm đạt yêu cầu!
+                          </span>
+                          <span className="text-sm text-green-600">
+                            ({testResults.filter((r) => r.passed).length}/
+                            {testResults.length} test cases đúng)
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-red-600">
+                            ❌ Bài làm chưa đạt yêu cầu
+                          </span>
+                          <span className="text-sm text-red-600">
+                            ({testResults.filter((r) => r.passed).length}/
+                            {testResults.length} test cases đúng)
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {testResults.map((result, index) => (
                     <div
-                      className={`p-4 rounded-lg mb-4 ${
-                        testResults.every((r) => r.passed)
-                          ? "bg-green-100 border border-green-200"
-                          : "bg-red-100 border border-red-200"
+                      key={index}
+                      className={`p-3 rounded-lg mb-2 ${
+                        result.passed
+                          ? "bg-green-50 border border-green-200"
+                          : "bg-red-50 border border-red-200"
                       }`}
                     >
-                      <div className="font-semibold flex items-center gap-2">
-                        {testResults.every((r) => r.passed) ? (
-                          <>
-                            <span className="text-green-600">
-                              ✅ Bài làm đạt yêu cầu!
-                            </span>
-                            <span className="text-sm text-green-600">
-                              ({testResults.filter((r) => r.passed).length}/
-                              {testResults.length} test cases đúng)
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-red-600">
-                              ❌ Bài làm chưa đạt yêu cầu
-                            </span>
-                            <span className="text-sm text-red-600">
-                              ({testResults.filter((r) => r.passed).length}/
-                              {testResults.length} test cases đúng)
-                            </span>
-                          </>
+                      <div className="flex justify-between items-center">
+                        <div className="font-medium">Test case {index + 1}</div>
+                        <div
+                          className={
+                            result.passed ? "text-green-600" : "text-red-600"
+                          }
+                        >
+                          {result.passed
+                            ? "✅ Đạt yêu cầu"
+                            : "❌ Chưa đạt yêu cầu"}
+                        </div>
+                      </div>
+                      <div className="text-sm mt-2 bg-white p-3 rounded border">
+                        <div>
+                          <span className="font-medium">Input:</span>{" "}
+                          {result.input || "(không có)"}
+                        </div>
+                        <div>
+                          <span className="font-medium">Expected output:</span>{" "}
+                          {result.expectedOutput}
+                        </div>
+                        <div>
+                          <span className="font-medium">Actual output:</span>{" "}
+                          {result.actualOutput || "(không có output)"}
+                        </div>
+                        {result.error && (
+                          <div className="text-red-600 mt-2">
+                            <span className="font-medium">Lỗi:</span>
+                            <pre className="mt-1 p-2 bg-red-50 rounded text-sm overflow-x-auto">
+                              {result.error.split("\n").map((line, i) => (
+                                <div key={i}>{line}</div>
+                              ))}
+                            </pre>
+                          </div>
                         )}
                       </div>
                     </div>
-                    {testResults.map((result, index) => (
-                      <div
-                        key={index}
-                        className={`p-3 rounded-lg mb-2 ${
-                          result.passed
-                            ? "bg-green-50 border border-green-200"
-                            : "bg-red-50 border border-red-200"
-                        }`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <div className="font-medium">
-                            Test case {index + 1}
-                          </div>
-                          <div
-                            className={
-                              result.passed ? "text-green-600" : "text-red-600"
-                            }
-                          >
-                            {result.passed
-                              ? "✅ Đạt yêu cầu"
-                              : "❌ Chưa đạt yêu cầu"}
-                          </div>
-                        </div>
-                        <div className="text-sm mt-2 bg-white p-3 rounded border">
-                          <div>
-                            <span className="font-medium">Input:</span>{" "}
-                            {result.input || "(không có)"}
-                          </div>
-                          <div>
-                            <span className="font-medium">
-                              Expected output:
-                            </span>{" "}
-                            {result.expectedOutput}
-                          </div>
-                          <div>
-                            <span className="font-medium">Actual output:</span>{" "}
-                            {result.actualOutput || "(không có output)"}
-                          </div>
-                          {result.error && (
-                            <div className="text-red-600 mt-2">
-                              <span className="font-medium">Lỗi:</span>
-                              <pre className="mt-1 p-2 bg-red-50 rounded text-sm overflow-x-auto">
-                                {result.error.split("\n").map((line, i) => (
-                                  <div key={i}>{line}</div>
-                                ))}
-                              </pre>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  </>
-                )}
-        </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </>
       );
     } else {
-  const clearContent = DOMPurify.sanitize(lesson.content || "");
-  return (
-    <div>
-      <div
-        className="prose prose-lg prose-gray max-w-none"
-        dangerouslySetInnerHTML={{ __html: clearContent }}
-      />
-      
-      {/* Nút nghe nội dung */}
-      <div className="mt-4">
-        <button
-          onClick={() => speakText(lesson.content)}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          🔊 Nghe nội dung
-        </button>
-      </div>
-    </div>
-  );
-}
-
+      const sanitizedContent = DOMPurify.sanitize(lesson.content || ""); // Làm sạch HTML
+       return (
+        <div>
+          {/* Thêm nút "Đọc" vào để người dùng có thể nghe nội dung bài học */}
+          <div className="mb-4 flex justify-end">
+            <TextToSpeechButton lessonContent={lesson.content} />
+          </div>
+          <div
+            className="prose prose-lg prose-gray max-w-none"
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }} // Hiển thị nội dung bài học
+          />
+          
+        </div>
+      );
+    }
   };
 
   const handleRunCode = async () => {

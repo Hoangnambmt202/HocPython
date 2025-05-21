@@ -2,11 +2,12 @@ require("dotenv").config({ path: "./src/.env" });
 const express = require("express");
 const cors = require("cors");
 const { mongoose } = require("mongoose");
-const routes = require("./routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = process.env.PORT;
+const path = require("path");
+const routes = require("./routes");
 
 // Middleware
 const corsOptions = {
@@ -23,10 +24,13 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 // Routes
 routes(app);
-const path = require("path");
 
 // Serve static extracted H5P
 app.use('/h5p-content', express.static(path.join(__dirname, 'extracted')));
+app.use("/audios", express.static(path.join(__dirname, "audios")));
+
+
+
 
 mongoose
   .connect(process.env.MONGODB_URI)

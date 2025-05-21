@@ -23,7 +23,7 @@ const ToastMessageComponent = ({ message, color, onClose, duration = 3000 }) => 
 
   return (
     <div
-      className={`absolute top-5 right-5 max-w-xs z-50 text-sm text-white rounded-xl shadow-lg transition-transform duration-500 ease-in-out transform ${
+      className={`fixed top-20 right-5 max-w-xs z-60 text-sm text-white rounded-xl shadow-lg transition-transform duration-500 ease-in-out transform ${
         visible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
       } ${bgColor}`}
       role="alert"

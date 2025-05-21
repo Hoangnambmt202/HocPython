@@ -1,4 +1,5 @@
 const LessonService = require("../services/LessonService");
+const ttsService = require("../services/ttsService")
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
@@ -55,8 +56,6 @@ const createLesson = async (req, res) => {
     const { chapterId } = req.params;
     const lessonData = req.body;
     const h5pFile = req.file;
-    console.log("Uploaded file:", req.file);
-
     const lesson = await LessonService.createLesson(chapterId, lessonData, h5pFile);
 
     res.status(201).json({ status: "success",message: "Tạo bài học thành công", data: lesson });
@@ -178,7 +177,24 @@ const getCodeExecutionResult = async (req, res) => {
     });
   }
 };
+const textToSpeech = async (req, res) => {
+  try {
+    const { text } = req.body;  // Lấy văn bản từ frontend gửi lên
+    if (!text) {
+      return res.status(400).json({ message: 'Văn bản không được để trống' });
+    }
 
+    // Gọi service để tạo âm thanh từ văn bản
+    const audioBuffer = await ttsService.generateSpeechFromText(text);
+
+    // Trả về âm thanh dưới dạng mp3
+    res.set('Content-Type', 'audio/mpeg');
+    res.send(audioBuffer);
+  } catch (error) {
+    console.error('Error generating speech:', error);
+    res.status(500).json({ message: 'Lỗi khi tạo âm thanh' });
+  }
+};
 module.exports = {
     createLesson,
     getAllLessons,
@@ -187,5 +203,6 @@ module.exports = {
     deleteLesson,
     runCode,
     getCodeExecutionResult,
-    codeExecutionLimiter
+    codeExecutionLimiter,
+    textToSpeech,
 }

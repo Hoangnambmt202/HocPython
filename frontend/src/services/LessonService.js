@@ -51,5 +51,6 @@ export default {
     updateLesson,
     deleteLesson,
     runCode,
-    checkCodeExecutionResult
+    checkCodeExecutionResult,
+    
 }

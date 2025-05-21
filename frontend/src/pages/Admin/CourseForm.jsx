@@ -45,64 +45,65 @@ const CourseForm = ({
 
   // Thay đổi handleSubmit để xử lý upload file cùng với form
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsUploading(true);
+  e.preventDefault();
+  setIsUploading(true);
 
-    try {
-      const formData = new FormData();
+  try {
+    // Create FormData object for file uploads
+    const formDataToSend = new FormData();
+    
+    // Append all regular form fields
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('lecturerId', formData.lecturerId);
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('discountPrice', formData.discountPrice);
+    formDataToSend.append('categoryId', formData.categoryId);
+    formDataToSend.append('tags', formData.tags);
+    formDataToSend.append('isPublished', formData.isPublished);
 
-      // Thêm các trường dữ liệu vào formData
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "tags" && typeof value === "string") {
-          formData.append(
-            key,
-            value.split(",").map((tag) => tag.trim())
-          );
-        } else {
-          formData.append(key, value);
-        }
-      });
-
-      // Thêm file ảnh nếu có
-      if (uploadOption === "file" && e.target.thumbnail.files[0]) {
-        formData.append("thumbnailFile", e.target.thumbnail.files[0]);
-      }
-
-      let res;
-      if (courseData) {
-        res = await CourseService.updateCourse(courseData._id, formData);
-        onCourseUpdated(res.data);
-      } else {
-        res = await CourseService.createCourse(formData);
-        onCourseAdded(res.data);
-      }
-
-      setToast({ show: true, message: res.message, color: "green" });
-
-      // Reset form nếu không phải chỉnh sửa
-      if (!courseData) {
-        setFormData({
-          title: "",
-          description: "",
-          lecturerId: "",
-          price: 0,
-          discountPrice: 0,
-          thumbnail: "",
-          categoryId: "",
-          tags: "",
-          isPublished: false,
-        });
-      }
-    } catch (error) {
-      setToast({
-        show: true,
-        message: error.response?.data?.error || "Có lỗi xảy ra",
-        color: "red",
-      });
-    } finally {
-      setIsUploading(false);
+    // Handle thumbnail based on upload option
+    if (uploadOption === 'url') {
+      formDataToSend.append('thumbnail', formData.thumbnail);
+    } else if (uploadOption === 'file' && e.target.thumbnail.files[0]) {
+      formDataToSend.append('thumbnailFile', e.target.thumbnail.files[0]);
     }
-  };
+
+    let res;
+    if (courseData) {
+      res = await CourseService.updateCourse(courseData._id, formDataToSend);
+      onCourseUpdated(res.data);
+    } else {
+      res = await CourseService.createCourse(formDataToSend);
+      onCourseAdded(res.data);
+    }
+
+    setToast({ show: true, message: res.message, color: 'green' });
+
+    // Reset form if not editing
+    if (!courseData) {
+      setFormData({
+        title: '',
+        description: '',
+        lecturerId: '',
+        price: 0,
+        discountPrice: 0,
+        thumbnail: '',
+        categoryId: '',
+        tags: '',
+        isPublished: false,
+      });
+    }
+  } catch (error) {
+    setToast({
+      show: true,
+      message: error.response?.data?.error || 'Có lỗi xảy ra',
+      color: 'red',
+    });
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -168,6 +169,7 @@ const CourseForm = ({
             >
               Giảng viên
             </label>
+       
             <select
               id="lecturerId"
               name="lecturerId"
@@ -176,7 +178,6 @@ const CourseForm = ({
               className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors bg-white"
             >
               <option value="">Chọn giảng viên</option>
-              <option value={formData.lecturerId}>{formData.lecturerId.name}</option>
               {lecturers.map((lecturer) => (
                 <option key={lecturer._id} value={lecturer._id}>
                   {lecturer.name}
@@ -200,7 +201,7 @@ const CourseForm = ({
               className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors bg-white"
             >
               <option value="">Chọn danh mục</option>
-              <option value={formData.categoryId}>{formData.categoryId.name}</option>
+
               {categories.map((category) => (
                 <option key={category._id} value={category._id}>
                   {category.name}

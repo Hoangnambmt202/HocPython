@@ -1,18 +1,19 @@
-const Lesson = require("../models/Lesson");
-const Chapter = require("../models/Chapter");
 const { Queue } = require('bullmq');
 const { v4: uuidv4 } = require('uuid');
-const config = require('../config/config');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
 const fs = require('fs-extra');
-
+const axios = require("axios");
 const path = require('path');
-const ChapterService = require("./ChapterService");
 const unzipper = require("unzipper");
 const util = require("util");
 
+const Lesson = require("../models/Lesson");
+const Chapter = require("../models/Chapter");
+const ChapterService = require("./ChapterService");
+const ttsService = require("./ttsService");
+const config = require('../config/config');
 
 
 const codeExecutionQueue = new Queue('code-execution', {
@@ -22,9 +23,7 @@ const codeExecutionQueue = new Queue('code-execution', {
   }
 });
 
-
 const SANDBOX_DIR = path.join(process.cwd(), 'temp');
-
 
 const ensureSandboxDir = async () => {
   try {
@@ -120,11 +119,18 @@ const createLesson = async (chapterId, data) => {
     if (!chapter) {
       throw new Error("Chương không tồn tại");
     }
-    
+    // let audioUrl = null;
+    //  if (data.type === "theory" && data.content) {
+    //   try {
+    //     audioUrl = await ttsService.generateSpeechFromText(data.content);
+    //   } catch (ttsError) {
+    //     console.warn("Không thể tạo audio từ lý thuyết:", ttsError.message);
+    //   }
+    // }
     const newLesson = new Lesson({
       ...data,
       chapterId,
-
+      // audioUrl,
     });
 
     await newLesson.save();

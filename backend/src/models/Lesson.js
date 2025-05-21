@@ -25,6 +25,7 @@ const lessonSchema = new mongoose.Schema({
       expectedOutput: String 
     }]
   },
+  audioUrl: { type: String, default: null }, // Đường dẫn file audio đọc lý thuyết
   duration: { type: Number, default: 0 }, // Thời gian học (phút),
   
 }, { timestamps: true });
