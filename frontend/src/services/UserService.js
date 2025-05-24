@@ -37,11 +37,13 @@ const getDetailUser = async () => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/me`, {withCredentials: true});
     return res.data;
 }
-const updateUser = async ({data}) => {
-    const res = await axios.put(`${import.meta.env.VITE_API_URL}/user/update`, data, {withCredentials: true});
-   
-    return res.data;
+const updateUser = async (data) => {
+  const res = await axios.put(`${import.meta.env.VITE_API_URL}/user/update`, data, {
+    withCredentials: true
+  });
+  return res.data;
 };
+
 const deleteUser = async (userId) => {
     const res = await axios.delete(`${import.meta.env.VITE_API_URL}/user/delete/${userId}`, {withCredentials: true});
     return res.data;

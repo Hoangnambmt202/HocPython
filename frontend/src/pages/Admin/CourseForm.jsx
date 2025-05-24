@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import CourseService from "../../services/CourseService";
 import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent";
+import CKEditorComponent from "../../components/CKEditor/CKEditor";
 
 const CourseForm = ({
   lecturers,
@@ -22,6 +23,7 @@ const CourseForm = ({
       discountPrice: 0,
       thumbnail: "",
       categoryId: "",
+      objectives: "",
       tags: "",
       isPublished: false,
     }
@@ -61,6 +63,7 @@ const CourseForm = ({
     formDataToSend.append('categoryId', formData.categoryId);
     formDataToSend.append('tags', formData.tags);
     formDataToSend.append('isPublished', formData.isPublished);
+    formDataToSend.append('objectives', formData.objectives);
 
     // Handle thumbnail based on upload option
     if (uploadOption === 'url') {
@@ -159,6 +162,22 @@ const CourseForm = ({
             rows="4"
             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
           ></textarea>
+        </div>
+        <div className="space-y-2">
+           <label
+            htmlFor="objectives"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Mục tiêu khóa học
+          </label>
+          <CKEditorComponent
+            content={formData.objectives}
+            setContent={(content) =>
+              setFormData({ ...formData, objectives: content })
+            }
+           
+          />
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

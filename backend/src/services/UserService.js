@@ -6,6 +6,7 @@ const { generalAccessToken , generateRefreshToken} = require("./JwtService");
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
+      console.log(newUser)
       const { name, email,  birth, phone, address, avatar, role, password , confirmPassword} = newUser
       try {
         const checkUser = await User.findOne({
@@ -100,6 +101,7 @@ const updateUser = (id,data) => {
   return new Promise(async (resolve, reject) => {
    
     try {
+      console.log(data);
       const checkUser = await User.findOne({_id:id});
       
       if(checkUser === null) {
@@ -182,10 +184,8 @@ const getDetailUser = (id) => {
         resolve({
           status: "err",
           message: "Không tìm thấy người dùng",
-
         });
       }
-      
       resolve({
         status: "success",
         message: "Chi tiết người dùng",

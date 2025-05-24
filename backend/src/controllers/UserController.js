@@ -28,7 +28,6 @@ const createUser = async (req, res) => {
     // }
 
     const response = await UserService.createUser(req.body);
- 
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
@@ -36,6 +35,7 @@ const createUser = async (req, res) => {
     });
   }
 };
+
 const loginUser = async (req, res) => {
   try {
     const reg =
@@ -54,42 +54,35 @@ const loginUser = async (req, res) => {
       });
     } ;
     
-
     const response = await UserService.loginUser(req.body);
     const { access_token, refresh_token, ...userData } = response;
-
-    res.cookie('access_token', access_token, {
-      httpOnly: true, 
-      secure:  true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      domain: '.hocpython-backend.onrender.com' 
-    });
-    res.cookie('refresh_token',refresh_token,{
-      httpOnly: true, 
-      secure:  true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      domain: '.hocpython-backend.onrender.com' 
-    });
     // res.cookie('access_token', access_token, {
-    //     httpOnly: true, 
-    //     secure:  false,
-    //     sameSite: 'Strict',
-    //     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-    //     // domain: '.hocpython-backend.onrender.com' 
-    //   });
-    //   res.cookie('refresh_token',refresh_token,{
-    //     httpOnly: true, 
-    //     secure:  false,
-    //     sameSite: 'Strict',
-    //     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-    //     // domain: '.hocpython-backend.onrender.com' 
-    //   });
+    //   httpOnly: true, 
+    //   secure:  true,
+    //   sameSite: 'none',
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    //   domain: '.hocpython-backend.onrender.com' 
+    // });
+    // res.cookie('refresh_token',refresh_token,{
+    //   httpOnly: true, 
+    //   secure:  true,
+    //   sameSite: 'none',
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    //   domain: '.hocpython-backend.onrender.com' 
+    // });
+    res.cookie('access_token', access_token, {
+        httpOnly: true, 
+        secure:  false,
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      });
+      res.cookie('refresh_token',refresh_token,{
+        httpOnly: true, 
+        secure:  false,
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      });
      return res.status(200).json(response);
-
-
-
   } catch (e) {
     return res.status(404).json({
       message: e,
@@ -102,13 +95,11 @@ const logoutUser = (req, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "Strict",
   });
-
   res.clearCookie("refresh_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Strict",
   });
-
   return res.status(200).json({
     status: "success",
     message: "Đăng xuất thành công",
@@ -117,9 +108,7 @@ const logoutUser = (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-  
     const userId = req.user._id;
-    
     const data = req.body;
     if (!userId) {
       return res.status(404).json({
@@ -127,22 +116,19 @@ const updateUser = async (req, res) => {
         message: "Không tim thấy id người dùng",
       });
     }
-    
-
     const response = await UserService.updateUser(userId, data);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
       message: e,
-
     });
   }
 };
+
+
 const deleteUser = async (req, res) => {
   try {
     const {id} = req.params;
-
-    
     const response = await UserService.deleteUser(id);
     return res.status(200).json(response);
   } catch (e) {
@@ -151,6 +137,7 @@ const deleteUser = async (req, res) => {
     });
   }
 };
+
 const getAllUser = async (req, res) => {
   try {
     const response = await UserService.getAllUser();

@@ -2,7 +2,9 @@
 import { LineChart, XAxis, YAxis, CartesianGrid, Line, Tooltip, BarChart, Bar, ResponsiveContainer } from 'recharts';
 import { Users, BookOpen, Trophy, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Helmet } from "react-helmet-async";
-
+import { useEffect, useState } from 'react';
+import UserService from '../../services/UserService';
+import CourseService from '../../services/CourseService';
 
 const Dashboard = () => {
   // Mock data
@@ -23,11 +25,12 @@ const Dashboard = () => {
     { month: 'T5', students: 58 },
     { month: 'T6', students: 71 },
   ];
-
+  const [students, setStudents] = useState([]);
+  const [courses, setCourses] = useState([]);
   const statsCards = [
     {
       title: 'Tổng Học Viên',
-      value: '1,234',
+      value: students.length,
       change: '+12%',
       isPositive: true,
       icon: Users,
@@ -35,7 +38,7 @@ const Dashboard = () => {
     },
     {
       title: 'Khóa Học Hoạt Động',
-      value: '24',
+      value: courses.length,
       change: '+3',
       isPositive: true,
       icon: BookOpen,
@@ -65,6 +68,36 @@ const Dashboard = () => {
     { name: 'Machine Learning Cơ Bản', students: 124, completion: 68, revenue: '15,000,000đ' },
     { name: 'Data Science với Python', students: 145, completion: 71, revenue: '13,200,000đ' },
   ];
+  useEffect(() => {
+      const fetchStudents = async () => {
+        try {
+          const role = "user";
+          const response = await UserService.getUserByRole(role);
+          if (response?.data) {
+            setStudents(response?.data);
+          } else {
+            setStudents([]);
+          }
+        } catch (error) {
+         console.log(error);
+        }
+      };
+      const fetchCourses = async () => {
+        try {
+          const response = await CourseService.getAllCourses();
+          if (response?.data) {
+            setCourses(response?.data);
+          } else {
+            setCourses([]);
+          }
+        }
+        catch (error) {
+          console.log(error);
+        }
+      }
+      fetchCourses();
+      fetchStudents();
+    }, []);
   
   return (
     <>

@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout, setUser } from "../../redux/slides/userSlides";
 import UserService from "../../services/UserService";
 import ToastMessageComponent from '../ToastMessageComponent/ToastMessageComponent'
-import NotificationList from "../NotificationList/NotificationList";
 
 
 const HeaderAdmin = () => {
@@ -132,6 +131,7 @@ const HeaderAdmin = () => {
                   <li>
                     <Link
                       to="/admin/profile"
+                      onClick={() => setIsDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Thông tin tài khoản
@@ -140,6 +140,7 @@ const HeaderAdmin = () => {
                   <li>
                     <Link
                       to="/admin/settings"
+                      onClick={() => setIsDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Cài đặt

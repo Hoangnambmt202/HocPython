@@ -49,6 +49,9 @@ const createCourse = async (data) => {
       discountPrice: data.discountPrice,
       thumbnail: data.thumbnail || "/src/assets/imgs/default-thumbnail.jpg",
       categoryId: data.categoryId,
+      level: data.level,
+      objectives: data.objectives,
+      requirements: data.requirements,
       tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
       isPublished: data.isPublished,
       totalLessons: 0 // Khởi tạo tổng số bài học là 0

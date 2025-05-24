@@ -3,7 +3,6 @@ import {
   Edit,
   Trash,
   Plus,
-
   Filter,
   ChevronDown,
   Search,
@@ -12,8 +11,9 @@ import AddForm from "../../components/AddFormComponent/AddForm";
 import { useMutation } from "@tanstack/react-query";
 import UserService from "../../services/UserService";
 import InputFormComponent from "../../components/InputFormComponent/InputFormComponent";
-import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent"; // Giả sử bạn đang sử dụng react-toastify
+import ToastMessageComponent from "../../components/ToastMessageComponent/ToastMessageComponent"; 
 import { Helmet } from "react-helmet-async";
+import moment from "moment";
 
 const LecturersManagement = () => {
   const [lecturers, setLecturers] = useState([]);
@@ -219,7 +219,7 @@ const LecturersManagement = () => {
               <td className="border border-gray-300 p-2">{lecturer.name}</td>
               <td className="border border-gray-300 p-2">{lecturer.email}</td>
               <td className="border border-gray-300 p-2">{lecturer.phone}</td>
-              <td className="border border-gray-300 p-2">{lecturer.createdAt}</td>
+              <td className="border border-gray-300 p-2">{moment(lecturer.createdAt).format('DD/MM/YYYY')}</td>
               <td className="border border-gray-300 p-2">
                 <span
                   className={`px-2 py-1 rounded text-xs ${
